@@ -58,7 +58,6 @@ class SolutionGraph extends PureComponent {
       Math.max(...g.nodes().map(n => g.node(n).y + g.node(n).height)) + margin;
 
     return (
-      <div style={{overflow: 'scroll  !important'}}>
         <svg style={{width, height}}>
           <g transform={`translate(${margin},${margin})`}>
             {g.nodes().map(n => (
@@ -110,7 +109,6 @@ class SolutionGraph extends PureComponent {
             })}
           </g>
         </svg>
-        </div>
     );
   }
 }
