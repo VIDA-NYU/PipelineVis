@@ -35,6 +35,9 @@ def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=1000):
                 data = {
                     'pipeline_id': pipeline['id'],
                     'pipeline_digest': pipeline['digest'],
+                    'pipeline_source': pipeline['source'],
+                    'inputs': pipeline['inputs'],
+                    'outputs': pipeline['outputs'],
                     'problem': run['problem'],
                     'start': run['start'],
                     'end': run['end'],
@@ -53,7 +56,7 @@ if __name__ == "__main__":
 	pipeline_runs_file = "/Users/jorgehpo/Documents/D3MPipelines/pipeline_runs-1570214933.json"
 	pipelines_file = "/Users/jorgehpo/Documents/D3MPipelines/pipelines-1570214926.json"
 	d = merge_pipeline_files(pipelines_file, pipeline_runs_file, n = -1)
-	with open("pipelines_processed.json", "w") as f:
+	with open("/Users/jorgehpo/Documents/D3MPipelines/pipelines_processed_20191004.json", "w") as f:
 	    json.dump(d, f)
 
 
