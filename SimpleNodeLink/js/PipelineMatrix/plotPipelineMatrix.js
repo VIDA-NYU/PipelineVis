@@ -141,6 +141,10 @@ export function plotPipelineMatrix(ref, data){
     .domain(extent(pipelines, x=>x["scores"][0]["value"]))
     .range([0, constants.pipelineScoreWidth]);
 
+  const importanceScale = scaleLinear()
+    .domain(extent(moduleNames, x=>infos[x]["module_importance"]))
+    .range([0, constants.moduleImportanceHeight]);
+
   const pipelineScoreBars = svg
     .selectAll("#pipeline_score_bars")
     .data([1])
@@ -159,6 +163,26 @@ export function plotPipelineMatrix(ref, data){
     .attr("y", (x, idx)=>rowScale(idx) + 3)
     .attr("width", (x) => scoreScale(x["scores"][0]["value"]))
     .attr("height", rowScale.bandwidth() - 4)
+    .style("fill", "#bababa");
+
+  const moduleImportanceBars = svg
+    .selectAll("#module_importance_bars")
+    .data([1])
+    .enter()
+    .append("g")
+    .attr("id", "module_importance_bars")
+    .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth },
+    ${constants.margin.top + constants.moduleNameHeight + pipelines.length * constants.cellHeight})`);
+
+  moduleImportanceBars
+    .selectAll("rect")
+    .data(moduleNames)
+    .enter()
+    .append("rect")
+    .attr("x", x => colScale(x) + 3)
+    .attr("y", 0)
+    .attr("width", colScale.bandwidth() - 3)
+    .attr("height", x=>importanceScale(infos[x]["module_importance"]))
     .style("fill", "#bababa");
 
   const legendModuleType = svg
