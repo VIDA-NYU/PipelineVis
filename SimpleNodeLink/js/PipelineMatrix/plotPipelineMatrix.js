@@ -49,6 +49,8 @@ export function plotPipelineMatrix(ref, data){
     .paddingInner(0)
     .paddingOuter(0);
 
+  const bandOver2  = rowScale.bandwidth()/2;
+
   const moduleColorScale = scaleOrdinal(schemePaired);
 
 
@@ -64,6 +66,41 @@ export function plotPipelineMatrix(ref, data){
     });
   });
 
+  const guideLinesGroup = svg
+    .selectAll("#rowGuideLinesGroup")
+    .data([1])
+    .enter()
+    .append("g")
+    .attr("id", "rowGuideLinesGroup")
+    .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, 
+      ${constants.margin.top + constants.moduleNameHeight})`);
+
+  guideLinesGroup
+    .selectAll(".row")
+    .data(pipelines)
+    .enter()
+    .append("line")
+    .attr("class", "row")
+    .attr("x1", 0)
+    .attr("y1", (_, idx) => rowScale(idx) + bandOver2)
+    .attr("x2", constants.cellWidth * moduleNames.length)
+    .attr("y2", (_, idx) => rowScale(idx) + bandOver2)
+    .style("stroke", "#bababa")
+    .style("stroke-width", 1)
+
+  guideLinesGroup
+    .selectAll(".col")
+    .data(moduleNames)
+    .enter()
+    .append("line")
+    .attr("class", "col")
+    .attr("x1", (x)=>colScale(x) + bandOver2)
+    .attr("y1", 0)
+    .attr("x2", (x)=>colScale(x) + bandOver2)
+    .attr("y2", constants.cellHeight * pipelines.length)
+    .style("stroke", "#bababa")
+    .style("stroke-width", 1);
+
   const moduleDots = svg.selectAll("#module_dots")
     .data([1])
     .enter()
@@ -77,8 +114,8 @@ export function plotPipelineMatrix(ref, data){
     .data(pipeline_steps)
     .enter()
     .append("circle")
-    .attr("cx", x=>colScale(x.pythonPath))
-    .attr("cy", x=>rowScale(x.pipelineID))
+    .attr("cx", x=>colScale(x.pythonPath) + bandOver2)
+    .attr("cy", x=>rowScale(x.pipelineID) + bandOver2)
     .attr("r", 5)
     .style("fill", x=>moduleColorScale(infos[x.pythonPath].module_type));
 
@@ -96,7 +133,7 @@ export function plotPipelineMatrix(ref, data){
     .enter()
     .append("text")
     .text(x=>infos[x]['module_name'])
-    .attr("transform", x => `translate(${colScale(x)}, ${constants.moduleNameHeight - 15}) rotate(-45)`)
+    .attr("transform", x => `translate(${colScale(x) + bandOver2}, ${constants.moduleNameHeight - 5}) rotate(-45)`)
     .style("fill", x=>moduleColorScale(infos[x].module_type));
 
 
@@ -119,9 +156,10 @@ export function plotPipelineMatrix(ref, data){
     .enter()
     .append("rect")
     .attr("x", 0)
-    .attr("y", (x, idx)=>rowScale(idx))
-    .attr("width", (x, idx) => scoreScale(pipelines[idx]["scores"][0]["value"]))
-    .attr("height", rowScale.bandwidth());
+    .attr("y", (x, idx)=>rowScale(idx) + 3)
+    .attr("width", (x) => scoreScale(x["scores"][0]["value"]))
+    .attr("height", rowScale.bandwidth() - 4)
+    .style("fill", "#bababa");
 
   const legendModuleType = svg
     .selectAll("#legend_module_type")
@@ -138,8 +176,6 @@ export function plotPipelineMatrix(ref, data){
     .append("g")
     .attr("transform", (x, idx)=>`translate(0, ${idx*14})`)
     .attr("data", x=>x);
-
-  console.log(moduleTypes);
 
   lengendRowGroup
     .append("rect")
