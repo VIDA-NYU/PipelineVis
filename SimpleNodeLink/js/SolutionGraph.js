@@ -14,7 +14,7 @@ class SolutionGraph extends PureComponent {
   render() {
     const { solution } = this.props;
     if (!solution.description || !solution.description.pipeline) {
-      console.log("Invalid pipeline/solution data")
+      console.log("Invalid pipeline/solution data");
       return <div />;
     }
 

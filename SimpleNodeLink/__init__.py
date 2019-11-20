@@ -1,1 +1,2 @@
 from ._plot_pipeline_node_link import plot_pipeline_node_link
+from ._plot_pipeline_matrix import plot_pipeline_matrix

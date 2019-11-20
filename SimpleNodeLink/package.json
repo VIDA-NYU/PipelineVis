@@ -46,6 +46,7 @@
     "d3-selection": "^1.4.0",
     "dagre": "^0.8.4",
     "install": "^0.12.2",
+    "lodash": "^4.17.15",
     "npm": "^6.9.0",
     "react-feather": "^1.1.6",
     "react-move": "^5.2.0",
