@@ -5,10 +5,10 @@ import {schemePaired} from "d3-scale-chromatic";
 
 export function plotPipelineMatrix(ref, data){
   const constants = {
-    pipelineNameWidth: 100,
-    moduleNameHeight: 100,
-    cellWidth: 12,
-    cellHeight: 12,
+    pipelineNameWidth: 200,
+    moduleNameHeight: 150,
+    cellWidth: 13,
+    cellHeight: 13,
     pipelineScoreWidth: 200,
     moduleImportanceHeight: 200,
     margin: {
@@ -20,7 +20,7 @@ export function plotPipelineMatrix(ref, data){
   };
 
 
-  const {infos, pipelines} = data;
+  const {infos, pipelines, module_types: moduleTypes} = data;
   const moduleNames = Object.keys(infos);
   const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
     constants.margin.left + constants.margin.right;
@@ -96,9 +96,7 @@ export function plotPipelineMatrix(ref, data){
     .enter()
     .append("text")
     .text(x=>infos[x]['module_name'])
-    .attr("x", x=>colScale(x))
-    .attr("y", 0)
-    .style("writing-mode", "tb")
+    .attr("transform", x => `translate(${colScale(x)}, ${constants.moduleNameHeight - 15}) rotate(-45)`)
     .style("fill", x=>moduleColorScale(infos[x].module_type));
 
 
@@ -106,7 +104,8 @@ export function plotPipelineMatrix(ref, data){
     .domain(extent(pipelines, x=>x["scores"][0]["value"]))
     .range([0, constants.pipelineScoreWidth]);
 
-  const pipelineScoreBars = svg.selectAll("#pipeline_score_bars")
+  const pipelineScoreBars = svg
+    .selectAll("#pipeline_score_bars")
     .data([1])
     .enter()
     .append("g")
@@ -123,4 +122,36 @@ export function plotPipelineMatrix(ref, data){
     .attr("y", (x, idx)=>rowScale(idx))
     .attr("width", (x, idx) => scoreScale(pipelines[idx]["scores"][0]["value"]))
     .attr("height", rowScale.bandwidth());
+
+  const legendModuleType = svg
+    .selectAll("#legend_module_type")
+    .data([1])
+    .enter()
+    .append("g")
+    .attr("id", "legend_module_type")
+    .attr("transform", `translate(${constants.margin.left}, ${constants.margin.top})`);
+
+  const lengendRowGroup = legendModuleType
+    .selectAll("g")
+    .data(moduleTypes)
+    .enter()
+    .append("g")
+    .attr("transform", (x, idx)=>`translate(0, ${idx*14})`)
+    .attr("data", x=>x);
+
+  console.log(moduleTypes);
+
+  lengendRowGroup
+    .append("rect")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("width", 12)
+    .attr("height", 12)
+    .style("fill", x=>moduleColorScale(x));
+
+  lengendRowGroup
+    .append("text")
+    .attr("x", 14)
+    .attr("y", 10)
+    .text(x=>x);
 }
