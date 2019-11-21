@@ -11,7 +11,6 @@ export function plotPipelineMatrix(ref, data, onClick){
     cellWidth: 13,
     cellHeight: 13,
     pipelineScoreWidth: 200,
-    moduleImportanceHeight: 0, //used at the bottom. legacy
     margin: {
       left: 10,
       right: 10,
@@ -27,7 +26,7 @@ export function plotPipelineMatrix(ref, data, onClick){
   pipelines.sort((a,b) => b["scores"][0]["value"] - a["scores"][0]["value"]);
   const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
     constants.margin.left + constants.margin.right;
-  const svgHeight = constants.moduleImportanceHeight + pipelines.length * constants.cellHeight + constants.moduleNameHeight +
+  const svgHeight = pipelines.length * constants.cellHeight + constants.moduleNameHeight +
     constants.margin.top + constants.margin.bottom;
 
   const div = select(ref);
@@ -54,7 +53,7 @@ export function plotPipelineMatrix(ref, data, onClick){
 
   const importanceScale = scaleLinear()
     .domain(extent(moduleNames, x=>infos[x]["module_importance"]))
-    .range([0, constants.moduleImportanceHeight]);
+    .range([0, constants.moduleNameHeight]);
 
 
   const bandOver2  = rowScale.bandwidth()/2;
@@ -191,6 +190,16 @@ export function plotPipelineMatrix(ref, data, onClick){
     .attr("height", rowScale.bandwidth() - 4)
     .style("fill", "#bababa");
 
+  pipelineScoreBars
+    .selectAll("text")
+    .data(pipelines)
+    .enter()
+    .append("text")
+    .attr("x", constants.pipelineScoreWidth)
+    .attr("y", (x, idx)=>rowScale(idx) + rowScale.bandwidth())
+    .attr("text-anchor", "end")
+    .text(x=>x["scores"][0]["value"].toFixed(2))
+    .style("fill", "#6b6b6b");
 
   const legendModuleType = svg
     .selectAll("#legend_module_type")
