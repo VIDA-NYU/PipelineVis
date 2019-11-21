@@ -1,4 +1,5 @@
-import {select, selectAll} from "d3-selection";
+import "d3-selection";
+import {select, event, mouse} from "d3-selection";
 import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
 import {extent, range} from "d3-array";
 import {schemePaired} from "d3-scale-chromatic";
@@ -22,6 +23,8 @@ export function plotPipelineMatrix(ref, data){
 
   const {infos, pipelines, module_types: moduleTypes} = data;
   const moduleNames = Object.keys(infos);
+  moduleNames.sort((a,b) => infos[b]['module_importance'] - infos[a]['module_importance']);
+  pipelines.sort((a,b) => b["scores"][0]["value"] - a["scores"][0]["value"]);
   const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
     constants.margin.left + constants.margin.right;
   const svgHeight = constants.moduleImportanceHeight + pipelines.length * constants.cellHeight + constants.moduleNameHeight +
@@ -48,6 +51,11 @@ export function plotPipelineMatrix(ref, data){
     .range([0, pipelines.length * constants.cellHeight])
     .paddingInner(0)
     .paddingOuter(0);
+
+  const importanceScale = scaleLinear()
+    .domain(extent(moduleNames, x=>infos[x]["module_importance"]))
+    .range([0, constants.moduleImportanceHeight]);
+
 
   const bandOver2  = rowScale.bandwidth()/2;
 
@@ -119,6 +127,27 @@ export function plotPipelineMatrix(ref, data){
     .attr("r", 5)
     .style("fill", x=>moduleColorScale(infos[x.pythonPath].module_type));
 
+  const moduleImportanceBars = svg
+    .selectAll("#module_importance_bars")
+    .data([1])
+    .enter()
+    .append("g")
+    .attr("id", "module_importance_bars")
+    .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth },
+    ${constants.margin.top})`);
+
+  moduleImportanceBars
+    .selectAll("rect")
+    .data(moduleNames)
+    .enter()
+    .append("rect")
+    .attr("x", x => colScale(x) + 3)
+    .attr("y", x=>constants.moduleNameHeight - importanceScale(infos[x]["module_importance"]))
+    .attr("width", colScale.bandwidth() - 3)
+    .attr("height", x=>importanceScale(infos[x]["module_importance"]))
+    .style("fill", "#bababa");
+
+
   const moduleNameLabels =  svg.selectAll("#module_names")
     .data([1])
     .enter()
@@ -133,7 +162,7 @@ export function plotPipelineMatrix(ref, data){
     .enter()
     .append("text")
     .text(x=>infos[x]['module_name'])
-    .attr("transform", x => `translate(${colScale(x) + bandOver2}, ${constants.moduleNameHeight - 5}) rotate(-45)`)
+    .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()}, ${constants.moduleNameHeight}) rotate(-90)`)
     .style("fill", x=>moduleColorScale(infos[x].module_type));
 
 
@@ -141,9 +170,6 @@ export function plotPipelineMatrix(ref, data){
     .domain(extent(pipelines, x=>x["scores"][0]["value"]))
     .range([0, constants.pipelineScoreWidth]);
 
-  const importanceScale = scaleLinear()
-    .domain(extent(moduleNames, x=>infos[x]["module_importance"]))
-    .range([0, constants.moduleImportanceHeight]);
 
   const pipelineScoreBars = svg
     .selectAll("#pipeline_score_bars")
@@ -165,25 +191,6 @@ export function plotPipelineMatrix(ref, data){
     .attr("height", rowScale.bandwidth() - 4)
     .style("fill", "#bababa");
 
-  const moduleImportanceBars = svg
-    .selectAll("#module_importance_bars")
-    .data([1])
-    .enter()
-    .append("g")
-    .attr("id", "module_importance_bars")
-    .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth },
-    ${constants.margin.top + constants.moduleNameHeight + pipelines.length * constants.cellHeight})`);
-
-  moduleImportanceBars
-    .selectAll("rect")
-    .data(moduleNames)
-    .enter()
-    .append("rect")
-    .attr("x", x => colScale(x) + 3)
-    .attr("y", 0)
-    .attr("width", colScale.bandwidth() - 3)
-    .attr("height", x=>importanceScale(infos[x]["module_importance"]))
-    .style("fill", "#bababa");
 
   const legendModuleType = svg
     .selectAll("#legend_module_type")
@@ -213,5 +220,73 @@ export function plotPipelineMatrix(ref, data){
     .append("text")
     .attr("x", 14)
     .attr("y", 10)
-    .text(x=>x);
+    .text(x=>x)
+    .style("fill", "#9a9a9a");
+
+  const legendPipelinePerformance = svg
+    .selectAll("#legend_pipeline_performance")
+    .data([1])
+    .enter()
+    .append("text")
+    .attr("text-anchor", "end")
+    .attr("x", constants.margin.left + constants.pipelineNameWidth + constants.cellWidth * moduleNames.length + constants.pipelineScoreWidth)
+    .attr("y", constants.margin.top + constants.moduleNameHeight - 5)
+    .text(pipelines[0]["scores"][0]["metric"]["metric"])
+    .style("fill", "#9a9a9a");
+
+
+  const left = constants.margin.left + constants.pipelineNameWidth,
+    top = constants.margin.top + constants.moduleNameHeight,
+    right = constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth,
+    bottom = constants.margin.top + constants.moduleNameHeight + pipelines.length * constants.cellHeight;
+
+  svg
+    .append("rect")
+    .attr("id", "highlight_row")
+    .attr("x", left)
+    .attr("width", right-left)
+    .attr("height", rowScale.bandwidth())
+    .style("fill","#00000000");
+
+  svg
+    .append("rect")
+    .attr("id", "highlight_col")
+    .attr("y", top)
+    .attr("height", bottom-top)
+    .attr("width", colScale.bandwidth())
+    .style("fill","#00000000");
+
+  const highlightColor = "#CCCCCC44"
+
+  svg.on("mousemove", function(){
+    const mGlobal = mouse(this);
+
+    if (mGlobal[0] >= left && mGlobal[0] <= right && mGlobal[1] >= top  && mGlobal[1] <= bottom) {
+      //const localX = colScale.invert(mGlobal[0]),
+      //  localY = rowScale.invert(mGlobal[1]);
+      const pipelineIdx = Math.floor((mGlobal[1] - top)/constants.cellHeight);
+      const colIdx = Math.floor((mGlobal[0] - left)/constants.cellHeight);
+      const moduleName = moduleNames[colIdx];
+
+      svg
+        .select("#highlight_row")
+        .attr("y", rowScale(pipelineIdx) + top)
+        .style("fill",highlightColor);
+
+      svg
+        .select("#highlight_col")
+        .attr("x", colScale(moduleName) + left)
+        .style("fill",highlightColor);
+    }else{
+      svg
+        .select("#highlight_row")
+        .style("fill","#00000000");
+
+      svg
+        .select("#highlight_col")
+        .style("fill","#00000000");
+
+    }
+  });
+
 }
