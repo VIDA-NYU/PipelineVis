@@ -4,8 +4,8 @@ import {plotPipelineMatrix} from "./plotPipelineMatrix";
 
 export class PipelineMatrix extends Component {
   display(){
-    const {data} = this.props;
-    plotPipelineMatrix(this.ref, data);
+    const {data, onClick} = this.props;
+    plotPipelineMatrix(this.ref, data, onClick);
   }
 
   shouldComponentUpdate(newprops){
@@ -28,8 +28,11 @@ export class PipelineMatrix extends Component {
   }
 }
 
+PipelineMatrix.defaultProps = {
+  onClick: ()=>{}
+};
+
 PipelineMatrix.propTypes = {
   data: PropTypes.object.isRequired,
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
+  onClick: PropTypes.func
 };

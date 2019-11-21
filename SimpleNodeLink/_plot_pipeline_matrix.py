@@ -2,6 +2,7 @@ import pkg_resources
 import string
 import numpy as np
 import json
+from scipy import optimize
 
 
 def id_generator(size=15):
@@ -25,12 +26,76 @@ def make_html(data_dict):
 	    <div id="{id}">
 	    </div>
 	    <script>
-	        pipelineVis.renderPipelineMatrix("#{id}", {data_dict});
+	        pipelineVis.renderPipelineMatrixBundle("#{id}", {data_dict});
 	    </script>
 	</body>
 	</html>
 	""".format(bundle=bundle, id=id_generator(), data_dict=json.dumps(data_dict))
 	return html_all
+
+def extract_primitive_names(pipeline):
+    return [s['primitive']['python_path'] for s in pipeline['steps']]
+
+def extract_module_matrix(pipelines):
+    from sklearn import preprocessing
+    import numpy as np
+    le = preprocessing.LabelEncoder()
+    all_primitives = set()
+    for pipeline in pipelines:
+        all_primitives = all_primitives.union(extract_primitive_names(pipeline))
+    le.fit(list(all_primitives))
+    data_matrix = np.zeros([len(pipelines), len(le.classes_)])
+    for i, pipeline in enumerate(pipelines):
+        for j, primitive in enumerate(extract_primitive_names(pipeline)):
+            idx_primitive = le.transform([primitive])
+            data_matrix[i, idx_primitive] = 1
+    return data_matrix, le.classes_
+
+def extract_scores(pipelines):
+    scores = []
+    for pipeline in pipelines:
+        score = pipeline['scores'][0]['value']
+        scores.append(score)
+    return scores
+
+def extract_primitive_info(pipelines):
+    pipelines = sorted(pipelines, key=lambda x: x['scores'][0]['normalized'], reverse=True)
+    module_matrix, module_names = extract_module_matrix(pipelines)
+    scores = extract_scores(pipelines)
+    coef, res = optimize.nnls(module_matrix, scores)
+    module_importances = {}
+    for idx, module_name in enumerate(module_names):
+        module_importances[module_name] = coef[idx]
+    infos = {}
+    module_types = set()
+    for pipeline in pipelines:
+        for step in pipeline['steps']:
+            python_path = step['primitive']['python_path']
+            if python_path in infos:
+                continue
+            split = python_path.split(".")
+            module_desc = step['primitive']['name']
+            module_type = split[2]
+            module_types.add(module_type)
+            module_name = split[3]
+            module_importance = module_importances[python_path]
+            infos[python_path] = {
+                "module_desc": module_desc,
+                "module_type": module_type,
+                "module_name": module_name,
+                "module_importance": module_importance
+            }
+    return infos, module_types
+
+def prepare_data_pipeline_matrix(pipelines):
+    info, module_types = extract_primitive_info(pipelines)
+    data = {
+        "infos": info,
+        "pipelines": pipelines,
+        "module_types": list(module_types)
+    }
+    return data
+
 
 def plot_pipeline_matrix(data_dict):
     from IPython.core.display import display, HTML

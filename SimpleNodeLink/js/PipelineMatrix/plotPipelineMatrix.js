@@ -4,14 +4,14 @@ import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
 import {extent, range} from "d3-array";
 import {schemePaired} from "d3-scale-chromatic";
 
-export function plotPipelineMatrix(ref, data){
+export function plotPipelineMatrix(ref, data, onClick){
   const constants = {
     pipelineNameWidth: 200,
     moduleNameHeight: 150,
     cellWidth: 13,
     cellHeight: 13,
     pipelineScoreWidth: 200,
-    moduleImportanceHeight: 200,
+    moduleImportanceHeight: 0, //used at the bottom. legacy
     margin: {
       left: 10,
       right: 10,
@@ -94,7 +94,7 @@ export function plotPipelineMatrix(ref, data){
     .attr("x2", constants.cellWidth * moduleNames.length)
     .attr("y2", (_, idx) => rowScale(idx) + bandOver2)
     .style("stroke", "#bababa")
-    .style("stroke-width", 1)
+    .style("stroke-width", 1);
 
   guideLinesGroup
     .selectAll(".col")
@@ -286,6 +286,19 @@ export function plotPipelineMatrix(ref, data){
         .select("#highlight_col")
         .style("fill","#00000000");
 
+    }
+  });
+
+  svg.on("click", function() {
+    const mGlobal = mouse(this);
+
+    if (mGlobal[0] >= left && mGlobal[0] <= right && mGlobal[1] >= top && mGlobal[1] <= bottom) {
+      //const localX = colScale.invert(mGlobal[0]),
+      //  localY = rowScale.invert(mGlobal[1]);
+      const pipelineIdx = Math.floor((mGlobal[1] - top) / constants.cellHeight);
+      const colIdx = Math.floor((mGlobal[0] - left) / constants.cellHeight);
+      const moduleName = moduleNames[colIdx];
+      onClick(pipelines[pipelineIdx]);
     }
   });
 
