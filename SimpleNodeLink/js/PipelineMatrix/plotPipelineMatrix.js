@@ -2,7 +2,7 @@ import "d3-selection";
 import {select, event, mouse} from "d3-selection";
 import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
 import {extent, range} from "d3-array";
-import {schemePaired} from "d3-scale-chromatic";
+import {schemeCategory10} from "d3-scale-chromatic";
 
 export function plotPipelineMatrix(ref, data, onClick){
   const constants = {
@@ -58,7 +58,7 @@ export function plotPipelineMatrix(ref, data, onClick){
 
   const bandOver2  = rowScale.bandwidth()/2;
 
-  const moduleColorScale = scaleOrdinal(schemePaired);
+  const moduleColorScale = scaleOrdinal(schemeCategory10);
 
 
   let pipeline_steps = [];
