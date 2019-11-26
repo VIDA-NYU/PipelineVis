@@ -22,7 +22,7 @@ def export_adb_file(fname, pipelines, success):
             adp_dict = default_adp_dict.copy()
             for step in pipeline["steps"]:
                 adp_dict[step["primitive"]["python_path"]] = "1"
-            adp_dict["result"] = "True" if success(pipeline["scores"][0]["value"]) else "False"
+            adp_dict["result"] = "False" if success(pipeline["scores"][0]["value"]) else "True"
             f.write(json.dumps(adp_dict) + "\n")
 
 def export_all_adp(root_dir, pipelines):

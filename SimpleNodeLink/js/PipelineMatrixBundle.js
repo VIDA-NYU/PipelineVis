@@ -27,3 +27,15 @@ export class PipelineMatrixBundle extends Component {
 PipelineMatrixBundle.propTypes = {
   data: PropTypes.object.isRequired,
 };
+
+/*
+* IDEAS:
+* - Adjusting the importance computation based on x (bigger is better), or MAX() - x (smaller is better)
+* - Expand the pipeline into a pipeline block (facilitate visualization, smaller frame)
+* - Module usage (how often it is used, and what is the score distribution for it) (maybe display it together with importance?)
+* - Cluster pipelines
+* - Module correlation / pair count (how modules are used together)
+* - Reorder modules based on type
+* - link pipeline graph with matrix
+* - How to show hyperparameters - parallel coordinates
+* */

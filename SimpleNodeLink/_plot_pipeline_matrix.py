@@ -58,11 +58,36 @@ def extract_scores(pipelines):
         scores.append(score)
     return scores
 
+def transform_module_type(module_type):
+    map = {
+        'feature_extraction': 'Feature Extraction',
+        'learner': 'Classification',
+        'normalization': 'Preprocessing',
+        'feature_construction': 'Feature Extraction',
+        'classification': 'Classification',
+        'data_transformation': 'Preprocessing',
+        'schema_discovery': 'Preprocessing',
+        'data_preprocessing': 'Preprocessing',
+        'data_cleaning': 'Preprocessing',
+        'regression': 'Regression',
+        'operator': 'Operator',
+        'feature_selection': 'Feature Extraction'
+    }
+    if module_type in map:
+        return map[module_type]
+    else:
+        return module_type
+
+
 def extract_primitive_info(pipelines):
+    from sklearn.linear_model import ElasticNet
     pipelines = sorted(pipelines, key=lambda x: x['scores'][0]['normalized'], reverse=True)
     module_matrix, module_names = extract_module_matrix(pipelines)
     scores = extract_scores(pipelines)
-    coef, res = optimize.nnls(module_matrix, scores)
+    #coef, res = optimize.nnls(module_matrix, scores)
+    net = ElasticNet(alpha = 0.001, l1_ratio=0.1, positive=True)
+    net.fit(module_matrix, scores)
+    coef = net.coef_
     module_importances = {}
     for idx, module_name in enumerate(module_names):
         module_importances[module_name] = coef[idx]
@@ -75,7 +100,7 @@ def extract_primitive_info(pipelines):
                 continue
             split = python_path.split(".")
             module_desc = step['primitive']['name']
-            module_type = split[2]
+            module_type = transform_module_type(split[2])
             module_types.add(module_type)
             module_name = split[3]
             module_importance = module_importances[python_path]
