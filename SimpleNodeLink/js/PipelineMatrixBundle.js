@@ -2,18 +2,26 @@ import React, {Component} from "react";
 import PropTypes from 'prop-types';
 import {PipelineMatrix} from "./PipelineMatrix";
 import SolutionGraph from "./SolutionGraph";
+import {FormControlLabel, Radio, RadioGroup} from "@material-ui/core";
+import {constants} from "./helpers";
 
 export class PipelineMatrixBundle extends Component {
   constructor(props){
     super(props);
     this.state = {
-      pipeline: null
+      pipeline: null,
+      sortColumnsBy: constants.sortModuleBy.moduleType
     };
   }
   render(){
     const {data} = this.props;
     return <div>
-      <PipelineMatrix data={data} onClick={(pipeline)=>{this.setState({pipeline})}}/>
+      <RadioGroup value={this.state.sortColumnsBy} onChange={x=>{this.setState({sortColumnsBy: x.target.value})}}>
+        <FormControlLabel value={constants.sortModuleBy.moduleType} control={<Radio />} label="Module Type" />
+        <FormControlLabel value={constants.sortModuleBy.importance} control={<Radio />} label="Module Importance" />
+      </RadioGroup>
+
+      <PipelineMatrix data={data} onClick={(pipeline)=>{this.setState({pipeline})}} sortColumnBy={this.state.sortColumnsBy}/>
       {this.state.pipeline?
         <SolutionGraph solution={ {description: {
             pipeline: this.state.pipeline

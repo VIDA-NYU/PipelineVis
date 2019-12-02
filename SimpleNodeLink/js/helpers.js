@@ -10,3 +10,22 @@ export function createGettersSetters(container, parameterDict){
     }
   }
 }
+
+
+export const constants = {
+  sortModuleBy: {
+    importance: 'IMPORTANCE',
+    moduleType: 'MODULE_TYPE'
+  },
+  pipelineNameWidth: 200,
+  moduleNameHeight: 150,
+  cellWidth: 13,
+  cellHeight: 13,
+  pipelineScoreWidth: 200,
+  margin: {
+    left: 10,
+    right: 10,
+    top: 10,
+    bottom: 10,
+  }
+};

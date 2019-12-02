@@ -117,7 +117,8 @@ def prepare_data_pipeline_matrix(pipelines):
     data = {
         "infos": info,
         "pipelines": pipelines,
-        "module_types": list(module_types)
+        "module_types": list(module_types),
+        "module_type_order": ["Preprocessing", "Feature Extraction", "Operator", "Regression", "Classification"],
     }
     return data
 

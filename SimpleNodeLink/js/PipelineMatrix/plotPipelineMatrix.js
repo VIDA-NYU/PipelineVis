@@ -3,26 +3,23 @@ import {select, event, mouse} from "d3-selection";
 import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
 import {extent, range} from "d3-array";
 import {schemeCategory10} from "d3-scale-chromatic";
+import {constants} from "../helpers";
 
-export function plotPipelineMatrix(ref, data, onClick){
-  const constants = {
-    pipelineNameWidth: 200,
-    moduleNameHeight: 150,
-    cellWidth: 13,
-    cellHeight: 13,
-    pipelineScoreWidth: 200,
-    margin: {
-      left: 10,
-      right: 10,
-      top: 10,
-      bottom: 10,
-    }
-  };
-
-
-  const {infos, pipelines, module_types: moduleTypes} = data;
+export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.sortModuleBy.moduleType){
+  const {infos, pipelines, module_types: moduleTypes, module_type_order: moduleTypeOrder} = data;
   const moduleNames = Object.keys(infos);
-  moduleNames.sort((a,b) => infos[b]['module_importance'] - infos[a]['module_importance']);
+
+  const moduleTypeOrderMap = {};
+  moduleTypeOrder.forEach((x, idx) => {moduleTypeOrderMap[x] = idx;});
+
+  if (sortColumnBy === constants.sortModuleBy.importance) {
+    moduleNames.sort((a,b) => infos[b]['module_importance'] - infos[a]['module_importance']);
+  } else if (sortColumnBy === constants.sortModuleBy.moduleType) {
+    console.log("sorting by moduleType");
+    moduleNames.sort((a,b) => infos[b]['module_importance'] - infos[a]['module_importance']);
+    moduleNames.sort((a,b) => moduleTypeOrderMap[infos[a]['module_type']] - moduleTypeOrderMap[infos[b]['module_type']]);
+  }
+
   pipelines.sort((a,b) => b["scores"][0]["value"] - a["scores"][0]["value"]);
   const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
     constants.margin.left + constants.margin.right;
@@ -115,6 +112,8 @@ export function plotPipelineMatrix(ref, data, onClick){
     .attr("id", "module_dots")
     .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, 
       ${constants.margin.top + constants.moduleNameHeight})`);
+
+
 
   moduleDots
     .selectAll("circle")
@@ -211,7 +210,7 @@ export function plotPipelineMatrix(ref, data, onClick){
 
   const lengendRowGroup = legendModuleType
     .selectAll("g")
-    .data(moduleTypes)
+    .data(moduleTypeOrder)
     .enter()
     .append("g")
     .attr("transform", (x, idx)=>`translate(0, ${idx*14})`)
