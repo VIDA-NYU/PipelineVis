@@ -4,6 +4,7 @@ import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
 import {extent, range} from "d3-array";
 import {schemeCategory10} from "d3-scale-chromatic";
 import {constants} from "../helpers";
+import "d3-transition";
 
 export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.sortModuleBy.moduleType){
   const {infos, pipelines, module_types: moduleTypes, module_type_order: moduleTypeOrder} = data;
@@ -15,7 +16,6 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
   if (sortColumnBy === constants.sortModuleBy.importance) {
     moduleNames.sort((a,b) => infos[b]['module_importance'] - infos[a]['module_importance']);
   } else if (sortColumnBy === constants.sortModuleBy.moduleType) {
-    console.log("sorting by moduleType");
     moduleNames.sort((a,b) => infos[b]['module_importance'] - infos[a]['module_importance']);
     moduleNames.sort((a,b) => moduleTypeOrderMap[infos[a]['module_type']] - moduleTypeOrderMap[infos[b]['module_type']]);
   }
@@ -26,13 +26,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
   const svgHeight = pipelines.length * constants.cellHeight + constants.moduleNameHeight +
     constants.margin.top + constants.margin.bottom;
 
-  const div = select(ref);
-  const svg = div
-    .selectAll("svg")
-    .data([1])
-    .enter()
-    .append("svg")
-    .attr("id", "pipeline_matrix_svg")
+  const svg = select(ref)
     .style("width", svgWidth + "px")
     .style("height", svgHeight + "px");
 
@@ -107,43 +101,57 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
 
   const moduleDots = svg.selectAll("#module_dots")
     .data([1])
-    .enter()
-    .append("g")
-    .attr("id", "module_dots")
-    .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, 
-      ${constants.margin.top + constants.moduleNameHeight})`);
-
+    .join(
+      enter => enter.append("g")
+        .attr("id", "module_dots")
+        .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, 
+      ${constants.margin.top + constants.moduleNameHeight})`)
+  );
 
 
   moduleDots
     .selectAll("circle")
     .data(pipeline_steps)
-    .enter()
-    .append("circle")
-    .attr("cx", x=>colScale(x.pythonPath) + bandOver2)
-    .attr("cy", x=>rowScale(x.pipelineID) + bandOver2)
-    .attr("r", 5)
-    .style("fill", x=>moduleColorScale(infos[x.pythonPath].module_type));
+    .join(
+      enter => enter.append("circle")
+        .attr("cx", x=>colScale(x.pythonPath) + bandOver2)
+        .attr("cy", x=>rowScale(x.pipelineID) + bandOver2)
+        .attr("r", 5)
+        .style("fill", x=>moduleColorScale(infos[x.pythonPath].module_type)),
+      update => update
+        .call(update => update.transition()
+          .duration(2000)
+          .attr("cx", x=>colScale(x.pythonPath) + bandOver2)
+          .attr("cy", x=>rowScale(x.pipelineID) + bandOver2)
+        ));
 
   const moduleImportanceBars = svg
     .selectAll("#module_importance_bars")
     .data([1])
-    .enter()
-    .append("g")
-    .attr("id", "module_importance_bars")
-    .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth },
-    ${constants.margin.top})`);
+    .join(
+      enter => enter
+        .append("g")
+        .attr("id", "module_importance_bars")
+        .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth },
+        ${constants.margin.top})`)
+    );
 
   moduleImportanceBars
     .selectAll("rect")
     .data(moduleNames)
-    .enter()
-    .append("rect")
-    .attr("x", x => colScale(x) + 3)
-    .attr("y", x=>constants.moduleNameHeight - importanceScale(infos[x]["module_importance"]))
-    .attr("width", colScale.bandwidth() - 3)
-    .attr("height", x=>importanceScale(infos[x]["module_importance"]))
-    .style("fill", "#bababa");
+    .join(
+      enter => enter
+        .append("rect")
+        .attr("x", x => colScale(x) + 3)
+        .attr("y", x=>constants.moduleNameHeight - importanceScale(infos[x]["module_importance"]))
+        .attr("width", colScale.bandwidth() - 3)
+        .attr("height", x=>importanceScale(infos[x]["module_importance"]))
+        .style("fill", "#bababa"),
+      update => update
+        .call(update => update.transition()
+        .duration(2000)
+        .attr("x", x => colScale(x) + 3)
+    ));
 
 
   const moduleNameLabels =  svg.selectAll("#module_names")
@@ -264,7 +272,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
     .attr("width", colScale.bandwidth())
     .style("fill","#00000000");
 
-  const highlightColor = "#CCCCCC44"
+  const highlightColor = "#CCCCCC44";
 
   svg.on("mousemove", function(){
     const mGlobal = mouse(this);

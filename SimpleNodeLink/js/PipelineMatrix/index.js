@@ -13,7 +13,6 @@ export class PipelineMatrix extends Component {
 
   shouldComponentUpdate(newprops){
     this.display();
-    console.log("test");
     return false;
   }
 
@@ -28,7 +27,7 @@ export class PipelineMatrix extends Component {
 
 
   render(){
-    return <div ref={ref => this.ref = ref}/>;
+    return <svg ref={ref => this.ref = ref}/>;
   }
 }
 
