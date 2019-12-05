@@ -100,8 +100,8 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
     .style("stroke-width", 1);
 
   const moduleDots = svg.selectAll("#module_dots")
-    .data([1])
-    .join(
+    .data([1]);
+  moduleDots.join(
       enter => enter.append("g")
         .attr("id", "module_dots")
         .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, 
@@ -127,14 +127,14 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
 
   const moduleImportanceBars = svg
     .selectAll("#module_importance_bars")
-    .data([1])
-    .join(
-      enter => enter
-        .append("g")
-        .attr("id", "module_importance_bars")
-        .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth },
-        ${constants.margin.top})`)
-    );
+    .data([1]);
+  moduleImportanceBars.join(
+    enter => enter
+      .append("g")
+      .attr("id", "module_importance_bars")
+      .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth },
+      ${constants.margin.top})`)
+  );
 
   moduleImportanceBars
     .selectAll("rect")
