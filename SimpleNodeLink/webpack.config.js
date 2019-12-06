@@ -35,6 +35,8 @@ const config = {
     },
     devServer:{
       writeToDisk:true,
+      hot:false,
+      inline: false,
     },
     mode: 'development'
 }
