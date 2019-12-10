@@ -10,13 +10,13 @@ export class PipelineMatrixBundle extends Component {
     super(props);
     this.state = {
       pipeline: null,
-      sortColumnsBy: constants.sortModuleBy.importance
+      sortColumnsBy: constants.sortModuleBy.moduleType
     };
   }
   render(){
     const {data} = this.props;
     return <div>
-      <RadioGroup value={this.state.sortColumnsBy} onChange={x=>{this.setState({sortColumnsBy: x.target.value})}}>
+      <RadioGroup value={this.state.sortColumnsBy} onChange={x=>{ this.setState({sortColumnsBy: x.target.value})}}>
         <FormControlLabel value={constants.sortModuleBy.moduleType} control={<Radio />} label="Module Type" />
         <FormControlLabel value={constants.sortModuleBy.importance} control={<Radio />} label="Module Importance" />
       </RadioGroup>

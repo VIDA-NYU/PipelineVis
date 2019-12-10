@@ -6,22 +6,22 @@ import {constants} from "../helpers";
 
 export class PipelineMatrix extends Component {
 
-  display(){
-    const {data, onClick, sortColumnBy} = this.props;
+  display(props){
+    const {data, onClick, sortColumnBy} = props;
     plotPipelineMatrix(this.ref, data, onClick, sortColumnBy);
   }
 
   shouldComponentUpdate(newprops){
-    this.display();
+    this.display(newprops);
     return false;
   }
 
   componentDidMount(){
-    this.display();
+    this.display(this.props);
   }
 
   componentDidUpdate(){
-    this.display();
+    this.display(this.props);
   }
 
 

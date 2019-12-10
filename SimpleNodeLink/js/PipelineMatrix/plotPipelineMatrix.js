@@ -10,6 +10,8 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
   const {infos, pipelines, module_types: moduleTypes, module_type_order: moduleTypeOrder} = data;
   const moduleNames = Object.keys(infos);
 
+  console.log("redraw "  + sortColumnBy);
+
   const moduleTypeOrderMap = {};
   moduleTypeOrder.forEach((x, idx) => {moduleTypeOrderMap[x] = idx;});
 
@@ -65,53 +67,63 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
   });
 
   const guideLinesGroup = svg
-    .selectAll("#rowGuideLinesGroup")
+    .selectAll("#guideLinesGroup")
     .data([1])
-    .enter()
-    .append("g")
-    .attr("id", "rowGuideLinesGroup")
-    .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, 
-      ${constants.margin.top + constants.moduleNameHeight})`);
+    .join(
+      enter => enter
+        .append("g")
+        .attr("id", "guideLinesGroup")
+        .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, 
+      ${constants.margin.top + constants.moduleNameHeight})`),
+      update => update
+    );
+
 
   guideLinesGroup
     .selectAll(".row")
     .data(pipelines)
-    .enter()
-    .append("line")
-    .attr("class", "row")
-    .attr("x1", 0)
-    .attr("y1", (_, idx) => rowScale(idx) + bandOver2)
-    .attr("x2", constants.cellWidth * moduleNames.length)
-    .attr("y2", (_, idx) => rowScale(idx) + bandOver2)
-    .style("stroke", "#bababa")
-    .style("stroke-width", 1);
+    .join(
+      enter => enter
+      .append("line")
+      .attr("class", "row")
+      .attr("x1", 0)
+      .attr("y1", (_, idx) => rowScale(idx) + bandOver2)
+      .attr("x2", constants.cellWidth * moduleNames.length)
+      .attr("y2", (_, idx) => rowScale(idx) + bandOver2)
+      .style("stroke", "#bababa")
+      .style("stroke-width", 1)
+    );
 
   guideLinesGroup
     .selectAll(".col")
     .data(moduleNames)
-    .enter()
-    .append("line")
-    .attr("class", "col")
-    .attr("x1", (x)=>colScale(x) + bandOver2)
-    .attr("y1", 0)
-    .attr("x2", (x)=>colScale(x) + bandOver2)
-    .attr("y2", constants.cellHeight * pipelines.length)
-    .style("stroke", "#bababa")
-    .style("stroke-width", 1);
+    .join(
+      enter => enter
+      .append("line")
+      .attr("class", "col")
+      .attr("x1", (x)=>colScale(x) + bandOver2)
+      .attr("y1", 0)
+      .attr("x2", (x)=>colScale(x) + bandOver2)
+      .attr("y2", constants.cellHeight * pipelines.length)
+      .style("stroke", "#bababa")
+      .style("stroke-width", 1)
+    );
 
-  const moduleDots = svg.selectAll("#module_dots")
-    .data([1]);
-  moduleDots.join(
+  const t = svg.transition()
+    .duration(750);
+
+  const moduleDots = svg.selectAll("#gdots")
+    .data([pipeline_steps])
+    .join(
       enter => enter.append("g")
-        .attr("id", "module_dots")
+        .attr("id", "gdots")
         .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, 
       ${constants.margin.top + constants.moduleNameHeight})`)
-  );
-
+    );
 
   moduleDots
     .selectAll("circle")
-    .data(pipeline_steps)
+    .data(x=>x)
     .join(
       enter => enter.append("circle")
         .attr("cx", x=>colScale(x.pythonPath) + bandOver2)
@@ -119,12 +131,11 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
         .attr("r", 5)
         .style("fill", x=>moduleColorScale(infos[x.pythonPath].module_type)),
       update => update
-        .call(update => update.transition()
-          .duration(2000)
+        .call(update => update.transition(t)
           .attr("cx", x=>colScale(x.pythonPath) + bandOver2)
           .attr("cy", x=>rowScale(x.pipelineID) + bandOver2)
         ));
-
+/*
   const moduleImportanceBars = svg
     .selectAll("#module_importance_bars")
     .data([1]);
@@ -316,6 +327,5 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
       const moduleName = moduleNames[colIdx];
       onClick(pipelines[pipelineIdx]);
     }
-  });
-
+  });*/
 }
