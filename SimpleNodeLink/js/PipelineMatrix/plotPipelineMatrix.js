@@ -54,14 +54,20 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
 
   let pipeline_steps = [];
 
+  let deduplicateChecker = {};
+
   pipelines.forEach((pipeline, pipelineID) => {
     pipeline['steps'].forEach( (step) => {
       const pythonPath = step.primitive.python_path;
-      pipeline_steps.push({
-        pythonPath,
-        pipelineID,
-        key: pythonPath + pipelineID
-      })
+      const key = pythonPath + pipelineID;
+      if (! (key in deduplicateChecker)){
+        deduplicateChecker[key] = true;
+        pipeline_steps.push({
+          pythonPath,
+          pipelineID,
+          key
+        });
+      }
     });
   });
 
@@ -109,7 +115,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
     );
 
   const t = svg.transition()
-    .duration(7500);
+    .duration(750);
 
   const moduleDots = svg.selectAll("#gdots")
     .data([pipeline_steps])
@@ -121,10 +127,11 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
     );
 
   moduleDots
-    .selectAll("circle")
+    .selectAll(".dot")
     .data(x=>x, x=>x.key)
     .join(
       enter => enter.append("circle")
+        .attr("class", "dot")
         .attr("cx", x=>colScale(x.pythonPath) + bandOver2)
         .attr("cy", x=>rowScale(x.pipelineID) + bandOver2)
         .attr("r", 5)
