@@ -3,8 +3,9 @@ import {select, event, mouse} from "d3-selection";
 import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
 import {extent, range} from "d3-array";
 import {schemeCategory10} from "d3-scale-chromatic";
-import {constants} from "../helpers";
+import {constants, extractHyperparams} from "../helpers";
 import "d3-transition";
+import {VerticalParCoord} from "./VerticalParCoord";
 
 export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.sortModuleBy.moduleType){
   const {infos, pipelines, module_types: moduleTypes, module_type_order: moduleTypeOrder} = data;
@@ -24,7 +25,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
   const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
     constants.margin.left + constants.margin.right;
   const svgHeight = pipelines.length * constants.cellHeight + constants.moduleNameHeight +
-    constants.margin.top + constants.margin.bottom;
+    constants.margin.top + constants.margin.bottom + constants.hyperparamsHeight;
 
   const svg = select(ref)
     .style("width", svgWidth + "px")
@@ -319,6 +320,28 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
       .attr("height", bottom-top)
       .attr("width", colScale.bandwidth())
       .style("fill","#00000000")
+    );
+
+
+  const hyperparams = extractHyperparams(infos, pipelines);
+
+  console.log(hyperparams);
+
+  const hyperparamsArray = moduleNames.map(mname => hyperparams[mname]);
+
+  const verticalParCoord = VerticalParCoord()
+    .width(colScale.bandwidth())
+    .height(constants.hyperparamsHeight);
+
+  svg
+    .selectAll(".paramcoords")
+    .data(hyperparamsArray)
+    .join(
+      enter => enter
+      .append("g")
+      .attr("class", "paramcoords")
+      .attr("transform", (d, idx)=>`translate(${left + constants.cellWidth * idx}, ${top + pipelines.length * constants.cellHeight})`)
+      .call(verticalParCoord)
     );
 
   const highlightColor = "#CCCCCC44";

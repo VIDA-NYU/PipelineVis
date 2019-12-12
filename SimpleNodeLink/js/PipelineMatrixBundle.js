@@ -23,9 +23,11 @@ export class PipelineMatrixBundle extends Component {
 
       <PipelineMatrix data={data} onClick={(pipeline)=>{this.setState({pipeline})}} sortColumnBy={this.state.sortColumnsBy}/>
       {this.state.pipeline?
+        <div>
         <SolutionGraph solution={ {description: {
             pipeline: this.state.pipeline
           }} }/>
+        </div>
         : null
       }
     </div>

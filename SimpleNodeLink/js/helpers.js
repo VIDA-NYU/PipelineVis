@@ -11,6 +11,71 @@ export function createGettersSetters(container, parameterDict){
   }
 }
 
+export function extractHyperparams(infos, pipelines){
+  const uniqueHyperparams = {};
+  const hyperparams = {};
+  /* Hyperparams shape:
+       hyperparams = {
+        [module_name]: [
+          { // pipeline_i
+             [hyperparam_1]: [value_1],
+             [hyperparam_2]: [value_2],
+             ...
+             [hyperparam_n]: [value_n],
+          }
+          ...
+        ],
+        [module_name]: [
+          {
+
+          }
+        ]
+       }
+
+   */
+  const moduleNames = Object.keys(infos);
+
+  moduleNames.forEach(moduleName => {
+    hyperparams[moduleName] = [];
+  })
+
+  pipelines.forEach((pipeline) => {
+    pipeline.steps.forEach(step => {
+      if ('hyperparams' in step) {
+        const moduleName = step.primitive.python_path;
+        const moduleParams = {}
+        Object.keys(step['hyperparams']).forEach(paramName => {
+          const hValue = JSON.stringify(step['hyperparams'][paramName]['data']);
+
+          if (! (moduleName in uniqueHyperparams)) {
+            uniqueHyperparams[moduleName] = {};
+          }
+          if (! (paramName in uniqueHyperparams[moduleName])) uniqueHyperparams[moduleName][paramName] = {};
+
+          uniqueHyperparams[moduleName][paramName][hValue] = true;
+          moduleParams[paramName] = hValue;
+
+        });
+        hyperparams[moduleName].push(moduleParams);
+      }
+    });
+  });
+
+  // Since not all hyperparams are used by all modules, normalizing hyperparam table
+
+  moduleNames.forEach(moduleName => {
+    hyperparams[moduleName].forEach(pipeline => {
+      Object.keys(uniqueHyperparams[moduleName]).forEach(paramName => {
+        if (!(paramName in pipeline)){
+          pipeline[paramName] = 'default';
+        }
+      });
+    });
+  });
+
+  return hyperparams;
+}
+
 
 export const constants = {
   sortModuleBy: {
@@ -19,6 +84,7 @@ export const constants = {
   },
   pipelineNameWidth: 200,
   moduleNameHeight: 150,
+  hyperparamsHeight: 200,
   cellWidth: 13,
   cellHeight: 13,
   pipelineScoreWidth: 200,
