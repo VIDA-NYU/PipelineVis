@@ -84,7 +84,7 @@ export const constants = {
   },
   pipelineNameWidth: 200,
   moduleNameHeight: 150,
-  hyperparamsHeight: 200,
+  hyperparamsHeight: 100,
   cellWidth: 13,
   cellHeight: 13,
   pipelineScoreWidth: 200,

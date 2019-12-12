@@ -341,7 +341,11 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
       .append("g")
       .attr("class", "paramcoords")
       .attr("transform", (d, idx)=>`translate(${left + constants.cellWidth * idx}, ${top + pipelines.length * constants.cellHeight})`)
-      .call(verticalParCoord)
+      .call(verticalParCoord),
+      update => update
+        .call(update => update.transition(t)
+          .attr("transform", (d, idx)=>`translate(${left + colScale()}, ${top + pipelines.length * constants.cellHeight})`)
+        )
     );
 
   const highlightColor = "#CCCCCC44";
