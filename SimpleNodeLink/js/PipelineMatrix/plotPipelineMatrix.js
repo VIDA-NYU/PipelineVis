@@ -335,16 +335,16 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
 
   svg
     .selectAll(".paramcoords")
-    .data(hyperparamsArray)
+    .data(hyperparamsArray, (d, idx) => moduleNames[idx])
     .join(
       enter => enter
       .append("g")
       .attr("class", "paramcoords")
-      .attr("transform", (d, idx)=>`translate(${left + constants.cellWidth * idx}, ${top + pipelines.length * constants.cellHeight})`)
+      .attr("transform", (d, idx)=>`translate(${left + colScale(moduleNames[idx])}, ${top + pipelines.length * constants.cellHeight})`)
       .call(verticalParCoord),
       update => update
         .call(update => update.transition(t)
-          .attr("transform", (d, idx)=>`translate(${left + colScale()}, ${top + pipelines.length * constants.cellHeight})`)
+          .attr("transform", (d, idx)=>`translate(${left + colScale(moduleNames[idx])}, ${top + pipelines.length * constants.cellHeight})`)
         )
     );
 
