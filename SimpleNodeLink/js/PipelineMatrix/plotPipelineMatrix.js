@@ -34,7 +34,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
   const colScale = scaleBand()
     .domain(moduleNames)
     .range([0, moduleNames.length * constants.cellWidth ])
-    .paddingInner(0)
+    .paddingInner(0.0001)
     .paddingOuter(0);
 
   const rowScale = scaleBand()
@@ -294,7 +294,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
   const left = constants.margin.left + constants.pipelineNameWidth,
     top = constants.margin.top + constants.moduleNameHeight,
     right = constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth,
-    bottom = constants.margin.top + constants.moduleNameHeight + pipelines.length * constants.cellHeight;
+    bottom = constants.margin.top + constants.moduleNameHeight + pipelines.length * constants.cellHeight + constants.hyperparamsHeight;
 
   svg
     .selectAll("#highlight_row")
@@ -324,27 +324,26 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
 
 
   const hyperparams = extractHyperparams(infos, pipelines);
-
-  console.log(hyperparams);
-
-  const hyperparamsArray = moduleNames.map(mname => hyperparams[mname]);
+  
+  const hyperparamsArray = moduleNames.map(mname => ({key: mname, data: hyperparams[mname]}));
 
   const verticalParCoord = VerticalParCoord()
     .width(colScale.bandwidth())
     .height(constants.hyperparamsHeight);
 
+
   svg
     .selectAll(".paramcoords")
-    .data(hyperparamsArray, (d, idx) => moduleNames[idx])
+    .data(hyperparamsArray, (d, idx) => d.key)
     .join(
       enter => enter
       .append("g")
       .attr("class", "paramcoords")
-      .attr("transform", (d, idx)=>`translate(${left + colScale(moduleNames[idx])}, ${top + pipelines.length * constants.cellHeight})`)
+      .attr("transform", (d, idx)=>`translate(${left + colScale(d.key)}, ${top + pipelines.length * constants.cellHeight})`)
       .call(verticalParCoord),
       update => update
         .call(update => update.transition(t)
-          .attr("transform", (d, idx)=>`translate(${left + colScale(moduleNames[idx])}, ${top + pipelines.length * constants.cellHeight})`)
+          .attr("transform", (d, idx)=>`translate(${left + colScale(d.key)}, ${top + pipelines.length * constants.cellHeight})`)
         )
     );
 

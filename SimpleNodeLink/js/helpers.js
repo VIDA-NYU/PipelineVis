@@ -14,7 +14,9 @@ export function createGettersSetters(container, parameterDict){
 export function extractHyperparams(infos, pipelines){
   const uniqueHyperparams = {};
   const hyperparams = {};
-  /* Hyperparams shape:
+  /* ==============================================
+     Hyperparams shape
+     ==============================================
        hyperparams = {
         [module_name]: [
           { // pipeline_i
@@ -37,7 +39,7 @@ export function extractHyperparams(infos, pipelines){
 
   moduleNames.forEach(moduleName => {
     hyperparams[moduleName] = [];
-  })
+  });
 
   pipelines.forEach((pipeline) => {
     pipeline.steps.forEach(step => {
