@@ -277,7 +277,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
     .text(x=>x)
     .style("fill", "#9a9a9a");
 
-  const legendPipelinePerformance = svg
+  const legendPipelinePerformanceType = svg
     .selectAll("#legend_pipeline_performance")
     .data([1])
     .join(
@@ -290,6 +290,30 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
       .style("fill", "#9a9a9a")
     );
 
+  console.log(pipelines);
+
+  const legendPipelineSourceGroup = svg
+    .selectAll("#legendPipelineSourceGroup")
+    .data([pipelines])
+    .join(
+      enter=>enter
+        .append("g")
+        .attr("id", "legendPipelineSourceGroup")
+        .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, ${constants.margin.top + constants.moduleNameHeight})`)
+    );
+
+  legendPipelineSourceGroup
+    .selectAll("text")
+    .data(x=>x, x=>x.pipeline_digest)
+    .join(
+      enter=>enter
+        .append("text")
+        .attr("text-anchor", "end")
+        .attr("x", 0)
+        .attr("y", (x,id)=>rowScale(id) + bandOver2)
+        .text(x => x.pipeline_source.name)
+        .style("fill", "#9a9a9a")
+    );
 
   const left = constants.margin.left + constants.pipelineNameWidth,
     top = constants.margin.top + constants.moduleNameHeight,
@@ -324,7 +348,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
 
 
   const hyperparams = extractHyperparams(infos, pipelines);
-  
+
   const hyperparamsArray = moduleNames.map(mname => ({key: mname, data: hyperparams[mname]}));
 
   const verticalParCoord = VerticalParCoord()
@@ -334,7 +358,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
 
   svg
     .selectAll(".paramcoords")
-    .data(hyperparamsArray, (d, idx) => d.key)
+    .data(hyperparamsArray, (d, idx) => {if (moduleNames[idx] !== d.key){console.log(moduleNames[idx], d.key)} return d.key})
     .join(
       enter => enter
       .append("g")
