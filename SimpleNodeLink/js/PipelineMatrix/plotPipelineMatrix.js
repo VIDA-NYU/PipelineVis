@@ -38,7 +38,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
     .paddingOuter(0);
 
   const rowScale = scaleBand()
-    .domain(range(pipelines.length))
+    .domain(pipelines.map(x => x.pipeline_digest))
     .range([0, pipelines.length * constants.cellHeight])
     .paddingInner(0)
     .paddingOuter(0);
@@ -57,9 +57,10 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
 
   let deduplicateChecker = {};
 
-  pipelines.forEach((pipeline, pipelineID) => {
+  pipelines.forEach((pipeline) => {
     pipeline['steps'].forEach( (step) => {
       const pythonPath = step.primitive.python_path;
+      const pipelineID = pipeline.pipeline_digest;
       const key = pythonPath + pipelineID;
       if (! (key in deduplicateChecker)){
         deduplicateChecker[key] = true;
@@ -206,7 +207,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
 
   const pipelineScoreBars = svg
     .selectAll("#pipeline_score_bars")
-    .data([1])
+    .data([pipelines])
     .join(
       enter => enter
       .append("g")
@@ -217,12 +218,12 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
 
   pipelineScoreBars
     .selectAll("rect")
-    .data(pipelines, pipeline=>pipeline.pipeline_digest)
+    .data(x=>x, x=>x.pipeline_digest)
     .join(
       enter => enter
       .append("rect")
       .attr("x", 0)
-      .attr("y", (x, idx)=>rowScale(idx) + 3)
+      .attr("y", (x)=>{console.log(x) ; return rowScale(x.pipeline_digest) + 3})
       .attr("width", (x) => scoreScale(x["scores"][0]["value"]))
       .attr("height", rowScale.bandwidth() - 4)
       .style("fill", "#bababa")
@@ -230,12 +231,12 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
 
   pipelineScoreBars
     .selectAll("text")
-    .data(pipelines, pipeline=>pipeline.pipeline_digest)
+    .data(x=>x, pipeline=>pipeline.pipeline_digest)
     .join(
       enter => enter
       .append("text")
       .attr("x", constants.pipelineScoreWidth)
-      .attr("y", (x, idx)=>rowScale(idx) + rowScale.bandwidth())
+      .attr("y", (x)=>rowScale(x.pipeline_digest) + rowScale.bandwidth())
       .attr("text-anchor", "end")
       .text(x=>x["scores"][0]["value"].toFixed(2))
       .style("fill", "#6b6b6b")
@@ -310,7 +311,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
         .append("text")
         .attr("text-anchor", "end")
         .attr("x", 0)
-        .attr("y", (x,id)=>rowScale(id) + bandOver2)
+        .attr("y", (x)=>rowScale(x.pipeline_digest) + bandOver2)
         .text(x => x.pipeline_source.name)
         .style("fill", "#9a9a9a")
     );
