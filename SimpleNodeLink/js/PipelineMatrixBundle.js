@@ -10,7 +10,8 @@ export class PipelineMatrixBundle extends Component {
     super(props);
     this.state = {
       pipeline: null,
-      sortColumnsBy: constants.sortModuleBy.moduleType
+      sortColumnsBy: constants.sortModuleBy.moduleType,
+      sortRowsBy: constants.sortPipelineBy.pipeline_score,
     };
   }
   render(){
@@ -21,7 +22,12 @@ export class PipelineMatrixBundle extends Component {
         <FormControlLabel value={constants.sortModuleBy.importance} control={<Radio />} label="Module Importance" />
       </RadioGroup>
 
-      <PipelineMatrix data={data} onClick={(pipeline)=>{this.setState({pipeline})}} sortColumnBy={this.state.sortColumnsBy}/>
+      <RadioGroup value={this.state.sortRowsBy} onChange={x=>{ this.setState({sortRowsBy: x.target.value})}}>
+        <FormControlLabel value={constants.sortPipelineBy.pipeline_score} control={<Radio />} label="Pipeline Score" />
+        <FormControlLabel value={constants.sortPipelineBy.pipeline_source} control={<Radio />} label="Pipeline Source" />
+      </RadioGroup>
+
+      <PipelineMatrix data={data} onClick={(pipeline)=>{this.setState({pipeline})}} sortColumnBy={this.state.sortColumnsBy} sortRowBy={this.state.sortRowsBy}/>
       {this.state.pipeline?
         <div>
         <SolutionGraph solution={ {description: {

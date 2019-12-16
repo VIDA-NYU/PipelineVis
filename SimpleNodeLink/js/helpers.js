@@ -81,8 +81,12 @@ export function extractHyperparams(infos, pipelines){
 
 export const constants = {
   sortModuleBy: {
-    importance: 'IMPORTANCE',
+    importance: 'MODULE_IMPORTANCE',
     moduleType: 'MODULE_TYPE'
+  },
+  sortPipelineBy: {
+    pipeline_source: 'PIPELINE_SOURCE',
+    pipeline_score: 'PIPELINE_SCORE'
   },
   pipelineNameWidth: 200,
   moduleNameHeight: 150,

@@ -7,8 +7,8 @@ import {constants} from "../helpers";
 export class PipelineMatrix extends Component {
 
   display(props){
-    const {data, onClick, sortColumnBy} = props;
-    plotPipelineMatrix(this.ref, data, onClick, sortColumnBy);
+    const {data, onClick, sortColumnBy, sortRowBy} = props;
+    plotPipelineMatrix(this.ref, data, onClick, sortColumnBy, sortRowBy);
   }
 
   shouldComponentUpdate(newprops){
@@ -39,4 +39,5 @@ PipelineMatrix.propTypes = {
   data: PropTypes.object.isRequired,
   onClick: PropTypes.func,
   sortColumnBy: PropTypes.string,
+  sortRowBy: PropTypes.string
 };
