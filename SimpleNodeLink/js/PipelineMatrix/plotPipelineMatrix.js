@@ -100,9 +100,9 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy=constants.so
       .append("line")
       .attr("class", "row")
       .attr("x1", 0)
-      .attr("y1", (_, idx) => rowScale(idx) + bandOver2)
+      .attr("y1", (x) => rowScale(x.pipeline_digest) + bandOver2)
       .attr("x2", constants.cellWidth * moduleNames.length)
-      .attr("y2", (_, idx) => rowScale(idx) + bandOver2)
+      .attr("y2", (x) => rowScale(x.pipeline_digest) + bandOver2)
       .style("stroke", "#bababa")
       .style("stroke-width", 1)
     );
