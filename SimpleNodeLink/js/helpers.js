@@ -86,7 +86,8 @@ export const constants = {
   },
   sortPipelineBy: {
     pipeline_source: 'PIPELINE_SOURCE',
-    pipeline_score: 'PIPELINE_SCORE'
+    pipeline_score: 'PIPELINE_SCORE',
+    tsp_sort: 'TSP_SORT',
   },
   pipelineNameWidth: 200,
   moduleNameHeight: 150,

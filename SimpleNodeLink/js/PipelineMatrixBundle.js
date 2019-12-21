@@ -25,6 +25,7 @@ export class PipelineMatrixBundle extends Component {
       <RadioGroup value={this.state.sortRowsBy} onChange={x=>{ this.setState({sortRowsBy: x.target.value})}}>
         <FormControlLabel value={constants.sortPipelineBy.pipeline_score} control={<Radio />} label="Pipeline Score" />
         <FormControlLabel value={constants.sortPipelineBy.pipeline_source} control={<Radio />} label="Pipeline Source" />
+        <FormControlLabel value={constants.sortPipelineBy.tsp_sort} control={<Radio />} label="Similarity" />
       </RadioGroup>
 
       <PipelineMatrix data={data} onClick={(pipeline)=>{this.setState({pipeline})}} sortColumnBy={this.state.sortColumnsBy} sortRowBy={this.state.sortRowsBy}/>
