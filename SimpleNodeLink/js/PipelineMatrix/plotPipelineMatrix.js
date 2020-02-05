@@ -369,7 +369,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
 
   const hyperparamsArray = moduleNames.map(mname => ({key: mname, data: hyperparams[mname]}));
 
-  const verticalParCoord = VerticalParCoord()
+  /*const verticalParCoord = VerticalParCoord()
     .width(colScale.bandwidth())
     .height(constants.hyperparamsHeight);
 
@@ -387,7 +387,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         .call(update => update.transition(t)
           .attr("transform", (d, idx) => `translate(${left + colScale(d.key)}, ${top + pipelines.length * constants.cellHeight})`)
         )
-    );
+    );*/
 
   const highlightColor = "#CCCCCC44";
 

@@ -10,7 +10,7 @@ export class PipelineMatrixBundle extends Component {
     super(props);
     this.state = {
       pipeline: null,
-      sortColumnsBy: constants.sortModuleBy.moduleType,
+      sortColumnsBy: constants.sortModuleBy.importance,
       sortRowsBy: constants.sortPipelineBy.pipeline_score,
     };
   }

@@ -79,12 +79,12 @@ def transform_module_type(module_type):
         return module_type
 
 
-def extract_primitive_info(pipelines):
+def extract_primitive_info(pipelines, enet_alpha, enet_l1):
     from sklearn.linear_model import ElasticNet
     pipelines = sorted(pipelines, key=lambda x: x['scores'][0]['normalized'], reverse=True)
     module_matrix, module_names = extract_module_matrix(pipelines)
     scores = extract_scores(pipelines)
-    net = ElasticNet(alpha = 0.001, l1_ratio=0.1, positive=True)
+    net = ElasticNet(alpha=enet_alpha, l1_ratio=enet_l1, positive=True)
     net.fit(module_matrix, scores)
     coef = net.coef_
     module_importances = {}
@@ -137,8 +137,8 @@ def tsp_sort (pipelines):
     J = jaccard_matrix(pipelines)
     return solve_tsp(J)
 
-def prepare_data_pipeline_matrix(pipelines):
-    info, module_types = extract_primitive_info(pipelines)
+def prepare_data_pipeline_matrix(pipelines, enet_alpha=0.001, enet_l1=0.1):
+    info, module_types = extract_primitive_info(pipelines, enet_alpha=enet_alpha, enet_l1=enet_l1)
     similarity_sort = tsp_sort(pipelines)
     for idx, pipeline in enumerate(pipelines):
         pipeline['tsp_sort'] = similarity_sort[idx]
