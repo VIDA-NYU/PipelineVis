@@ -30,11 +30,15 @@ export class PipelineMatrixBundle extends Component {
 
       <PipelineMatrix data={data} onClick={(pipeline)=>{this.setState({pipeline})}} sortColumnBy={this.state.sortColumnsBy} sortRowBy={this.state.sortRowsBy}/>
       {this.state.pipeline?
-        <div>
-        <SolutionGraph solution={ {description: {
-            pipeline: this.state.pipeline
-          }} }/>
-        </div>
+        <>
+          Pipeline Digest: {this.state.pipeline.pipeline_digest}
+          <SolutionGraph
+            solution={ {description: {
+              pipeline: this.state.pipeline
+            }} }
+            onClick={node => console.log(node)}
+          />
+        </>
         : null
       }
     </div>

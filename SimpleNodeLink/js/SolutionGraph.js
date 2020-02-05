@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import dagre from 'dagre';
 import { startCase } from 'lodash';
+import PropTypes from 'prop-types';
 
 function getPrimitiveLabel(name) {
   const nameParts = name.split('.');
@@ -11,6 +12,7 @@ function getPrimitiveLabel(name) {
 }
 
 class SolutionGraph extends PureComponent {
+
   render() {
     const { solution } = this.props;
     if (!solution.description || !solution.description.pipeline) {
@@ -57,6 +59,13 @@ class SolutionGraph extends PureComponent {
     const height =
       Math.max(...g.nodes().map(n => g.node(n).y + g.node(n).height)) + margin;
 
+    const onClick = (graph_idx) => {
+      let [nodeType, nodeIdx] = graph_idx.split(".");
+      nodeIdx = parseInt(nodeIdx);
+      const node = solution.description.pipeline[nodeType][nodeIdx];
+      this.props.onClick(node);
+    };
+
     return (
         <svg style={{width, height}}>
           <g transform={`translate(${margin},${margin})`}>
@@ -85,6 +94,7 @@ class SolutionGraph extends PureComponent {
                       : (n.startsWith('outputs') ? '#c14141' : '#c6c6c6'),
                       padding: '5px',
                     }}
+                    onClick={() => onClick(n)}
                   >
                     {startCase(g.node(n).label)}
                   </div>
@@ -112,5 +122,14 @@ class SolutionGraph extends PureComponent {
     );
   }
 }
+
+SolutionGraph.propTypes = {
+  solution: PropTypes.object,
+  onClick: PropTypes.func
+};
+
+SolutionGraph.defaultProps = {
+  onClick: step => {}, // step of the pipeline that was clicked
+};
 
 export default SolutionGraph;
