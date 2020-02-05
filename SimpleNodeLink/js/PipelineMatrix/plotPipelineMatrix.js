@@ -260,18 +260,18 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
 
 
   const legendModuleType = svg
-    .selectAll("#legend_module_type")
-    .data([1])
+    .selectAll(".legend_module_type")
+    .data([moduleTypeOrder])
     .join(
       enter => enter
         .append("g")
-        .attr("id", "legend_module_type")
+        .attr("class", "legend_module_type")
         .attr("transform", `translate(${constants.margin.left}, ${constants.margin.top})`)
     );
 
   const lengendRowGroup = legendModuleType
     .selectAll("g")
-    .data(moduleTypeOrder)
+    .data(x => x, x => x)
     .join(
       enter => enter
         .append("g")
@@ -295,15 +295,16 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
     .style("fill", "#9a9a9a");
 
   const legendPipelinePerformanceType = svg
-    .selectAll("#legend_pipeline_performance")
-    .data([1])
+    .selectAll(".legend_pipeline_performance")
+    .data([pipelines[0]["scores"][0]["metric"]["metric"]])
     .join(
       enter => enter
         .append("text")
+        .attr("class", "legend_pipeline_performance")
         .attr("text-anchor", "end")
         .attr("x", constants.margin.left + constants.pipelineNameWidth + constants.cellWidth * moduleNames.length + constants.pipelineScoreWidth)
         .attr("y", constants.margin.top + constants.moduleNameHeight - 5)
-        .text(pipelines[0]["scores"][0]["metric"]["metric"])
+        .text(x => x)
         .style("fill", "#9a9a9a")
     );
 
