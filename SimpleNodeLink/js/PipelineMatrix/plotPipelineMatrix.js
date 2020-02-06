@@ -165,8 +165,16 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
       ${constants.margin.top})`)
     );
 
-  console.log(meanScore);
-  console.log(importanceScale(meanScore));
+  /*moduleImportanceBars
+    .selectAll("circle")
+    .data(x => x, x => x) // loading data with identity function
+    .join(
+      enter => enter
+        .append("circle")
+        .attr("cx", x => colScale(x) + 3)
+        .attr("cy", x => importanceScale(infos[x]["module_importance"]))
+        .attr("r", 5)
+    );*/
 
   moduleImportanceBars
     .selectAll("rect")
@@ -181,8 +189,8 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         )
         .attr("width", colScale.bandwidth() - 3)
         .attr("height", x => infos[x]["module_importance"] > meanScore ?
-          importanceScale(meanScore) - (constants.moduleNameHeight - importanceScale(infos[x]["module_importance"]))
-          : constants.moduleNameHeight - importanceScale(meanScore) - importanceScale(infos[x]["module_importance"])
+          (importanceScale(meanScore) - (constants.moduleNameHeight - importanceScale(infos[x]["module_importance"])))
+          : (constants.moduleNameHeight - importanceScale(meanScore) - importanceScale(infos[x]["module_importance"]))
         )
         .style("fill", "#bababa"),
       update => update

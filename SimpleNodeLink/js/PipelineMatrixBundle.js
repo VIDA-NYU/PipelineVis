@@ -73,7 +73,7 @@ export class PipelineMatrixBundle extends Component {
 
     return <div>
       <div>
-        <div>Sort primitives by:</div>
+        <div><strong>Sort primitives by:</strong></div>
         <div className="radio">
           <label>
             <input type="radio" value={sortModuleBy.importance}
@@ -94,7 +94,7 @@ export class PipelineMatrixBundle extends Component {
         </div>
       </div>
 
-      <p>Sort pipelines by:</p>
+      <p><strong>Sort pipelines by:</strong></p>
       <div className="radio">
         <label>
           <input type="radio" value={sortPipelineBy.pipeline_score}
