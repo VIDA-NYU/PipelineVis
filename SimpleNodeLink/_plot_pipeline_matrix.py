@@ -56,7 +56,7 @@ def extract_scores(pipelines):
     for pipeline in pipelines:
         score = pipeline['scores'][0]['value']
         scores.append(score)
-    return scores
+    return np.array(scores)
 
 def transform_module_type(module_type):
     map = {
@@ -79,17 +79,22 @@ def transform_module_type(module_type):
         return module_type
 
 
+def compute_diff_score(feature_idx, coefs, scores):
+    idx_used = np.where(coefs[:, feature_idx] == 1)[0]
+    idx_unused = np.where(coefs[:, feature_idx] == 0)[0]
+    if len(idx_used) == len(scores):
+        return 0
+    return np.mean(scores[idx_used]) - np.mean(scores)
+
 def extract_primitive_info(pipelines, enet_alpha, enet_l1):
-    from sklearn.linear_model import ElasticNet
     pipelines = sorted(pipelines, key=lambda x: x['scores'][0]['normalized'], reverse=True)
     module_matrix, module_names = extract_module_matrix(pipelines)
     scores = extract_scores(pipelines)
-    net = ElasticNet(alpha=enet_alpha, l1_ratio=enet_l1, positive=True)
-    net.fit(module_matrix, scores)
-    coef = net.coef_
+    meanDiff = [compute_diff_score(i, module_matrix, scores) for  i in range(module_matrix.shape[1])]
+    mean_score = np.mean(scores)
     module_importances = {}
     for idx, module_name in enumerate(module_names):
-        module_importances[module_name] = coef[idx]
+        module_importances[module_name] = meanDiff[idx]
     infos = {}
     module_types = set()
     for pipeline in pipelines:
@@ -109,7 +114,7 @@ def extract_primitive_info(pipelines, enet_alpha, enet_l1):
                 "module_name": module_name,
                 "module_importance": module_importance
             }
-    return infos, module_types
+    return infos, module_types, mean_score
 
 def tsp_sort (pipelines):
     def extract_primitives(p):
@@ -138,7 +143,7 @@ def tsp_sort (pipelines):
     return solve_tsp(J)
 
 def prepare_data_pipeline_matrix(pipelines, enet_alpha=0.001, enet_l1=0.1):
-    info, module_types = extract_primitive_info(pipelines, enet_alpha=enet_alpha, enet_l1=enet_l1)
+    info, module_types, mean_score = extract_primitive_info(pipelines, enet_alpha=enet_alpha, enet_l1=enet_l1)
     similarity_sort = tsp_sort(pipelines)
     for idx, pipeline in enumerate(pipelines):
         pipeline['tsp_sort'] = similarity_sort[idx]
@@ -147,6 +152,7 @@ def prepare_data_pipeline_matrix(pipelines, enet_alpha=0.001, enet_l1=0.1):
         "infos": info,
         "pipelines": pipelines,
         "module_types": list(module_types),
+        "mean_score": mean_score,
         "module_type_order": ["Preprocessing", "Feature Extraction", "Operator", "Regression", "Classification"],
     }
     return data

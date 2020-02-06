@@ -8,7 +8,7 @@ import "d3-transition";
 import {VerticalParCoord} from "./VerticalParCoord";
 
 export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.sortModuleBy.moduleType, sortRowBy = constants.sortPipelineBy.pipeline_source) {
-  const {infos, pipelines, module_types: moduleTypes, module_type_order: moduleTypeOrder} = data;
+  const {infos, pipelines, module_types: moduleTypes, module_type_order: moduleTypeOrder, mean_score: meanScore} = data;
   const moduleNames = Object.keys(infos);
 
   const moduleTypeOrderMap = {};
@@ -165,6 +165,9 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
       ${constants.margin.top})`)
     );
 
+  console.log(meanScore);
+  console.log(importanceScale(meanScore));
+
   moduleImportanceBars
     .selectAll("rect")
     .data(x => x, x => x) // loading data with identity function
@@ -172,9 +175,15 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
       enter => enter
         .append("rect")
         .attr("x", x => colScale(x) + 3)
-        .attr("y", x => constants.moduleNameHeight - importanceScale(infos[x]["module_importance"]))
+        .attr("y", x => infos[x]["module_importance"] > meanScore ?
+          constants.moduleNameHeight - importanceScale(infos[x]["module_importance"])
+          : importanceScale(meanScore)
+        )
         .attr("width", colScale.bandwidth() - 3)
-        .attr("height", x => importanceScale(infos[x]["module_importance"]))
+        .attr("height", x => infos[x]["module_importance"] > meanScore ?
+          importanceScale(meanScore) - (constants.moduleNameHeight - importanceScale(infos[x]["module_importance"]))
+          : constants.moduleNameHeight - importanceScale(meanScore) - importanceScale(infos[x]["module_importance"])
+        )
         .style("fill", "#bababa"),
       update => update
         .call(update => {
