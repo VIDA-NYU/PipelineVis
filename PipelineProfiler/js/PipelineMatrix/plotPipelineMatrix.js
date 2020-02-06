@@ -215,8 +215,21 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         .attr("x2", constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth)
         .attr("y1", x => constants.margin.top + constants.moduleNameHeight + importanceScale(x))
         .attr("y2", x => constants.margin.top + constants.moduleNameHeight + importanceScale(x))
-        .style("stroke", "#FF0000")
+        .style("stroke", "rgb(107, 107, 107)")
         .style("stroke-width", 1)
+    );
+
+  const moduleMeanImportanceText = svg
+    .selectAll(".moduleMeanImportanceText")
+    .data([meanScore], x=>x)
+    .join(
+      enter => enter
+        .append("text")
+        .attr("class", "moduleMeanImportanceText")
+        .attr("x", constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth)
+        .attr("y", x => constants.margin.top + constants.moduleNameHeight + importanceScale(x))
+        .style("fill", "rgb(107, 107, 107)")
+        .text(meanScore)
     );
 
   const moduleNameLabels = svg.selectAll("#module_names")
