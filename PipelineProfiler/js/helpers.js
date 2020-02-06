@@ -90,6 +90,7 @@ export const constants = {
     tsp_sort: 'TSP_SORT',
   },
   pipelineNameWidth: 200,
+  moduleImportanceHeight: 150,
   moduleNameHeight: 150,
   hyperparamsHeight: 100,
   cellWidth: 13,

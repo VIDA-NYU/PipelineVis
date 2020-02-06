@@ -29,12 +29,12 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
     pipelines.sort((a, b) => b["scores"][0]["value"] - a["scores"][0]["value"]);
     pipelines.sort((a, b) => a.pipeline_source.name > b.pipeline_source.name ? 1 : (a.pipeline_source.name < b.pipeline_source.name ? -1 : 1));
   } else if (sortRowBy === constants.sortPipelineBy.tsp_sort) {
-    pipelines.sort((a,b) => a.tsp_sort - b.tsp_sort)
+    pipelines.sort((a, b) => a.tsp_sort - b.tsp_sort)
   }
 
   const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
     constants.margin.left + constants.margin.right;
-  const svgHeight = pipelines.length * constants.cellHeight + constants.moduleNameHeight +
+  const svgHeight = pipelines.length * constants.cellHeight + constants.moduleNameHeight + constants.moduleImportanceHeight +
     constants.margin.top + constants.margin.bottom;
 
   const svg = select(ref)
@@ -91,7 +91,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         .append("g")
         .attr("id", "guideLinesGroup")
         .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, 
-      ${constants.margin.top + constants.moduleNameHeight})`),
+      ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`),
       update => update
     );
 
@@ -135,7 +135,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
       enter => enter.append("g")
         .attr("id", "gdots")
         .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, 
-      ${constants.margin.top + constants.moduleNameHeight})`)
+      ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`)
     );
 
   moduleDots
@@ -162,7 +162,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         .append("g")
         .attr("id", "module_importance_bars")
         .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth},
-      ${constants.margin.top})`)
+      ${constants.margin.top + constants.moduleNameHeight})`)
     );
 
   /*moduleImportanceBars
@@ -199,6 +199,24 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
               .attr("x", x => colScale(x) + 3)
           }
         )
+    );
+
+  console.log(meanScore)
+  console.log(importanceScale.domain());
+
+  const moduleMeanImportanceLine = svg
+    .selectAll(".moduleMeanImportanceLine")
+    .data([meanScore], x=>x)
+    .join(
+      enter => enter
+        .append("line")
+        .attr("class", "moduleMeanImportanceLine")
+        .attr("x1", constants.margin.left + constants.pipelineNameWidth)
+        .attr("x2", constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth)
+        .attr("y1", x => constants.margin.top + constants.moduleNameHeight + importanceScale(x))
+        .attr("y2", x => constants.margin.top + constants.moduleNameHeight + importanceScale(x))
+        .style("stroke", "#FF0000")
+        .style("stroke-width", 1)
     );
 
   const moduleNameLabels = svg.selectAll("#module_names")
@@ -240,7 +258,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         .append("g")
         .attr("id", "pipeline_score_bars")
         .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth},
-        ${constants.margin.top + constants.moduleNameHeight})`)
+        ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`)
     );
 
   pipelineScoreBars
@@ -320,7 +338,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         .attr("class", "legend_pipeline_performance")
         .attr("text-anchor", "end")
         .attr("x", constants.margin.left + constants.pipelineNameWidth + constants.cellWidth * moduleNames.length + constants.pipelineScoreWidth)
-        .attr("y", constants.margin.top + constants.moduleNameHeight - 5)
+        .attr("y", constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight - 5)
         .text(x => x)
         .style("fill", "#9a9a9a")
     );
@@ -332,7 +350,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
       enter => enter
         .append("g")
         .attr("id", "legendPipelineSourceGroup")
-        .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, ${constants.margin.top + constants.moduleNameHeight})`)
+        .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`)
     );
 
   legendPipelineSourceGroup
@@ -352,9 +370,9 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
     );
 
   const left = constants.margin.left + constants.pipelineNameWidth,
-    top = constants.margin.top + constants.moduleNameHeight,
+    top = constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight,
     right = constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth,
-    bottom = constants.margin.top + constants.moduleNameHeight + pipelines.length * constants.cellHeight + constants.hyperparamsHeight;
+    bottom = constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight + pipelines.length * constants.cellHeight + constants.hyperparamsHeight;
 
   svg
     .selectAll("#highlight_row")
