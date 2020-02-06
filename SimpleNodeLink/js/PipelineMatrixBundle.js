@@ -42,6 +42,8 @@ export class PipelineMatrixBundle extends Component {
     if (selectedPrimitive) {
       if (selectedPrimitive.primitive) {
         primitiveName = selectedPrimitive.primitive.python_path;
+      } else if (selectedPrimitive.name) {
+        primitiveName = selectedPrimitive.name;
       }
       const tableData = this.createHyperparamTableDataFromNode(selectedPrimitive);
       if (tableData) {
