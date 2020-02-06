@@ -184,13 +184,13 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         .append("rect")
         .attr("x", x => colScale(x) + 3)
         .attr("y", x => infos[x]["module_importance"] > meanScore ?
-          constants.moduleNameHeight - importanceScale(infos[x]["module_importance"])
+          constants.moduleImportanceHeight - importanceScale(infos[x]["module_importance"])
           : importanceScale(meanScore)
         )
         .attr("width", colScale.bandwidth() - 3)
         .attr("height", x => infos[x]["module_importance"] > meanScore ?
-          (importanceScale(meanScore) - (constants.moduleNameHeight - importanceScale(infos[x]["module_importance"])))
-          : (constants.moduleNameHeight - importanceScale(meanScore) - importanceScale(infos[x]["module_importance"]))
+          (importanceScale(meanScore) - (constants.moduleImportanceHeight - importanceScale(infos[x]["module_importance"])))
+          : (constants.moduleImportanceHeight - importanceScale(meanScore) - importanceScale(infos[x]["module_importance"]))
         )
         .style("fill", "#bababa"),
       update => update

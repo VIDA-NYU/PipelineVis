@@ -84,14 +84,14 @@ def compute_diff_score(feature_idx, coefs, scores):
     idx_unused = np.where(coefs[:, feature_idx] == 0)[0]
     if len(idx_used) == len(scores):
         return 0
-    return np.mean(scores[idx_used]) - np.mean(scores)
+    return np.mean(scores[idx_used]) - np.mean(scores[idx_unused])
 
 def extract_primitive_info(pipelines, enet_alpha, enet_l1):
     pipelines = sorted(pipelines, key=lambda x: x['scores'][0]['normalized'], reverse=True)
     module_matrix, module_names = extract_module_matrix(pipelines)
     scores = extract_scores(pipelines)
     meanDiff = [compute_diff_score(i, module_matrix, scores) for  i in range(module_matrix.shape[1])]
-    mean_score = np.mean(scores)
+    mean_score = np.mean(meanDiff)
     module_importances = {}
     for idx, module_name in enumerate(module_names):
         module_importances[module_name] = meanDiff[idx]
