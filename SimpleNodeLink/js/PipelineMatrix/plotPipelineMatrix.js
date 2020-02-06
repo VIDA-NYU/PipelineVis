@@ -35,7 +35,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
   const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
     constants.margin.left + constants.margin.right;
   const svgHeight = pipelines.length * constants.cellHeight + constants.moduleNameHeight +
-    constants.margin.top + constants.margin.bottom + constants.hyperparamsHeight;
+    constants.margin.top + constants.margin.bottom;
 
   const svg = select(ref)
     .style("width", svgWidth + "px")

@@ -1,8 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from 'prop-types';
 import {plotPipelineMatrix} from "./plotPipelineMatrix";
-import {Radio, RadioGroup, FormControlLabel} from '@material-ui/core';
-import {constants} from "../helpers";
 
 export class PipelineMatrix extends Component {
 

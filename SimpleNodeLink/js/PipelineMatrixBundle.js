@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import PropTypes from 'prop-types';
 import {PipelineMatrix} from "./PipelineMatrix";
 import SolutionGraph from "./SolutionGraph";
-import {FormControlLabel, Radio, RadioGroup} from "@material-ui/core";
 import {constants} from "./helpers";
 
 export class PipelineMatrixBundle extends Component {
@@ -14,32 +13,140 @@ export class PipelineMatrixBundle extends Component {
       sortRowsBy: constants.sortPipelineBy.pipeline_score,
     };
   }
+
+  createHyperparamTableDataFromNode(node){
+    console.log(node);
+    const tableData = [];
+    if ('hyperparams' in node) {
+      for (const hyperparamName of Object.keys(node.hyperparams)) {
+        let row = {};
+        row['name'] = hyperparamName;
+        row['value'] = node.hyperparams[hyperparamName].data;
+        tableData.push(row);
+      }
+    }
+    if (tableData.length === 0) {
+      return null;
+    }
+    return tableData;
+  }
+
   render(){
+
     const {data} = this.props;
+    const {selectedPrimitive} = this.state;
+    const {sortModuleBy, sortPipelineBy} = constants;
+
+    let primitiveName = "";
+    let primitiveHyperparamsView = null;
+    if (selectedPrimitive) {
+      if (selectedPrimitive.primitive) {
+        primitiveName = selectedPrimitive.primitive.python_path;
+      }
+      const tableData = this.createHyperparamTableDataFromNode(selectedPrimitive);
+      if (tableData) {
+        primitiveHyperparamsView = <>
+          <p><strong>Primitive Name:</strong> {primitiveName}</p>
+          <table>
+            <tr>
+              <th>Parameter Name</th>
+              <th>Parameter Value</th>
+            </tr>
+            {tableData.map(row => (
+              <tr key={row.name}>
+                <td>{row.name}</td>
+                <td>{JSON.stringify(row.value)}</td>
+              </tr>
+            ))}
+          </table>
+        </>;
+      } else {
+        primitiveHyperparamsView = <>
+          <p><strong>Primitive Name:</strong> {primitiveName}</p>
+          <p>No hyperparameters set.</p>
+          </>;
+      }
+
+    }
+
     return <div>
-      <RadioGroup value={this.state.sortColumnsBy} onChange={x=>{ this.setState({sortColumnsBy: x.target.value})}}>
-        <FormControlLabel value={constants.sortModuleBy.moduleType} control={<Radio />} label="Module Type" />
-        <FormControlLabel value={constants.sortModuleBy.importance} control={<Radio />} label="Module Importance" />
-      </RadioGroup>
+      <div>
+        <div>Sort primitives by:</div>
+        <div className="radio">
+          <label>
+            <input type="radio" value={sortModuleBy.importance}
+                   checked={this.state.sortColumnsBy === sortModuleBy.importance}
+                   onClick={x=>{ this.setState({sortColumnsBy: sortModuleBy.importance})}}
+            />
+            Module Importance
+          </label>
+        </div>
+        <div className="radio">
+          <label>
+            <input type="radio" value={sortModuleBy.moduleType}
+                   checked={this.state.sortColumnsBy === sortModuleBy.moduleType}
+                   onClick={x=>{ this.setState({sortColumnsBy: sortModuleBy.moduleType})}}
+            />
+            Module Type
+          </label>
+        </div>
+      </div>
 
-      <RadioGroup value={this.state.sortRowsBy} onChange={x=>{ this.setState({sortRowsBy: x.target.value})}}>
-        <FormControlLabel value={constants.sortPipelineBy.pipeline_score} control={<Radio />} label="Pipeline Score" />
-        <FormControlLabel value={constants.sortPipelineBy.pipeline_source} control={<Radio />} label="Pipeline Source" />
-        <FormControlLabel value={constants.sortPipelineBy.tsp_sort} control={<Radio />} label="Similarity" />
-      </RadioGroup>
+      <p>Sort pipelines by:</p>
+      <div className="radio">
+        <label>
+          <input type="radio" value={sortPipelineBy.pipeline_score}
+                 checked={this.state.sortRowsBy === sortPipelineBy.pipeline_score}
+                 onClick={x=>{ this.setState({sortRowsBy: sortPipelineBy.pipeline_score})}}
+          />
+          Pipeline score
+        </label>
+      </div>
+      <div className="radio">
+        <label>
+          <input type="radio" value={sortPipelineBy.pipeline_source}
+                 checked={this.state.sortRowsBy === sortPipelineBy.pipeline_source}
+                 onClick={x=>{ this.setState({sortRowsBy: sortPipelineBy.pipeline_source})}}
+          />
+          Pipeline source
+        </label>
+      </div>
+      <div className="radio">
+        <label>
+          <input type="radio" value={sortPipelineBy.tsp_sort}
+                 checked={this.state.sortRowsBy === sortPipelineBy.tsp_sort}
+                 onClick={x=>{ this.setState({sortRowsBy: sortPipelineBy.tsp_sort})}}
+          />
+          Similarity
+        </label>
+      </div>
 
-      <PipelineMatrix data={data} onClick={(pipeline)=>{this.setState({pipeline})}} sortColumnBy={this.state.sortColumnsBy} sortRowBy={this.state.sortRowsBy}/>
+      <PipelineMatrix
+        data={data}
+        onClick={
+          (pipeline) => {
+            this.setState({pipeline, primitiveParams: null})
+          }
+        }
+        sortColumnBy={this.state.sortColumnsBy}
+        sortRowBy={this.state.sortRowsBy}
+      />
       {this.state.pipeline?
         <>
-          Pipeline Digest: {this.state.pipeline.pipeline_digest}
+          <p><strong>Pipeline Digest: </strong> {this.state.pipeline.pipeline_digest}</p>
           <SolutionGraph
             solution={ {description: {
               pipeline: this.state.pipeline
             }} }
-            onClick={node => console.log(node)}
+            onClick={node => {
+              this.setState({selectedPrimitive: node})
+            }}
           />
         </>
         : null
+      }
+      {
+        primitiveHyperparamsView
       }
     </div>
   }
