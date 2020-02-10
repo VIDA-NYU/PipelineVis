@@ -90,7 +90,6 @@ def extract_primitive_info(pipelines, enet_alpha, enet_l1):
     module_matrix, module_names = extract_module_matrix(pipelines)
     scores = extract_scores(pipelines)
     meanDiff = [compute_diff_score(i, module_matrix, scores) for  i in range(module_matrix.shape[1])]
-    mean_score = np.mean(meanDiff)
     module_importances = {}
     for idx, module_name in enumerate(module_names):
         module_importances[module_name] = meanDiff[idx]
@@ -113,15 +112,14 @@ def extract_primitive_info(pipelines, enet_alpha, enet_l1):
                 "module_name": module_name,
                 "module_importance": module_importance
             }
-    return infos, module_types, mean_score
+    return infos, module_types
 
 def prepare_data_pipeline_matrix(pipelines, enet_alpha=0.001, enet_l1=0.1):
-    info, module_types, mean_score = extract_primitive_info(pipelines, enet_alpha=enet_alpha, enet_l1=enet_l1)
+    info, module_types = extract_primitive_info(pipelines, enet_alpha=enet_alpha, enet_l1=enet_l1)
     data = {
         "infos": info,
         "pipelines": pipelines,
         "module_types": list(module_types),
-        "mean_score": mean_score,
         "module_type_order": ["Preprocessing", "Feature Extraction", "Operator", "Regression", "Classification"],
     }
     return data
