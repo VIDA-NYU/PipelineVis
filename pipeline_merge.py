@@ -8,7 +8,7 @@
 import json
 import argparse
 
-def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=-1):
+def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=-1, verbose=False):
     # Function that merges the pipelines file with the pipeline_runs file.
     # Arguments:
     # pipelines_file: Path to the pipeline_runs file. See http://metalearning.datadrivendiscovery.org/dumps
@@ -49,7 +49,8 @@ def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=-1):
                 }
                 merged.append(data)
             except Exception as e:
-                print (repr(e))
+                if (verbose):
+                    print (repr(e))
         print ("Done.")
     return merged
 
@@ -61,7 +62,8 @@ if __name__ == "__main__":
     parser.add_argument("pipelines_file", help="Path to the pipelines file. See http://metalearning.datadrivendiscovery.org/dumps", type=str)
     parser.add_argument("output_file", help="Path to output file.", type=str)
     parser.add_argument("-n", "--number_pipelines", help="Number of pipelines to save to the file. If n=-1, save all pipelines to the merged file.", type=int, default=-1)
+    parser.add_argument("-v", "--verbose", help="Increase output verbosity (show json key errors)", action="store_true")
     args = parser.parse_args()
-    d = merge_pipeline_files(args.pipelines_file, args.pipeline_runs_file, n = args.number_pipelines)
+    d = merge_pipeline_files(args.pipelines_file, args.pipeline_runs_file, n = args.number_pipelines, verbose=args.verbose)
     with open(args.output_file, "w", encoding="utf8") as f:
         json.dump(d, f)
