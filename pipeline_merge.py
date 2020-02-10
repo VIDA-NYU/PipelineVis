@@ -24,7 +24,7 @@ def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=-1):
             pipelines[pipeline["digest"]] = pipeline
     
     # merging pipeline information with pipeline_runs
-    print ("Merging pipeline information with pipeline_runs_file...")
+    print ("Merging pipeline information with pipeline_runs_file (this might take a while)...")
     merged = []
     with open(pipeline_runs_file, "r",  encoding="utf8") as f:
         for line in f:
@@ -49,7 +49,7 @@ def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=-1):
                 }
                 merged.append(data)
             except Exception as e:
-                print (e)
+                print (repr(e))
         print ("Done.")
     return merged
 
@@ -65,8 +65,3 @@ if __name__ == "__main__":
     d = merge_pipeline_files(args.pipelines_file, args.pipeline_runs_file, n = args.number_pipelines)
     with open(args.output_file, "w", encoding="utf8") as f:
         json.dump(d, f)
-
-
-
-
-
