@@ -34,7 +34,7 @@ import rpy2.robjects as robjects
 from rpy2.robjects import numpy2ri
 numpy2ri.activate()
 robjects.r('''
-       source('johnson_green_fabbris_metrics.r')
+       source('johnson.r')
 ''')
 
 johnsonR = robjects.globalenv['johnsonR']
