@@ -9,6 +9,12 @@ import json
 import argparse
 
 def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=-1):
+    # Function that merges the pipelines file with the pipeline_runs file.
+    # Arguments:
+    # pipelines_file: Path to the pipeline_runs file. See http://metalearning.datadrivendiscovery.org/dumps
+    # pipeline_runs_file: Path to the pipelines file. See http://metalearning.datadrivendiscovery.org/dumps
+    # n: Number of merged pipelines to output. If n=-1, save all pipelines to the merged file
+
     # adding pipelines to lookup table {<digest>: <data>}
     print ("Adding pipelines to lookup table...")
     pipelines = {}
