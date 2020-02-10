@@ -2,16 +2,17 @@
 # coding: utf-8
 
 # Script that preprocesses and merges "pipelines" and "pipeline_runs" from D3M Metalearning 
-# Last files downloaded from https://gitlab.com/datadrivendiscovery/metalearning and 
-# https://metalearning.datadrivendiscovery.org/dumps/2019/10/04/
+# Last files downloaded from https://metalearning.datadrivendiscovery.org/dumps/2019/10/04/
+# Metalearning data description: https://gitlab.com/datadrivendiscovery/metalearning
 
 import json
+import argparse
 
-def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=1000):
+def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=-1):
     # adding pipelines to lookup table {<digest>: <data>}
     print ("Adding pipelines to lookup table...")
     pipelines = {}
-    with open(pipelines_file, "r") as f:
+    with open(pipelines_file, "r", encoding="utf8") as f:
         for line in f:
             pipeline = json.loads(line)
             pipelines[pipeline["digest"]] = pipeline
@@ -19,7 +20,7 @@ def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=1000):
     # merging pipeline information with pipeline_runs
     print ("Merging pipeline information with pipeline_runs_file...")
     merged = []
-    with open(pipeline_runs_file, "r") as f:
+    with open(pipeline_runs_file, "r",  encoding="utf8") as f:
         for line in f:
             if len(merged) == n:
                 break
@@ -49,11 +50,15 @@ def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=1000):
 
 
 if __name__ == "__main__":
-	pipeline_runs_file = "C:/Users/Jorge Ono/Documents/d3m_metalearning/pipeline_runs-1570214933.json"
-	pipelines_file = "C:/Users/Jorge Ono/Documents/d3m_metalearning/pipelines-1570214926.json"
-	d = merge_pipeline_files(pipelines_file, pipeline_runs_file, n = -1)
-	with open("C:/Users/Jorge Ono/Documents/d3m_metalearning/pipelines_processed_20191004.json", "w") as f:
-	    json.dump(d, f)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("pipeline_runs_file", help="Path to the pipeline_runs file. See http://metalearning.datadrivendiscovery.org/dumps", type=str)
+    parser.add_argument("pipelines_file", help="Path to the pipelines file. See http://metalearning.datadrivendiscovery.org/dumps", type=str)
+    parser.add_argument("output_file", help="Path to output file.", type=str)
+    parser.add_argument("-n", "--number_pipelines", help="Number of pipelines to save to the file. If n=-1, save all pipelines to the merged file.", type=int, default=-1)
+    args = parser.parse_args()
+    d = merge_pipeline_files(args.pipelines_file, args.pipeline_runs_file, n = args.number_pipelines)
+    with open(args.output_file, "w", encoding="utf8") as f:
+        json.dump(d, f)
 
 
 
