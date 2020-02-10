@@ -3,7 +3,6 @@ import string
 import numpy as np
 import json
 from scipy import optimize
-from tsp_solver.greedy import solve_tsp
 
 def id_generator(size=15):
     """Helper function to generate random div ids. This is useful for embedding
@@ -14,7 +13,7 @@ def id_generator(size=15):
 
 def make_html(data_dict):
 	lib_path = pkg_resources.resource_filename(__name__, "build/pipelineVis.js")
-	bundle = open(lib_path).read()
+	bundle = open(lib_path, "r", encoding="utf8").read()
 	html_all = """
 	<html>
 	<head>
@@ -116,38 +115,8 @@ def extract_primitive_info(pipelines, enet_alpha, enet_l1):
             }
     return infos, module_types, mean_score
 
-def tsp_sort (pipelines):
-    def extract_primitives(p):
-        primitives = set()
-        for module in p['steps']:
-            module_id = '.'.join(module['primitive']['python_path'].split('.')[2:])
-            primitives.add(module_id)
-        return primitives
-
-    def pipeline_jaccard(p1, p2):
-        s1 = extract_primitives(p1)
-        s2 = extract_primitives(p2)
-        return len(s1 & s2) / len(s1 | s2)
-
-    def jaccard_matrix(pipelines):
-        n = len(pipelines)
-        matrix = np.zeros([n, n])
-        for i in range(n-1):
-            for j in range(i+1, n):
-                matrix[i, j] = pipeline_jaccard(pipelines[i], pipelines[j])
-        matrix += matrix.T
-        matrix += np.eye(n)
-        return matrix
-
-    J = jaccard_matrix(pipelines)
-    return solve_tsp(J)
-
 def prepare_data_pipeline_matrix(pipelines, enet_alpha=0.001, enet_l1=0.1):
     info, module_types, mean_score = extract_primitive_info(pipelines, enet_alpha=enet_alpha, enet_l1=enet_l1)
-    similarity_sort = tsp_sort(pipelines)
-    for idx, pipeline in enumerate(pipelines):
-        pipeline['tsp_sort'] = similarity_sort[idx]
-
     data = {
         "infos": info,
         "pipelines": pipelines,

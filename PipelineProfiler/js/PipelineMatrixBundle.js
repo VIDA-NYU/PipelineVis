@@ -113,16 +113,6 @@ export class PipelineMatrixBundle extends Component {
           Pipeline source
         </label>
       </div>
-      <div className="radio">
-        <label>
-          <input type="radio" value={sortPipelineBy.tsp_sort}
-                 checked={this.state.sortRowsBy === sortPipelineBy.tsp_sort}
-                 onClick={x=>{ this.setState({sortRowsBy: sortPipelineBy.tsp_sort})}}
-          />
-          Similarity
-        </label>
-      </div>
-
       <PipelineMatrix
         data={data}
         onClick={

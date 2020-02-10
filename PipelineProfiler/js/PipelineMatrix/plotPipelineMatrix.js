@@ -28,9 +28,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
   } else if (sortRowBy === constants.sortPipelineBy.pipeline_source) {
     pipelines.sort((a, b) => b["scores"][0]["value"] - a["scores"][0]["value"]);
     pipelines.sort((a, b) => a.pipeline_source.name > b.pipeline_source.name ? 1 : (a.pipeline_source.name < b.pipeline_source.name ? -1 : 1));
-  } else if (sortRowBy === constants.sortPipelineBy.tsp_sort) {
-    pipelines.sort((a, b) => a.tsp_sort - b.tsp_sort)
-  }
+  } 
 
   const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
     constants.margin.left + constants.margin.right;

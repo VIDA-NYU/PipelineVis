@@ -6,9 +6,6 @@
 # https://metalearning.datadrivendiscovery.org/dumps/2019/10/04/
 
 import json
-from IPython.core.display import display, HTML
-display(HTML("<style>.container { width:2500px !important; }</style>"))
-
 
 def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=1000):
     # adding pipelines to lookup table {<digest>: <data>}
@@ -52,10 +49,10 @@ def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=1000):
 
 
 if __name__ == "__main__":
-	pipeline_runs_file = "/Users/jorgehpo/Documents/D3MPipelines/pipeline_runs-1570214933.json"
-	pipelines_file = "/Users/jorgehpo/Documents/D3MPipelines/pipelines-1570214926.json"
+	pipeline_runs_file = "C:/Users/Jorge Ono/Documents/d3m_metalearning/pipeline_runs-1570214933.json"
+	pipelines_file = "C:/Users/Jorge Ono/Documents/d3m_metalearning/pipelines-1570214926.json"
 	d = merge_pipeline_files(pipelines_file, pipeline_runs_file, n = -1)
-	with open("/Users/jorgehpo/Documents/D3MPipelines/pipelines_processed_20191004.json", "w") as f:
+	with open("C:/Users/Jorge Ono/Documents/d3m_metalearning/pipelines_processed_20191004.json", "w") as f:
 	    json.dump(d, f)
 
 
