@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import PropTypes from 'prop-types';
 import {plotPipelineMatrix} from "./plotPipelineMatrix";
+import "./pipelineMatrix.css";
 
 export class PipelineMatrix extends Component {
 

@@ -45,7 +45,7 @@ export function extractHyperparams(infos, pipelines){
     pipeline.steps.forEach(step => {
       if ('hyperparams' in step) {
         const moduleName = step.primitive.python_path;
-        const moduleParams = {}
+        const moduleParams = {};
         Object.keys(step['hyperparams']).forEach(paramName => {
           const hValue = JSON.stringify(step['hyperparams'][paramName]['data']);
 
@@ -89,7 +89,7 @@ export const constants = {
     pipeline_score: 'PIPELINE_SCORE',
   },
   pipelineNameWidth: 200,
-  moduleImportanceHeight: 150,
+  moduleImportanceHeight: 100,
   moduleNameHeight: 150,
   hyperparamsHeight: 100,
   cellWidth: 13,
