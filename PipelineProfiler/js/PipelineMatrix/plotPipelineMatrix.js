@@ -51,9 +51,13 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
     .paddingInner(0)
     .paddingOuter(0);
 
+  const importanceDomain = extent(moduleNames, x => infos[x]["module_importance"]);
+
+  const halfImportanceDomain = Math.max(Math.abs(importanceDomain[0]), Math.abs(importanceDomain[1]));
+
   const importanceScale = scaleLinear()
-    .domain(extent(moduleNames, x => infos[x]["module_importance"]))
-    .range([0, constants.moduleNameHeight]);
+    .domain([0, halfImportanceDomain])
+    .range([0, constants.moduleNameHeight/2]);
 
 
   const bandOver2 = rowScale.bandwidth() / 2;
@@ -174,6 +178,8 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         .attr("r", 5)
     );*/
 
+  const halfImportanceHeight = constants.moduleImportanceHeight / 2;
+
   moduleImportanceBars
     .selectAll("rect")
     .data(x => x, x => x) // loading data with identity function
@@ -182,13 +188,13 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         .append("rect")
         .attr("x", x => colScale(x) + 3)
         .attr("y", x => infos[x]["module_importance"] > 0 ?
-          constants.moduleImportanceHeight - importanceScale(infos[x]["module_importance"])
-          : importanceScale(0)
+          halfImportanceHeight - importanceScale(infos[x]["module_importance"])
+          : halfImportanceHeight
         )
         .attr("width", colScale.bandwidth() - 3)
         .attr("height", x => infos[x]["module_importance"] > 0 ?
-          (importanceScale(0) - (constants.moduleImportanceHeight - importanceScale(infos[x]["module_importance"])))
-          : (constants.moduleImportanceHeight - importanceScale(0) - importanceScale(infos[x]["module_importance"]))
+          importanceScale(infos[x]["module_importance"])
+          : importanceScale(-infos[x]["module_importance"])
         )
         .style("fill", "#bababa"),
       update => update
@@ -199,19 +205,17 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         )
     );
 
-  console.log(importanceScale.domain());
-
   const moduleMeanImportanceLine = svg
     .selectAll(".moduleMeanImportanceLine")
-    .data([0], x => x)
+    .data([halfImportanceHeight], x => x)
     .join(
       enter => enter
         .append("line")
         .attr("class", "moduleMeanImportanceLine")
         .attr("x1", constants.margin.left + constants.pipelineNameWidth)
         .attr("x2", constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth)
-        .attr("y1", x => constants.margin.top + constants.moduleNameHeight + importanceScale(x))
-        .attr("y2", x => constants.margin.top + constants.moduleNameHeight + importanceScale(x))
+        .attr("y1", x => constants.margin.top + constants.moduleNameHeight + halfImportanceHeight)
+        .attr("y2", x => constants.margin.top + constants.moduleNameHeight + halfImportanceHeight)
         .style("stroke", "rgb(107, 107, 107)")
         .style("stroke-width", 1)
     );
@@ -224,7 +228,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         .append("text")
         .attr("class", "moduleMeanImportanceText")
         .attr("x", constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth)
-        .attr("y", x => constants.margin.top + constants.moduleNameHeight + importanceScale(x))
+        .attr("y", x => constants.margin.top + constants.moduleNameHeight + halfImportanceHeight)
         .style("fill", "rgb(107, 107, 107)")
         .text(x => x)
     );
