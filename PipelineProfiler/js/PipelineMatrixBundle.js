@@ -79,6 +79,7 @@ export class PipelineMatrixBundle extends Component {
             <input type="radio" value={sortModuleBy.importance}
                    checked={this.state.sortColumnsBy === sortModuleBy.importance}
                    onClick={x=>{ this.setState({sortColumnsBy: sortModuleBy.importance})}}
+                   onChange={x=>{}}
             />
             Module Importance
           </label>
@@ -88,6 +89,7 @@ export class PipelineMatrixBundle extends Component {
             <input type="radio" value={sortModuleBy.moduleType}
                    checked={this.state.sortColumnsBy === sortModuleBy.moduleType}
                    onClick={x=>{ this.setState({sortColumnsBy: sortModuleBy.moduleType})}}
+                   onChange={x=>{}}
             />
             Module Type
           </label>
@@ -100,6 +102,7 @@ export class PipelineMatrixBundle extends Component {
           <input type="radio" value={sortPipelineBy.pipeline_score}
                  checked={this.state.sortRowsBy === sortPipelineBy.pipeline_score}
                  onClick={x=>{ this.setState({sortRowsBy: sortPipelineBy.pipeline_score})}}
+                 onChange={x=>{}}
           />
           Pipeline score
         </label>
@@ -109,6 +112,7 @@ export class PipelineMatrixBundle extends Component {
           <input type="radio" value={sortPipelineBy.pipeline_source}
                  checked={this.state.sortRowsBy === sortPipelineBy.pipeline_source}
                  onClick={x=>{ this.setState({sortRowsBy: sortPipelineBy.pipeline_source})}}
+                 onChange={x=>{}}
           />
           Pipeline source
         </label>

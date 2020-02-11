@@ -444,21 +444,30 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
     const mGlobal = mouse(this);
 
     if (mGlobal[0] >= left && mGlobal[0] <= right && mGlobal[1] >= top && mGlobal[1] <= bottom) {
-      //const localX = colScale.invert(mGlobal[0]),
-      //  localY = rowScale.invert(mGlobal[1]);
-      const pipelineIdx = pipelines[Math.floor((mGlobal[1] - top) / constants.cellHeight)].pipeline_digest;
-      const colIdx = Math.floor((mGlobal[0] - left) / constants.cellHeight);
-      const moduleName = moduleNames[colIdx];
+      const row = Math.floor((mGlobal[1] - top) / constants.cellHeight);
+      if (row < pipelines.length) {
+        const pipelineIdx = pipelines[Math.floor((mGlobal[1] - top) / constants.cellHeight)].pipeline_digest;
+        const colIdx = Math.floor((mGlobal[0] - left) / constants.cellHeight);
+        const moduleName = moduleNames[colIdx];
 
-      svg
-        .select("#highlight_row")
-        .attr("y", rowScale(pipelineIdx) + top)
-        .style("fill", highlightColor);
+        svg
+          .select("#highlight_row")
+          .attr("y", rowScale(pipelineIdx) + top)
+          .style("fill", highlightColor);
 
-      svg
-        .select("#highlight_col")
-        .attr("x", colScale(moduleName) + left)
-        .style("fill", highlightColor);
+        svg
+          .select("#highlight_col")
+          .attr("x", colScale(moduleName) + left)
+          .style("fill", highlightColor);
+      } else {
+        svg
+          .select("#highlight_row")
+          .style("fill", "#00000000");
+
+        svg
+          .select("#highlight_col")
+          .style("fill", "#00000000");
+      }
     } else {
       svg
         .select("#highlight_row")
