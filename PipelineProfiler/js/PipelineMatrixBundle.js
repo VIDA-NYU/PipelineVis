@@ -15,7 +15,6 @@ export class PipelineMatrixBundle extends Component {
   }
 
   createHyperparamTableDataFromNode(node){
-    console.log(node);
     const tableData = [];
     if ('hyperparams' in node) {
       for (const hyperparamName of Object.keys(node.hyperparams)) {
@@ -49,16 +48,18 @@ export class PipelineMatrixBundle extends Component {
         primitiveHyperparamsView = <>
           <p><strong>Primitive Name:</strong> {primitiveName}</p>
           <table>
-            <tr>
-              <th>Parameter Name</th>
-              <th>Parameter Value</th>
-            </tr>
-            {tableData.map(row => (
-              <tr key={row.name}>
-                <td>{row.name}</td>
-                <td>{JSON.stringify(row.value)}</td>
+            <tbody>
+              <tr>
+                <th>Parameter Name</th>
+                <th>Parameter Value</th>
               </tr>
-            ))}
+              {tableData.map(row => (
+                <tr key={row.name}>
+                  <td>{row.name}</td>
+                  <td>{JSON.stringify(row.value)}</td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </>;
       } else {

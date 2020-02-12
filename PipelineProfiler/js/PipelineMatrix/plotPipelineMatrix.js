@@ -3,14 +3,15 @@ import {select, event, mouse} from "d3-selection";
 import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
 import {extent} from "d3-array";
 import {schemeCategory10} from "d3-scale-chromatic";
-import {constants, extractHyperparams} from "../helpers";
+import {constants, extractHyperparams, computePrimitiveImportances} from "../helpers";
 import "d3-transition";
 import {axisLeft} from "d3-axis";
-import {VerticalParCoord} from "./VerticalParCoord";
 
 export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.sortModuleBy.moduleType, sortRowBy = constants.sortPipelineBy.pipeline_source) {
   const {infos, pipelines, module_types: moduleTypes, module_type_order: moduleTypeOrder} = data;
   const moduleNames = Object.keys(infos);
+
+  console.log(computePrimitiveImportances(infos, pipelines, {type: constants.scoreRequest.D3MSCORE, name: 'ACCURACY'}));
 
   const moduleTypeOrderMap = {};
   moduleTypeOrder.forEach((x, idx) => {
@@ -288,7 +289,6 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
           .attr("transform", x => `translate(${constants.pipelineScoreWidth}, ${rowScale(x.pipeline_digest) + rowScale.bandwidth()})`)
         )
     );
-
 
   const legendModuleType = svg
     .selectAll(".legend_module_type")

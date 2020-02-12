@@ -64,7 +64,6 @@ export function extractHyperparams(infos, pipelines){
   });
 
   // Since not all hyperparams are used by all modules, normalizing hyperparam table
-
   moduleNames.forEach(moduleName => {
     hyperparams[moduleName].forEach(pipeline => {
       Object.keys(uniqueHyperparams[moduleName]).forEach(paramName => {
@@ -74,12 +73,82 @@ export function extractHyperparams(infos, pipelines){
       });
     });
   });
-
   return hyperparams;
 }
 
+function extractPrimitiveNames(pipeline){
+  return pipeline['steps'].map(step => step['primitive']['python_path'])
+}
+
+function computePipelinePrimitiveHashTable(pipelines) {
+  const pipelinePrimitiveLookup = [];
+  for (const pipeline of pipelines) {
+    const hash = {};
+    for (const primitive of extractPrimitiveNames(pipeline)){
+      hash[primitive] = true;
+    }
+    pipelinePrimitiveLookup.push(hash)
+  }
+  return pipelinePrimitiveLookup;
+}
+
+
+
+function extractScores (pipelines, scoreRequest) { // scoreRequest: {type: constants.scoreRequest, name: str}
+  if (scoreRequest['type'] === constants.scoreRequest.TIME){
+    return pipelines.map(p => (new Date(p['end']) - new Date(p['start'])) / 1000);
+  } else if (scoreRequest['type'] === constants.scoreRequest.D3MSCORE) {
+    let idxScore = -1;
+    pipelines[0]['scores'].forEach((score, idx) => {
+      if (score['metric']['metric'] === scoreRequest.name) {
+        idxScore = idx;
+      }
+    });
+    if (idxScore === -1) {
+      return null;
+    }
+    return pipelines.map(p => p['scores'][idxScore]['value']);
+  }
+}
+
+function computePrimitiveImportance(pipelinePrimitiveLookup, scores, primitive) {
+  let meanScoreUsing = 0;
+  let meanScoreNotUsing = 0;
+  let nUsing = 0;
+  let nNotUsing = 0;
+  pipelinePrimitiveLookup.forEach((hash, idx) => {
+    if (primitive in hash) {
+      meanScoreUsing += scores[idx];
+      nUsing += 1;
+    } else {
+      meanScoreNotUsing += scores[idx];
+      nNotUsing += 1
+    }
+  });
+  if (nUsing === scores.length || nNotUsing === scores.length) {
+    return 0;
+  }
+  meanScoreUsing =  meanScoreUsing / nUsing;
+  meanScoreNotUsing = meanScoreNotUsing / nNotUsing;
+  return meanScoreUsing - meanScoreNotUsing;
+}
+
+export function computePrimitiveImportances(infos, pipelines, scoreRequest) {
+  const primitiveNames = Object.keys(infos);
+  const scores = extractScores(pipelines, scoreRequest);
+  const hashTable = computePipelinePrimitiveHashTable(pipelines);
+  return primitiveNames.map(primitiveName => computePrimitiveImportance(hashTable, scores, primitiveName));
+}
+
+export function extractMetrics(pipelines) {
+  return pipelines[0]['scores'].map(score => score['metric']['metric']);
+}
 
 export const constants = {
+  scoreRequest: {
+    TIME: 'TIME',
+    D3MSCORE: 'D3MSCORE'
+  },
   sortModuleBy: {
     importance: 'MODULE_IMPORTANCE',
     moduleType: 'MODULE_TYPE'
