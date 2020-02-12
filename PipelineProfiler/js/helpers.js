@@ -94,7 +94,7 @@ function computePipelinePrimitiveHashTable(pipelines) {
 
 
 
-function extractScores (pipelines, scoreRequest) { // scoreRequest: {type: constants.scoreRequest, name: str}
+export function extractMetric (pipelines, scoreRequest) { // scoreRequest: {type: constants.scoreRequest, name: str}
   if (scoreRequest['type'] === constants.scoreRequest.TIME){
     return pipelines.map(p => (new Date(p['end']) - new Date(p['start'])) / 1000);
   } else if (scoreRequest['type'] === constants.scoreRequest.D3MSCORE) {
@@ -135,12 +135,16 @@ function computePrimitiveImportance(pipelinePrimitiveLookup, scores, primitive) 
 
 export function computePrimitiveImportances(infos, pipelines, scoreRequest) {
   const primitiveNames = Object.keys(infos);
-  const scores = extractScores(pipelines, scoreRequest);
+  const scores = extractMetric(pipelines, scoreRequest);
   const hashTable = computePipelinePrimitiveHashTable(pipelines);
-  return primitiveNames.map(primitiveName => computePrimitiveImportance(hashTable, scores, primitiveName));
+  const primitiveImportances = {};
+  primitiveNames.forEach(name => {
+    primitiveImportances[name] = computePrimitiveImportance(hashTable, scores, name);
+  });
+  return primitiveImportances;
 }
 
-export function extractMetrics(pipelines) {
+export function extractMetricNames(pipelines) {
   return pipelines[0]['scores'].map(score => score['metric']['metric']);
 }
 

@@ -77,22 +77,10 @@ def transform_module_type(module_type):
     else:
         return module_type
 
-
-def compute_diff_score(feature_idx, coefs, scores):
-    idx_used = np.where(coefs[:, feature_idx] == 1)[0]
-    idx_unused = np.where(coefs[:, feature_idx] == 0)[0]
-    if len(idx_used) == len(scores):
-        return 0
-    return np.mean(scores[idx_used]) - np.mean(scores[idx_unused])
-
 def extract_primitive_info(pipelines, enet_alpha, enet_l1):
     pipelines = sorted(pipelines, key=lambda x: x['scores'][0]['normalized'], reverse=True)
     module_matrix, module_names = extract_module_matrix(pipelines)
     scores = extract_scores(pipelines)
-    meanDiff = [compute_diff_score(i, module_matrix, scores) for  i in range(module_matrix.shape[1])]
-    module_importances = {}
-    for idx, module_name in enumerate(module_names):
-        module_importances[module_name] = meanDiff[idx]
     infos = {}
     module_types = set()
     for pipeline in pipelines:
@@ -105,12 +93,10 @@ def extract_primitive_info(pipelines, enet_alpha, enet_l1):
             module_type = transform_module_type(split[2])
             module_types.add(module_type)
             module_name = split[3]
-            module_importance = module_importances[python_path]
             infos[python_path] = {
                 "module_desc": module_desc,
                 "module_type": module_type,
                 "module_name": module_name,
-                "module_importance": module_importance
             }
     return infos, module_types
 

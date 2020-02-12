@@ -3,32 +3,38 @@ import {select, event, mouse} from "d3-selection";
 import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
 import {extent} from "d3-array";
 import {schemeCategory10} from "d3-scale-chromatic";
-import {constants, extractHyperparams, computePrimitiveImportances} from "../helpers";
+import {constants, extractHyperparams, extractMetric, computePrimitiveImportances} from "../helpers";
 import "d3-transition";
 import {axisLeft} from "d3-axis";
 
-export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.sortModuleBy.moduleType, sortRowBy = constants.sortPipelineBy.pipeline_source) {
+export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumnBy = constants.sortModuleBy.moduleType, sortRowBy = constants.sortPipelineBy.pipeline_source) {
   const {infos, pipelines, module_types: moduleTypes, module_type_order: moduleTypeOrder} = data;
   const moduleNames = Object.keys(infos);
-
-  console.log(computePrimitiveImportances(infos, pipelines, {type: constants.scoreRequest.D3MSCORE, name: 'ACCURACY'}));
 
   const moduleTypeOrderMap = {};
   moduleTypeOrder.forEach((x, idx) => {
     moduleTypeOrderMap[x] = idx;
   });
 
+  const importances = computePrimitiveImportances(infos, pipelines, metricRequest);
+  const selectedScores = extractMetric(pipelines, metricRequest);
+  const selectedScoresDigests = selectedScores.map((score, idx) => ({score, pipeline_digest: pipelines[idx].pipeline_digest}));
+  const selectedScoresDigestsMap = {};
+  selectedScoresDigests.forEach(x => {
+    selectedScoresDigestsMap[x.pipeline_digest] = x.score;
+  });
+
   if (sortColumnBy === constants.sortModuleBy.importance) {
-    moduleNames.sort((a, b) => infos[b]['module_importance'] - infos[a]['module_importance']);
+    moduleNames.sort((a, b) => importances[b] - importances[a]);
   } else if (sortColumnBy === constants.sortModuleBy.moduleType) {
-    moduleNames.sort((a, b) => infos[b]['module_importance'] - infos[a]['module_importance']);
+    moduleNames.sort((a, b) => importances[b] - importances[a]);
     moduleNames.sort((a, b) => moduleTypeOrderMap[infos[a]['module_type']] - moduleTypeOrderMap[infos[b]['module_type']]);
   }
 
   if (sortRowBy === constants.sortPipelineBy.pipeline_score) {
-    pipelines.sort((a, b) => b["scores"][0]["value"] - a["scores"][0]["value"]);
+    pipelines.sort((a, b) => selectedScoresDigestsMap[b.pipeline_digest] - selectedScoresDigestsMap[a.pipeline_digest]);
   } else if (sortRowBy === constants.sortPipelineBy.pipeline_source) {
-    pipelines.sort((a, b) => b["scores"][0]["value"] - a["scores"][0]["value"]);
+    pipelines.sort((a, b) => selectedScoresDigestsMap[b.pipeline_digest] - selectedScoresDigestsMap[a.pipeline_digest]);
     pipelines.sort((a, b) => a.pipeline_source.name > b.pipeline_source.name ? 1 : (a.pipeline_source.name < b.pipeline_source.name ? -1 : 1));
   }
 
@@ -53,7 +59,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
     .paddingInner(0)
     .paddingOuter(0);
 
-  const importanceDomain = extent(moduleNames, x => infos[x]["module_importance"]);
+  const importanceDomain = extent(moduleNames, x => importances[x]);
 
   const halfImportanceDomain = Math.max(Math.abs(importanceDomain[0]), Math.abs(importanceDomain[1]));
 
@@ -185,14 +191,14 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
       enter => enter
         .append("rect")
         .attr("x", x => colScale(x) + 3)
-        .attr("y", x => infos[x]["module_importance"] > 0 ?
-          halfImportanceHeight - importanceScale(infos[x]["module_importance"])
+        .attr("y", x => importances[x] > 0 ?
+          halfImportanceHeight - importanceScale(importances[x])
           : halfImportanceHeight
         )
         .attr("width", colScale.bandwidth() - 3)
-        .attr("height", x => infos[x]["module_importance"] > 0 ?
-          importanceScale(infos[x]["module_importance"])
-          : importanceScale(-infos[x]["module_importance"])
+        .attr("height", x => importances[x] > 0 ?
+          importanceScale(importances[x])
+          : importanceScale(-importances[x])
         )
         .style("fill", "#bababa"),
       update => update
@@ -244,12 +250,12 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
     );
 
   const scoreScale = scaleLinear()
-    .domain(extent(pipelines, x => x["scores"][0]["value"]))
+    .domain(extent(selectedScores, x => x))
     .range([0, constants.pipelineScoreWidth]);
 
   const pipelineScoreBars = svg
     .selectAll("#pipeline_score_bars")
-    .data([pipelines])
+    .data([selectedScoresDigests])
     .join(
       enter => enter
         .append("g")
@@ -265,7 +271,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
       enter => enter
         .append("rect")
         .attr("transform", x => `translate(0, ${rowScale(x.pipeline_digest) + 3})`)
-        .attr("width", (x) => scoreScale(x["scores"][0]["value"]))
+        .attr("width", (x) => scoreScale(x.score))
         .attr("height", rowScale.bandwidth() - 4)
         .style("fill", "#bababa"),
       update => update
@@ -282,7 +288,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         .append("text")
         .attr("transform", x => `translate(${constants.pipelineScoreWidth}, ${rowScale(x.pipeline_digest) + rowScale.bandwidth()})`)
         .attr("text-anchor", "end")
-        .text(x => x["scores"][0]["value"].toFixed(2))
+        .text(x => x.score.toFixed(2))
         .style("fill", "#6b6b6b"),
       update => update
         .call(update => update.transition(t)
@@ -329,7 +335,7 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
 
   const legendPipelinePerformanceType = svg
     .selectAll(".legend_pipeline_performance")
-    .data([pipelines[0]["scores"][0]["metric"]["metric"]])
+    .data([metricRequest.name])
     .join(
       enter => enter
         .append("text")
@@ -338,7 +344,13 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
         .attr("x", constants.margin.left + constants.pipelineNameWidth + constants.cellWidth * moduleNames.length + constants.pipelineScoreWidth)
         .attr("y", constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight - 5)
         .text(x => x)
-        .style("fill", "#9a9a9a")
+        .style("fill", "#9a9a9a"),
+      update => update
+        .attr("text-anchor", "end")
+        .attr("x", constants.margin.left + constants.pipelineNameWidth + constants.cellWidth * moduleNames.length + constants.pipelineScoreWidth)
+        .attr("y", constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight - 5)
+        .text(x => x)
+        .style("fill", "#9a9a9a"),
     );
 
   const legendPipelineSourceGroup = svg
