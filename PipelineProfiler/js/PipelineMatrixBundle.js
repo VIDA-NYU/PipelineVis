@@ -32,7 +32,6 @@ export class PipelineMatrixBundle extends Component {
   }
 
   render(){
-
     const {data} = this.props;
     const {selectedPrimitive} = this.state;
     const {sortModuleBy, sortPipelineBy} = constants;
@@ -121,7 +120,8 @@ export class PipelineMatrixBundle extends Component {
         data={data}
         onClick={
           (pipeline) => {
-            this.setState({pipeline, primitiveParams: null})
+            this.setState({pipeline})
+            this.setState({selectedPrimitive: null})
           }
         }
         sortColumnBy={this.state.sortColumnsBy}

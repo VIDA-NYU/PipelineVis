@@ -177,21 +177,6 @@ export function plotPipelineMatrix(ref, data, onClick, sortColumnBy = constants.
 
   const halfImportanceHeight = constants.moduleImportanceHeight / 2;
 
-  const moduleMeanImportanceLine = svg
-    .selectAll(".moduleMeanImportanceLine")
-    .data([halfImportanceHeight], x => x)
-    .join(
-      enter => enter
-        .append("line")
-        .attr("class", "moduleMeanImportanceLine")
-        .attr("x1", constants.margin.left + constants.pipelineNameWidth)
-        .attr("x2", constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth)
-        .attr("y1", x => constants.margin.top + constants.moduleNameHeight + halfImportanceHeight)
-        .attr("y2", x => constants.margin.top + constants.moduleNameHeight + halfImportanceHeight)
-        .style("stroke", "rgb(107, 107, 107)")
-        .style("stroke-width", 1)
-    );
-
   moduleImportanceBars
     .selectAll("rect")
     .data(x => x, x => x) // loading data with identity function
