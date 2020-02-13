@@ -184,6 +184,8 @@ export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumn
 
   const halfImportanceHeight = constants.moduleImportanceHeight / 2;
 
+  console.log(importances)
+
   moduleImportanceBars
     .selectAll("rect")
     .data(x => x, x => x) // loading data with identity function
@@ -205,6 +207,16 @@ export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumn
         .call(update => {
             return update.transition(t)
               .attr("x", x => colScale(x) + 3)
+              .attr("y", x => importances[x] > 0 ?
+                halfImportanceHeight - importanceScale(importances[x])
+                : halfImportanceHeight
+              )
+              .attr("width", colScale.bandwidth() - 3)
+              .attr("height", x => importances[x] > 0 ?
+                importanceScale(importances[x])
+                : importanceScale(-importances[x])
+              )
+              .style("fill", "#bababa")
           }
         )
     );
@@ -277,6 +289,9 @@ export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumn
       update => update
         .call(update => update.transition(t)
           .attr("transform", x => `translate(0, ${rowScale(x.pipeline_digest) + 3})`)
+          .attr("width", (x) => scoreScale(x.score))
+          .attr("height", rowScale.bandwidth() - 4)
+          .style("fill", "#bababa"),
         )
     );
 
@@ -293,6 +308,9 @@ export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumn
       update => update
         .call(update => update.transition(t)
           .attr("transform", x => `translate(${constants.pipelineScoreWidth}, ${rowScale(x.pipeline_digest) + rowScale.bandwidth()})`)
+          .attr("text-anchor", "end")
+          .text(x => x.score.toFixed(2))
+          .style("fill", "#6b6b6b"),
         )
     );
 
@@ -333,6 +351,10 @@ export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumn
     .text(x => x)
     .style("fill", "#9a9a9a");
 
+  console.log(metricRequest.name);
+
+  /*
+  ====> Removed this text and used a select instead.
   const legendPipelinePerformanceType = svg
     .selectAll(".legend_pipeline_performance")
     .data([metricRequest.name])
@@ -351,7 +373,7 @@ export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumn
         .attr("y", constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight - 5)
         .text(x => x)
         .style("fill", "#9a9a9a"),
-    );
+    );*/
 
   const legendPipelineSourceGroup = svg
     .selectAll("#legendPipelineSourceGroup")
