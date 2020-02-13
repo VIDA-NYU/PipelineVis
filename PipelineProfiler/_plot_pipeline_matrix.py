@@ -2,7 +2,6 @@ import pkg_resources
 import string
 import numpy as np
 import json
-from scipy import optimize
 
 def id_generator(size=15):
     """Helper function to generate random div ids. This is useful for embedding

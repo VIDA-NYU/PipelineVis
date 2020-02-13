@@ -10,7 +10,7 @@ export class PipelineMatrix extends Component {
     super(props);
     const metricNames = extractMetricNames(this.props.data.pipelines);
     let metricOptions = metricNames.map(name => ({type: constants.scoreRequest.D3MSCORE, name}));
-    metricOptions.push({type: constants.scoreRequest.TIME, name: 'TIME'});
+    metricOptions.push({type: constants.scoreRequest.TIME, name: 'TIME (s)'});
     const metricRequest = metricOptions[0];
     //const scores = extract
     this.state = {
