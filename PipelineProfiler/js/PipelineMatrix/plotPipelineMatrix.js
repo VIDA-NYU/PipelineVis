@@ -184,8 +184,6 @@ export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumn
 
   const halfImportanceHeight = constants.moduleImportanceHeight / 2;
 
-  console.log(importances)
-
   moduleImportanceBars
     .selectAll("rect")
     .data(x => x, x => x) // loading data with identity function
@@ -351,8 +349,6 @@ export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumn
     .text(x => x)
     .style("fill", "#9a9a9a");
 
-  console.log(metricRequest.name);
-
   /*
   ====> Removed this text and used a select instead.
   const legendPipelinePerformanceType = svg
@@ -461,6 +457,7 @@ export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumn
 
   svg.on("mousemove", function () {
     const mGlobal = mouse(this);
+    console.log(mGlobal);
 
     if (mGlobal[0] >= left && mGlobal[0] <= right && mGlobal[1] >= top && mGlobal[1] <= bottom) {
       const row = Math.floor((mGlobal[1] - top) / constants.cellHeight);

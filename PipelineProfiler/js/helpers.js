@@ -1,3 +1,5 @@
+import { median } from 'd3-array';
+
 export function createGettersSetters(container, parameterDict){
   let keys = Object.keys(parameterDict);
   for (let kid in keys){
@@ -112,25 +114,19 @@ export function extractMetric (pipelines, scoreRequest) { // scoreRequest: {type
 }
 
 function computePrimitiveImportance(pipelinePrimitiveLookup, scores, primitive) {
-  let meanScoreUsing = 0;
-  let meanScoreNotUsing = 0;
-  let nUsing = 0;
-  let nNotUsing = 0;
+  let arrayUsing = [];
+  let arrayNotUsing = [];
   pipelinePrimitiveLookup.forEach((hash, idx) => {
     if (primitive in hash) {
-      meanScoreUsing += scores[idx];
-      nUsing += 1;
+      arrayUsing.push(scores[idx]);
     } else {
-      meanScoreNotUsing += scores[idx];
-      nNotUsing += 1
+      arrayNotUsing.push(scores[idx]);
     }
   });
-  if (nUsing === scores.length || nNotUsing === scores.length) {
+  if (arrayUsing.length === scores.length || arrayNotUsing.length === scores.length) {
     return 0;
   }
-  meanScoreUsing =  meanScoreUsing / nUsing;
-  meanScoreNotUsing = meanScoreNotUsing / nNotUsing;
-  return meanScoreUsing - meanScoreNotUsing;
+  return median(arrayUsing) - median(arrayNotUsing);
 }
 
 export function computePrimitiveImportances(infos, pipelines, scoreRequest) {
