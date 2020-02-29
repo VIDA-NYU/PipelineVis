@@ -2,14 +2,26 @@ import networkx as nx
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 
+def graph_data_accessor(node, graph_name):
+    if 'hyperparams' in node:
+        hyperparams = node['hyperparams']
+    else:
+        hyperparams = {}
+    return {
+        'python_path': node['primitive']['python_path'],
+        'hyperparams': hyperparams,
+        'graph_name': graph_name
+    }
+
 def pipeline_to_graph(pipeline, name=''):
     G = nx.DiGraph(name=name)
     # Adding input node
-    G.add_node('inputs.0', python_path = 'Input')
+    G.add_node('inputs.0', data=[{'python_path': 'Input', 'hyperparams': {}, 'graph_name': name}])
     # Adding all steps
     steps = pipeline['steps']
     for idx, step in enumerate(steps):
         step_key = 'steps.' + str(idx)
+        G.add_node(step_key, data = [graph_data_accessor(step, name)])
         for argument_key in step['arguments']:
             arguments = step['arguments'][argument_key]['data']
             if not isinstance(arguments, list):
@@ -17,9 +29,8 @@ def pipeline_to_graph(pipeline, name=''):
             for argument in arguments:
                 argument_key = '.'.join(argument.split(".")[:2])
                 G.add_edge(argument_key, step_key)
-                G.nodes[step_key]['python_path'] = step['primitive']['python_path']
     # Adding output node
-    G.add_node('outputs.0', python_path = 'Output')
+    G.add_node('outputs.0', data=[{'python_path': 'Output', 'hyperparams': {}, 'graph_name': name}])
     out_node_input = '.'.join(pipeline['outputs'][0]['data'].split(".")[:2])
     G.add_edge(out_node_input, 'outputs.0')
     return G
@@ -42,13 +53,19 @@ def compute_node_similarity_matrix(g1, g2):
     similarity = np.zeros([len(g1.nodes), len(g2.nodes)])
     for idx_g1, n_g1 in enumerate(g1.nodes):
         for idx_g2, n_g2 in enumerate(g2.nodes):
-            python_path1 = g1.nodes[n_g1]['python_path']
-            python_path2 = g2.nodes[n_g2]['python_path']
-            similarity[idx_g1, idx_g2] = python_path_similarity(python_path1, python_path2)
+            datas1 = g1.nodes[n_g1]['data']
+            datas2 = g2.nodes[n_g2]['data']
+            similarities = []
+            for data1 in datas1: # Node can have multiple primitives. Computing the max average similarity
+                for data2 in datas2:
+                    python_path1 = data1['python_path']
+                    python_path2 = data2['python_path']
+                    similarities.append(python_path_similarity(python_path1, python_path2))
+            similarity[idx_g1, idx_g2] = np.mean(similarities)
     return similarity
 
 def compute_edit_cost_matrix(similarity_matrix, add_cost, del_cost):
-    INF = 1.1
+    INF = 1000
     # compute
     n_nodes_g1 = similarity_matrix.shape[0]
     n_nodes_g2 = similarity_matrix.shape[1]
@@ -94,24 +111,26 @@ def dict_append(dictionary, key, value):
 
 def merge_graphs(g1, g2):
     equivalence_g1, equivalence_g2 = compute_node_equivalence(g1, g1)
-    print(equivalence_g1)
     G = nx.DiGraph()
+    # Adding g1 node data
     for node in g1.nodes:
-        python_path = g1.nodes[node]["python_path"]
+        data = g1.nodes[node]["data"]
         if node not in equivalence_g1:
             node = "G1." + node
         G.add_node(node)
-        dict_append(G.nodes[node], "python_path", python_path)
+        G.nodes[node]["data"] = data
+
+    # Adding g2 node data
     for node in g2.nodes:
-        python_path = g2.nodes[node]["python_path"]
+        data = g2.nodes[node]["data"]
         if node not in equivalence_g2:
             node = "G2." + node
+            G.add_node(node, data = data)
         else:
             node = equivalence_g2[node]
-        G.add_node(node)
-        dict_append(G.nodes[node], "python_path", python_path)
+            G.nodes[node]["data"] = G.nodes[node]["data"] + data
 
-    # Adding g1
+    # Adding edges from g1
     for edge in g1.edges:
         source, dest = edge
         if source not in equivalence_g1:
@@ -119,7 +138,8 @@ def merge_graphs(g1, g2):
         if dest not in equivalence_g1:
             dest = "G1." + dest
         G.add_edge(source, dest)
-    # Merging with G2
+
+    # Merging edges from g2
     for edge in g2.edges:
         source, dest = edge
         if source not in equivalence_g2:
