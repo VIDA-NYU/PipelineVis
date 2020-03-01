@@ -11,7 +11,7 @@ def id_generator(size=15):
     return ''.join(np.random.choice(chars, size, replace=True))
 
 
-def make_html(data_dict):
+def make_html(data_dict, draw_function):
 	lib_path = pkg_resources.resource_filename(__name__, "build/pipelineVis.js")
 	bundle = open(lib_path).read()
 	html_all = """
@@ -25,16 +25,22 @@ def make_html(data_dict):
 	    <div id="{id}">
 	    </div>
 	    <script>
-	        pipelineVis.renderPipelineNodeLink("#{id}", {data_dict});
+	        pipelineVis.{draw_function}("#{id}", {data_dict});
 	    </script>
 	</body>
 	</html>
-	""".format(bundle=bundle, id=id_generator(), data_dict=json.dumps(data_dict))
+	""".format(bundle=bundle, draw_function=draw_function, id=id_generator(), data_dict=json.dumps(data_dict))
 	return html_all
 
 def plot_pipeline_node_link(data_dict):
     """Takes as input an array of model expl objects (mldiff.compute_exp_obj) and the dataset, and plots coocurring rules
     in the IPython cell."""
     from IPython.core.display import display, HTML
-    html_all = make_html(data_dict)
+    html_all = make_html(data_dict, draw_function="renderPipelineNodeLink")
+    display(HTML(html_all))
+
+def plot_merged_pipeline(data_dict):
+    """Takes as input networkx.readwrite.json_graph.node_link_data and renders a graph in the IPython Cell"""
+    from IPython.core.display import display, HTML
+    html_all = make_html(data_dict, draw_function="renderMergedPipeline")
     display(HTML(html_all))

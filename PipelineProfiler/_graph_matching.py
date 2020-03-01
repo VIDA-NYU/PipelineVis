@@ -61,6 +61,7 @@ def compute_node_similarity_matrix(g1, g2):
                     python_path1 = data1['python_path']
                     python_path2 = data2['python_path']
                     path_similarity = python_path_similarity(python_path1, python_path2)
+                    # small hack to consider "neighborhood" (TODO: replace similarity flooding)
                     n_g1_proc = '.'.join(n_g1.split(".")[-2:])
                     n_g2_proc = '.'.join(n_g2.split(".")[-2:])
                     if n_g1_proc == n_g2_proc:
