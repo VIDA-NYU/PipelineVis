@@ -76,20 +76,26 @@ class MergedGraph extends PureComponent {
                 height={g.node(n).height}
                 requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"
               >
-                <div
-                  style={{
-                    textAlign: 'center',
-                    fontSize: '12px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-                    border: 'solid 1px black',
-                    borderColor: '#c6c6c6',
-                    padding: '5px',
-                  }}
-                >
-                  {JSON.stringify(g.node(n).data.map(node => node.python_path))}
+                <div>
+                  {
+                    g.node(n).data.map(node => {
+                      return <div
+                        style={{
+                          textAlign: 'center',
+                          fontSize: '12px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          height: nodeDimentions.height + "px",
+                          border: 'solid 1px black',
+                          borderColor: '#c6c6c6',
+                          padding: '5px',
+                        }}
+                      >
+                        {JSON.stringify(g.node(n).data.map(node => node.python_path))}
+                      </div>;
+                    })
+                  }
                 </div>
               </foreignObject>
             </g>
