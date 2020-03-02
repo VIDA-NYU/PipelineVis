@@ -2,16 +2,12 @@ import React, { PureComponent } from 'react';
 import dagre from 'dagre';
 import { startCase } from 'lodash';
 import PropTypes from 'prop-types';
+import {getPrimitiveLabel} from "./helpers";
 
 function preprocessNode(node) {
   let primitives = {}; // map that keep track of primitives and what graph uses them
   for (const data of node.data) {
     let {python_path} = data;
-    /*[{'data': [{'python_path': 'Input',
-        'hyperparams': {},
-        'graph_name': ''},
-        {'python_path': 'Input', 'hyperparams': {}, 'graph_name': ''}],
-      'id': 'inputs.0'},*/
     if (!(python_path in primitives)) {
       primitives[python_path] = [data];
     } else {
@@ -20,9 +16,11 @@ function preprocessNode(node) {
   }
   let subnodes = [];
   Object.keys(primitives).forEach(python_path => {
+    console.log(primitives[python_path]);
     let subnode = {
       id: node.id,
       python_path: python_path,
+      node_name: primitives[python_path][0]['node_name'],
       origins: [],
       hyperparams: [],
     };
@@ -45,7 +43,7 @@ class MergedGraph extends PureComponent {
     g.setDefaultEdgeLabel(function() {
       return {};
     });
-    const nodeDimentions = { width: 120, height: 70 };
+    const nodeDimentions = { width: 100, height: 55 };
     merged.nodes.forEach(node => {
       const preprocessed = preprocessNode(node);
       g.setNode(node.id, {data: preprocessed, width: nodeDimentions.width, height: preprocessed.length*nodeDimentions.height})
@@ -92,7 +90,15 @@ class MergedGraph extends PureComponent {
                           padding: '5px',
                         }}
                       >
-                        {JSON.stringify(g.node(n).data.map(node => node.python_path))}
+                        <div style={{
+                          left: 0,
+                          top: 0,
+                          position: 'absolute',
+                          width:10,
+                          height:10,
+                          background: '#ff0000'
+                        }}></div>
+                        {getPrimitiveLabel(node.node_name)}
                       </div>;
                     })
                   }

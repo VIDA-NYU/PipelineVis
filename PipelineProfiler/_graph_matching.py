@@ -10,13 +10,14 @@ def graph_data_accessor(node, graph_name):
     return {
         'python_path': node['primitive']['python_path'],
         'hyperparams': hyperparams,
-        'graph_name': graph_name
+        'graph_name': graph_name,
+        'node_name': node['primitive']['name']
     }
 
 def pipeline_to_graph(pipeline, name=''):
     G = nx.DiGraph(name=name)
     # Adding input node
-    G.add_node('inputs.0', data=[{'python_path': 'Input', 'hyperparams': {}, 'graph_name': name}])
+    G.add_node('inputs.0', data=[{'python_path': 'Input', 'node_name': 'Input', 'hyperparams': {}, 'graph_name': name}])
     # Adding all steps
     steps = pipeline['steps']
     for idx, step in enumerate(steps):
@@ -30,7 +31,7 @@ def pipeline_to_graph(pipeline, name=''):
                 argument_key = '.'.join(argument.split(".")[:2])
                 G.add_edge(argument_key, step_key)
     # Adding output node
-    G.add_node('outputs.0', data=[{'python_path': 'Output', 'hyperparams': {}, 'graph_name': name}])
+    G.add_node('outputs.0', data=[{'python_path': 'Output', 'node_name': 'Output', 'hyperparams': {}, 'graph_name': name}])
     out_node_input = '.'.join(pipeline['outputs'][0]['data'].split(".")[:2])
     G.add_edge(out_node_input, 'outputs.0')
     return G

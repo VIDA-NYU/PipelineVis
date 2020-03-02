@@ -2,14 +2,8 @@ import React, { PureComponent } from 'react';
 import dagre from 'dagre';
 import { startCase } from 'lodash';
 import PropTypes from 'prop-types';
+import {getPrimitiveLabel} from './helpers';
 
-function getPrimitiveLabel(name) {
-  const nameParts = name.split('.');
-  if (name.split('.').length > 2) {
-    name = nameParts.pop();
-  }
-  return startCase(name);
-}
 
 class SolutionGraph extends PureComponent {
 

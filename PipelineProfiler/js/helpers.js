@@ -1,4 +1,5 @@
 import { median } from 'd3-array';
+import {startCase} from "lodash";
 
 export function createGettersSetters(container, parameterDict){
   let keys = Object.keys(parameterDict);
@@ -127,6 +128,14 @@ function computePrimitiveImportance(pipelinePrimitiveLookup, scores, primitive) 
     return 0;
   }
   return median(arrayUsing) - median(arrayNotUsing);
+}
+
+export function getPrimitiveLabel(name) {
+  const nameParts = name.split('.');
+  if (name.split('.').length > 2) {
+    name = nameParts.pop();
+  }
+  return startCase(name);
 }
 
 export function computePrimitiveImportances(infos, pipelines, scoreRequest) {
