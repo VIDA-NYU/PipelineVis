@@ -69,7 +69,7 @@ class MergedGraph extends PureComponent {
 
     return (
       <div>
-        <div style={{display: 'flex'}}>
+        <div style={{display: 'flex', fontSize: '12px'}}>
           {
             sourceGraphColorScale.domain().map(sourceGraph => {
               return <div style={{display: 'flex', marginRight: 20}}>
@@ -96,37 +96,43 @@ class MergedGraph extends PureComponent {
                     {
                       g.node(n).data.map((node, idx) => {
                         const sourceBarWidth = nodeDimentions.width/node.origins.length;
-
-                        return <div
-                          key={idx}
-                          style={{
-                            position: 'relative',
-                            textAlign: 'center',
-                            fontSize: '12px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            height: nodeDimentions.height + "px",
-                            border: 'solid 1px black',
-                            borderColor: '#c6c6c6',
-                            padding: '5px',
-                          }}
-                        >
-                          <div style={{position: 'absolute', left: 0, top: 0, display: 'flex'}}>
+                        let sourceBars = null;
+                        if (node.origins.length < sourceGraphColorScale.domain().length){
+                          sourceBars = <div style={{display: 'flex', width:nodeDimentions.width, height: 5}}>
                             {
-                            node.origins.map(origin => {
-                              return <div key={origin}
-                                style={{
-                                width: sourceBarWidth,
-                                height: 10,
-                                background: sourceGraphColorScale(origin)
-                              }}
-                              />
-                            })
+                              node.origins.map(origin => {
+                                return <div key={origin}
+                                            style={{
+                                              width: sourceBarWidth,
+                                              height: 5,
+                                              background: sourceGraphColorScale(origin)
+                                            }}
+                                />
+                              })
                             }
+                          </div>;
+                        }
+
+                        return <div>
+                            {sourceBars}
+                          <div
+                            key={idx}
+                            style={{
+                              position: 'relative',
+                              textAlign: 'center',
+                              fontSize: '10px',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              height: (nodeDimentions.height - 5) + "px",
+                              border: 'solid 1px black',
+                              borderColor: '#c6c6c6',
+                              padding: '5px',
+                            }}
+                          >
+                            {getPrimitiveLabel(node.node_name)}
                           </div>
-                          {getPrimitiveLabel(node.node_name)}
-                          </div>
+                        </div>
                       })
                     }
                   </div>
