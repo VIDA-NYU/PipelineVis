@@ -2,7 +2,7 @@ import pkg_resources
 import string
 import numpy as np
 import json
-
+import networkx as nx
 
 def id_generator(size=15):
     """Helper function to generate random div ids. This is useful for embedding
@@ -39,8 +39,9 @@ def plot_pipeline_node_link(data_dict):
     html_all = make_html(data_dict, draw_function="renderPipelineNodeLink")
     display(HTML(html_all))
 
-def plot_merged_pipeline(data_dict):
-    """Takes as input networkx.readwrite.json_graph.node_link_data and renders a graph in the IPython Cell"""
+def plot_merged_pipeline(merged):
+    """Takes as input networkx.DiGraph and renders a graph in the IPython Cell"""
     from IPython.core.display import display, HTML
+    data_dict = nx.readwrite.json_graph.node_link_data(merged)
     html_all = make_html(data_dict, draw_function="renderMergedPipeline")
     display(HTML(html_all))
