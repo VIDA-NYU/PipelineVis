@@ -56,8 +56,6 @@ class MergedGraph extends PureComponent {
       g.setNode(node.id, {data: preprocessed, width: nodeDimentions.width, height: preprocessed.length*nodeDimentions.height})
     });
 
-    console.log(sourceGraphColorScale.domain());
-
     merged.links.forEach(link => {
       g.setEdge(link.source, link.target, {});
     });
@@ -70,79 +68,90 @@ class MergedGraph extends PureComponent {
       Math.max(...g.nodes().map(n => g.node(n).y + g.node(n).height)) + margin.top + margin.bottom;
 
     return (
-      <svg style={{width, height}}>
-        <g transform={`translate(${margin.left},${margin.top})`}>
-          {g.nodes().map(n => (
-            <g
-              key={n}
-              transform={`translate(${g.node(n).x -
-              g.node(n).width / 2},${g.node(n).y - g.node(n).height / 2})`}
-            >
-              <foreignObject
-                width={g.node(n).width}
-                height={g.node(n).height}
-                requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"
+      <div>
+        <div style={{display: 'flex'}}>
+          {
+            sourceGraphColorScale.domain().map(sourceGraph => {
+              return <div style={{display: 'flex', marginRight: 20}}>
+                <div style={{width: 20, height: 20, background: sourceGraphColorScale(sourceGraph)}}/>
+                <div style={{marginLeft: 5}}>{sourceGraph}</div>
+              </div>;
+            })
+          }
+        </div>
+        <svg style={{width, height}}>
+          <g transform={`translate(${margin.left},${margin.top})`}>
+            {g.nodes().map(n => {
+              return <g
+                key={n}
+                transform={`translate(${g.node(n).x -
+                g.node(n).width / 2},${g.node(n).y - g.node(n).height / 2})`}
               >
-                <div>
-                  {
-                    g.node(n).data.map((node, idx) => {
-                      const sourceBarWidth = nodeDimentions.width/node.origins.length;
+                <foreignObject
+                  width={g.node(n).width}
+                  height={g.node(n).height}
+                  requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"
+                >
+                  <div>
+                    {
+                      g.node(n).data.map((node, idx) => {
+                        const sourceBarWidth = nodeDimentions.width/node.origins.length;
 
-                      return <div
-                        key={idx}
-                        style={{
-                          position: 'relative',
-                          textAlign: 'center',
-                          fontSize: '12px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          height: nodeDimentions.height + "px",
-                          border: 'solid 1px black',
-                          borderColor: '#c6c6c6',
-                          padding: '5px',
-                        }}
-                      >
-                        {
-                        node.origins.map(origin => {
-                          return <div key={origin}
-                            style={{
-                            left: 0,
-                            top: 0,
-                            position: 'absolute',
-                            width: sourceBarWidth,
-                            height: 10,
-                            background: sourceGraphColorScale(origin)
+                        return <div
+                          key={idx}
+                          style={{
+                            position: 'relative',
+                            textAlign: 'center',
+                            fontSize: '12px',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            height: nodeDimentions.height + "px",
+                            border: 'solid 1px black',
+                            borderColor: '#c6c6c6',
+                            padding: '5px',
                           }}
-                          />
-                        })
-                        }
-                        {getPrimitiveLabel(node.node_name)}
-                        </div>
-                    })
-                  }
-                </div>
-              </foreignObject>
-            </g>
-          ))}
-          {g.edges().map(e => {
-            return (
-              <g key={e.v + e.w}>
-                <path
-                  stroke="black"
-                  fill="none"
-                  d={`${g
-                    .edge(e)
-                    .points.map(
-                      (p, i) => `${i === 0 ? 'M' : 'L'}${p.x} ${p.y}`,
-                    )
-                    .join(' ')}`}
-                />
+                        >
+                          <div style={{position: 'absolute', left: 0, top: 0, display: 'flex'}}>
+                            {
+                            node.origins.map(origin => {
+                              return <div key={origin}
+                                style={{
+                                width: sourceBarWidth,
+                                height: 10,
+                                background: sourceGraphColorScale(origin)
+                              }}
+                              />
+                            })
+                            }
+                          </div>
+                          {getPrimitiveLabel(node.node_name)}
+                          </div>
+                      })
+                    }
+                  </div>
+                </foreignObject>
               </g>
-            );
-          })}
-        </g>
-      </svg>
+            })}
+            {g.edges().map(e => {
+              return (
+                <g key={e.v + e.w}>
+                  <path
+                    stroke="black"
+                    fill="none"
+                    d={`${g
+                      .edge(e)
+                      .points.map(
+                        (p, i) => `${i === 0 ? 'M' : 'L'}${p.x} ${p.y}`,
+                      )
+                      .join(' ')}`}
+                  />
+                </g>
+              );
+            })}
+          </g>
+        </svg>
+      </div>
     );
   }
 }
