@@ -3,6 +3,8 @@ import dagre from 'dagre';
 import { startCase } from 'lodash';
 import PropTypes from 'prop-types';
 import {getPrimitiveLabel} from "./helpers";
+import {schemeCategory10} from 'd3-scale-chromatic';
+import {scaleOrdinal} from "d3-scale";
 
 function preprocessNode(node) {
   let primitives = {}; // map that keep track of primitives and what graph uses them
@@ -16,7 +18,6 @@ function preprocessNode(node) {
   }
   let subnodes = [];
   Object.keys(primitives).forEach(python_path => {
-    console.log(primitives[python_path]);
     let subnode = {
       id: node.id,
       python_path: python_path,
@@ -36,6 +37,7 @@ function preprocessNode(node) {
 class MergedGraph extends PureComponent {
   render() {
     const { merged } = this.props;
+    const sourceGraphColorScale = scaleOrdinal(schemeCategory10);
 
     var g = new dagre.graphlib.Graph();
 
@@ -46,23 +48,30 @@ class MergedGraph extends PureComponent {
     const nodeDimentions = { width: 100, height: 55 };
     merged.nodes.forEach(node => {
       const preprocessed = preprocessNode(node);
+      preprocessed.forEach(subnode => {
+        subnode.origins.forEach(origin => {
+          sourceGraphColorScale(origin);
+        });
+      });
       g.setNode(node.id, {data: preprocessed, width: nodeDimentions.width, height: preprocessed.length*nodeDimentions.height})
     });
+
+    console.log(sourceGraphColorScale.domain());
 
     merged.links.forEach(link => {
       g.setEdge(link.source, link.target, {});
     });
 
     dagre.layout(g);
-    const margin = 30;
+    const margin = {top:50, bottom: 50, left: 30, right: 30};
     const width =
-      Math.max(...g.nodes().map(n => g.node(n).x + g.node(n).width)) + margin;
+      Math.max(...g.nodes().map(n => g.node(n).x + g.node(n).width)) + margin.left + margin.right;
     const height =
-      Math.max(...g.nodes().map(n => g.node(n).y + g.node(n).height)) + margin;
+      Math.max(...g.nodes().map(n => g.node(n).y + g.node(n).height)) + margin.top + margin.bottom;
 
     return (
       <svg style={{width, height}}>
-        <g transform={`translate(${margin},${margin})`}>
+        <g transform={`translate(${margin.left},${margin.top})`}>
           {g.nodes().map(n => (
             <g
               key={n}
@@ -76,9 +85,13 @@ class MergedGraph extends PureComponent {
               >
                 <div>
                   {
-                    g.node(n).data.map(node => {
+                    g.node(n).data.map((node, idx) => {
+                      const sourceBarWidth = nodeDimentions.width/node.origins.length;
+
                       return <div
+                        key={idx}
                         style={{
+                          position: 'relative',
                           textAlign: 'center',
                           fontSize: '12px',
                           display: 'flex',
@@ -90,16 +103,22 @@ class MergedGraph extends PureComponent {
                           padding: '5px',
                         }}
                       >
-                        <div style={{
-                          left: 0,
-                          top: 0,
-                          position: 'absolute',
-                          width:10,
-                          height:10,
-                          background: '#ff0000'
-                        }}></div>
+                        {
+                        node.origins.map(origin => {
+                          return <div key={origin}
+                            style={{
+                            left: 0,
+                            top: 0,
+                            position: 'absolute',
+                            width: sourceBarWidth,
+                            height: 10,
+                            background: sourceGraphColorScale(origin)
+                          }}
+                          />
+                        })
+                        }
                         {getPrimitiveLabel(node.node_name)}
-                      </div>;
+                        </div>
                     })
                   }
                 </div>
