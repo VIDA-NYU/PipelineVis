@@ -10,25 +10,8 @@ import {axisLeft} from "d3-axis";
 export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importances, onClick, metricRequest, sortColumnBy = constants.sortModuleBy.moduleType, sortRowBy = constants.sortPipelineBy.pipeline_source) {
   const {infos, module_types: moduleTypes, module_type_order: moduleTypeOrder} = data;
 
-  const moduleTypeOrderMap = {};
-  moduleTypeOrder.forEach((x, idx) => {
-    moduleTypeOrderMap[x] = idx;
-  });
-
-
   const selectedScores = extractMetric(pipelines, metricRequest);
   const selectedScoresDigests = selectedScores.map((score, idx) => ({score, pipeline_digest: pipelines[idx].pipeline_digest}));
-  const selectedScoresDigestsMap = {};
-  selectedScoresDigests.forEach(x => {
-    selectedScoresDigestsMap[x.pipeline_digest] = x.score;
-  });
-
-  if (sortColumnBy === constants.sortModuleBy.importance) {
-    moduleNames.sort((a, b) => importances[b] - importances[a]);
-  } else if (sortColumnBy === constants.sortModuleBy.moduleType) {
-    moduleNames.sort((a, b) => importances[b] - importances[a]);
-    moduleNames.sort((a, b) => moduleTypeOrderMap[infos[a]['module_type']] - moduleTypeOrderMap[infos[b]['module_type']]);
-  }
 
   const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
     constants.margin.left + constants.margin.right;

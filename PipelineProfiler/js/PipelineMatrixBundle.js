@@ -13,7 +13,6 @@ export class PipelineMatrixBundle extends Component {
     metricOptions.push({type: constants.scoreRequest.TIME, name: 'TIME (s)'});
     const metricRequest = metricOptions[0];
     const importances = computePrimitiveImportances(props.data.infos, props.data.pipelines, metricRequest);
-    console.log(importances);
     this.state = {
       pipelines: null,
       pipeline: null,
@@ -116,6 +115,15 @@ export class PipelineMatrixBundle extends Component {
       selectedScoresDigestsMap[x.pipeline_digest] = x.score;
     });
 
+    /*
+      if (sortColumnBy === constants.sortModuleBy.importance) {
+        moduleNames.sort((a, b) => importances[b] - importances[a]);
+      } else if (sortColumnBy === constants.sortModuleBy.moduleType) {
+        moduleNames.sort((a, b) => importances[b] - importances[a]);
+        moduleNames.sort((a, b) => moduleTypeOrderMap[infos[a]['module_type']] - moduleTypeOrderMap[infos[b]['module_type']]);
+      }
+    */
+
     return <div>
       <div>
         <div><strong>Sort primitives by:</strong></div>
@@ -124,7 +132,9 @@ export class PipelineMatrixBundle extends Component {
             <input type="radio" value={sortModuleBy.importance}
                    checked={this.state.sortColumnsBy === sortModuleBy.importance}
                    onClick={x=>{
-                     this.setState({sortColumnsBy: sortModuleBy.importance});
+                     let newModuleNames = [...this.state.moduleNames];
+                     newModuleNames.sort((a, b) => this.state.importances[b] - this.state.importances[a]);
+                     this.setState({sortColumnsBy: sortModuleBy.importance, moduleNames: newModuleNames});
                    }}
                    onChange={x=>{}}
             />
@@ -136,7 +146,15 @@ export class PipelineMatrixBundle extends Component {
             <input type="radio" value={sortModuleBy.moduleType}
                    checked={this.state.sortColumnsBy === sortModuleBy.moduleType}
                    onClick={x=>{
-                     this.setState({sortColumnsBy: sortModuleBy.moduleType});
+                     const infos = this.props.data.infos;
+                     const moduleTypeOrderMap = {};
+                     this.props.data.module_type_order.forEach((x, idx) => {
+                       moduleTypeOrderMap[x] = idx;
+                     });
+                     let newModuleNames = [...this.state.moduleNames];
+                     newModuleNames.sort((a, b) => this.state.importances[b] - this.state.importances[a]);
+                     newModuleNames.sort((a, b) => moduleTypeOrderMap[infos[a]['module_type']] - moduleTypeOrderMap[infos[b]['module_type']]);
+                     this.setState({sortColumnsBy: sortModuleBy.moduleType, moduleNames: newModuleNames});
                    }}
                    onChange={x=>{}}
             />
