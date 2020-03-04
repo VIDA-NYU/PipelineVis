@@ -3,6 +3,16 @@ import string
 import numpy as np
 import json
 
+def merge_graphs_comm_api(comm, open_msg): # this function is connected with the comm api on module load (__init__.py)
+        # comm is the kernel Comm instance
+        # msg is the comm_open message
+
+        # Register handler for later messages
+        @comm.on_msg
+        def _recv(msg):
+            # Use msg['content']['data'] for the data in the message
+            comm.send({'echo': msg['content']['data']})
+
 def id_generator(size=15):
     """Helper function to generate random div ids. This is useful for embedding
     HTML into ipython notebooks."""
@@ -10,7 +20,7 @@ def id_generator(size=15):
     return ''.join(np.random.choice(chars, size, replace=True))
 
 
-def make_html(data_dict):
+def make_html(data_dict, id):
 	lib_path = pkg_resources.resource_filename(__name__, "build/pipelineVis.js")
 	bundle = open(lib_path, "r", encoding="utf8").read()
 	html_all = """
@@ -28,7 +38,7 @@ def make_html(data_dict):
 	    </script>
 	</body>
 	</html>
-	""".format(bundle=bundle, id=id_generator(), data_dict=json.dumps(data_dict))
+	""".format(bundle=bundle, id=id, data_dict=json.dumps(data_dict))
 	return html_all
 
 def extract_primitive_names(pipeline):
@@ -112,5 +122,6 @@ def prepare_data_pipeline_matrix(pipelines, enet_alpha=0.001, enet_l1=0.1):
 
 def plot_pipeline_matrix(data_dict):
     from IPython.core.display import display, HTML
-    html_all = make_html(data_dict)
+    id = id_generator()
+    html_all = make_html(data_dict, id)
     display(HTML(html_all))

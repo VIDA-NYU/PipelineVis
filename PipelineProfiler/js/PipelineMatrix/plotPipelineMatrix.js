@@ -7,8 +7,8 @@ import {constants, extractHyperparams, extractMetric, computePrimitiveImportance
 import "d3-transition";
 import {axisLeft} from "d3-axis";
 
-export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumnBy = constants.sortModuleBy.moduleType, sortRowBy = constants.sortPipelineBy.pipeline_source) {
-  const {infos, pipelines, module_types: moduleTypes, module_type_order: moduleTypeOrder} = data;
+export function plotPipelineMatrix(ref, data, pipelines, onClick, metricRequest, sortColumnBy = constants.sortModuleBy.moduleType, sortRowBy = constants.sortPipelineBy.pipeline_source) {
+  const {infos, module_types: moduleTypes, module_type_order: moduleTypeOrder} = data;
   const moduleNames = Object.keys(infos);
 
   const moduleTypeOrderMap = {};
@@ -29,13 +29,6 @@ export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumn
   } else if (sortColumnBy === constants.sortModuleBy.moduleType) {
     moduleNames.sort((a, b) => importances[b] - importances[a]);
     moduleNames.sort((a, b) => moduleTypeOrderMap[infos[a]['module_type']] - moduleTypeOrderMap[infos[b]['module_type']]);
-  }
-
-  if (sortRowBy === constants.sortPipelineBy.pipeline_score) {
-    pipelines.sort((a, b) => selectedScoresDigestsMap[b.pipeline_digest] - selectedScoresDigestsMap[a.pipeline_digest]);
-  } else if (sortRowBy === constants.sortPipelineBy.pipeline_source) {
-    pipelines.sort((a, b) => selectedScoresDigestsMap[b.pipeline_digest] - selectedScoresDigestsMap[a.pipeline_digest]);
-    pipelines.sort((a, b) => a.pipeline_source.name > b.pipeline_source.name ? 1 : (a.pipeline_source.name < b.pipeline_source.name ? -1 : 1));
   }
 
   const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
@@ -457,7 +450,6 @@ export function plotPipelineMatrix(ref, data, onClick, metricRequest, sortColumn
 
   svg.on("mousemove", function () {
     const mGlobal = mouse(this);
-    console.log(mGlobal);
 
     if (mGlobal[0] >= left && mGlobal[0] <= right && mGlobal[1] >= top && mGlobal[1] <= bottom) {
       const row = Math.floor((mGlobal[1] - top) / constants.cellHeight);

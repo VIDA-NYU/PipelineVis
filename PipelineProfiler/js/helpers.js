@@ -142,6 +142,7 @@ export function getPrimitiveLabel(name) {
 export function computePrimitiveImportances(infos, pipelines, scoreRequest) {
   const primitiveNames = Object.keys(infos);
   const scores = extractMetric(pipelines, scoreRequest);
+
   const hashTable = computePipelinePrimitiveHashTable(pipelines);
   const primitiveImportances = {};
   primitiveNames.forEach(name => {

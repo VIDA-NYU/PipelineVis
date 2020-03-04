@@ -8,21 +8,15 @@ export class PipelineMatrix extends Component {
 
   constructor(props) {
     super(props);
-    const metricNames = extractMetricNames(this.props.data.pipelines);
-    let metricOptions = metricNames.map(name => ({type: constants.scoreRequest.D3MSCORE, name}));
-    metricOptions.push({type: constants.scoreRequest.TIME, name: 'TIME (s)'});
-    const metricRequest = metricOptions[0];
-    //const scores = extract
     this.state = {
-      metricRequest,
-      metricOptions
+      selectedPipelines: [], // can be null, array of 0, 1 or more
     }
 
   }
 
   display(props, state){
-    const {data, onClick, sortColumnBy, sortRowBy} = props;
-    plotPipelineMatrix(this.ref, data, onClick, state.metricRequest, sortColumnBy, sortRowBy);
+    const {data, pipelines, onClick, sortColumnBy, sortRowBy} = props;
+    plotPipelineMatrix(this.ref, data, pipelines, onClick, this.props.metricRequest, sortColumnBy, sortRowBy);
   }
 
   shouldComponentUpdate(newprops, newstate){
@@ -41,7 +35,8 @@ export class PipelineMatrix extends Component {
 
 
   render(){
-    const {infos, pipelines, module_types: moduleTypes, module_type_order: moduleTypeOrder} = this.props.data;
+    const {pipelines} = this.props;
+    const {infos, module_types: moduleTypes, module_type_order: moduleTypeOrder} = this.props.data;
 
     const moduleNames = Object.keys(infos);
 
@@ -51,7 +46,7 @@ export class PipelineMatrix extends Component {
       constants.margin.top + constants.margin.bottom;
 
     return <div style={{position: 'relative', height: svgHeight, width: svgWidth}}>
-        <svg style={{position: 'absolute'}} ref={ref => this.ref = ref}/>
+        <svg style={{position: 'absolute', left: 0, top: 0}} ref={ref => this.ref = ref}/>
         <select style={{
           position: 'absolute',
           width: constants.pipelineScoreWidth,
@@ -59,13 +54,11 @@ export class PipelineMatrix extends Component {
           top: constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight - 25
         }} className={"selectMetric"} onChange={
           event => {
-            console.log("set state");
-            console.log(event.target.value);
-            this.setState({metricRequest: JSON.parse(event.target.value)})
+            this.props.metricRequestChange(JSON.parse(event.target.value));
           }
         }>
           {
-            this.state.metricOptions.map(metricRequest => {
+            this.props.metricOptions.map(metricRequest => {
               return <option key={metricRequest['name']} value={JSON.stringify(metricRequest)}>{metricRequest['name']}</option>
             })
           }
@@ -81,6 +74,11 @@ PipelineMatrix.defaultProps = {
 PipelineMatrix.propTypes = {
   data: PropTypes.object.isRequired,
   onClick: PropTypes.func,
+  pipelines: PropTypes.array.isRequired,
+  importances: PropTypes.object.isRequired,
+  metricRequestChange: PropTypes.func.isRequired,
   sortColumnBy: PropTypes.string,
+  metricRequest: PropTypes.object.isRequired,
+  metricOptions: PropTypes.array.isRequired,
   sortRowBy: PropTypes.string
 };
