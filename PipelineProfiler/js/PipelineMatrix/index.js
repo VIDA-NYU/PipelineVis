@@ -16,7 +16,7 @@ export class PipelineMatrix extends Component {
 
   display(props, state){
     const {data, pipelines, onClick, sortColumnBy, sortRowBy} = props;
-    plotPipelineMatrix(this.ref, data, pipelines, onClick, this.props.metricRequest, sortColumnBy, sortRowBy);
+    plotPipelineMatrix(this.ref, data, pipelines, this.props.moduleNames, this.props.importances, onClick, this.props.metricRequest, sortColumnBy, sortRowBy);
   }
 
   shouldComponentUpdate(newprops, newstate){
@@ -80,5 +80,6 @@ PipelineMatrix.propTypes = {
   sortColumnBy: PropTypes.string,
   metricRequest: PropTypes.object.isRequired,
   metricOptions: PropTypes.array.isRequired,
-  sortRowBy: PropTypes.string
+  sortRowBy: PropTypes.string,
+  moduleNames: PropTypes.array.isRequired,
 };

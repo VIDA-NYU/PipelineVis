@@ -13,6 +13,7 @@ export class PipelineMatrixBundle extends Component {
     metricOptions.push({type: constants.scoreRequest.TIME, name: 'TIME (s)'});
     const metricRequest = metricOptions[0];
     const importances = computePrimitiveImportances(props.data.infos, props.data.pipelines, metricRequest);
+    console.log(importances);
     this.state = {
       pipelines: null,
       pipeline: null,
@@ -56,8 +57,7 @@ export class PipelineMatrixBundle extends Component {
     const {selectedPrimitive} = this.state;
     const {sortModuleBy, sortPipelineBy} = constants;
 
-
-    if (window.Jupyter !== undefined) {
+    /*if (window.Jupyter !== undefined) {
       const comm = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {'foo': 6})
       for (let i = 0; i < 10; ++i){
         comm.send({'foo': i})
@@ -67,7 +67,7 @@ export class PipelineMatrixBundle extends Component {
       comm.on_msg(function(msg) {
         console.log(msg.content.data.echo);
       });
-    }
+    }*/
 
     let primitiveName = "";
     let primitiveHyperparamsView = null;
