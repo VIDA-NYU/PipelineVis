@@ -115,7 +115,6 @@ def prepare_data_pipeline_matrix(pipelines, enet_alpha=0.001, enet_l1=0.1):
         "infos": info,
         "pipelines": pipelines,
         "module_types": list(module_types),
-        "module_type_order": ["Preprocessing", "Feature Extraction", "Operator", "Regression", "Classification"],
     }
     return data
 

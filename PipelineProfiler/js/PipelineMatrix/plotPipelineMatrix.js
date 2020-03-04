@@ -8,7 +8,8 @@ import "d3-transition";
 import {axisLeft} from "d3-axis";
 
 export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importances, onClick, metricRequest, sortColumnBy = constants.sortModuleBy.moduleType, sortRowBy = constants.sortPipelineBy.pipeline_source) {
-  const {infos, module_types: moduleTypes, module_type_order: moduleTypeOrder} = data;
+  const {infos, module_types: moduleTypes} = data;
+  const {moduleTypeOrder}  = constants;
 
   const selectedScores = extractMetric(pipelines, metricRequest);
   const selectedScoresDigests = selectedScores.map((score, idx) => ({score, pipeline_digest: pipelines[idx].pipeline_digest}));

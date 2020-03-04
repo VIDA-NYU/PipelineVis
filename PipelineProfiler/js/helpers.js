@@ -156,6 +156,7 @@ export function extractMetricNames(pipelines) {
 }
 
 export const constants = {
+  moduleTypeOrder: ["Preprocessing", "Feature Extraction", "Operator", "Regression", "Classification"],
   scoreRequest: {
     TIME: 'TIME',
     D3MSCORE: 'D3MSCORE'

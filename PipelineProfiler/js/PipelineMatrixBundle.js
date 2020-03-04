@@ -5,35 +5,68 @@ import SolutionGraph from "./SolutionGraph";
 import {computePrimitiveImportances, constants, extractMetric, extractMetricNames} from "./helpers";
 
 export class PipelineMatrixBundle extends Component {
+
   constructor(props){
     super(props);
-    const moduleNames = Object.keys(props.data.infos);
+    let pipelines = props.data.pipelines;
+    let moduleNames = Object.keys(props.data.infos);
     const metricNames = extractMetricNames(props.data.pipelines);
     let metricOptions = metricNames.map(name => ({type: constants.scoreRequest.D3MSCORE, name}));
     metricOptions.push({type: constants.scoreRequest.TIME, name: 'TIME (s)'});
     const metricRequest = metricOptions[0];
     const importances = computePrimitiveImportances(props.data.infos, props.data.pipelines, metricRequest);
+    const sortColumnsBy = constants.sortModuleBy.importance,
+      sortRowsBy = constants.sortPipelineBy.pipeline_score;
+
+    pipelines = this.computeSortedPipelines(pipelines, sortRowsBy, metricRequest);
+    moduleNames = this.computeSortedModuleNames(moduleNames, sortColumnsBy, importances, this.props.data.infos);
+
     this.state = {
-      pipelines: null,
+      pipelines,
       pipeline: null,
-      sortColumnsBy: constants.sortModuleBy.importance,
-      sortRowsBy: constants.sortPipelineBy.pipeline_score,
+      sortColumnsBy,
+      sortRowsBy,
       metricRequest,
       metricOptions,
       importances,
       moduleNames,
-    };
-  }
-
-  static getDerivedStateFromProps(newProps, state) {
-    if (!state.pipelines) {
-      return {
-        pipelines: newProps.data.pipelines,
-      }
     }
-    return null;
   }
 
+  computeSortedPipelines(pipelines, sortPipelinesBy, metricRequest){
+    const selectedScores = extractMetric(pipelines, metricRequest);
+    const selectedScoresDigests = selectedScores.map((score, idx) => ({score, pipeline_digest: pipelines[idx].pipeline_digest}));
+    const selectedScoresDigestsMap = {};
+    selectedScoresDigests.forEach(x => {
+      selectedScoresDigestsMap[x.pipeline_digest] = x.score;
+    });
+
+    let newPipelines = [...pipelines];
+    if (sortPipelinesBy === constants.sortPipelineBy.pipeline_score){
+      newPipelines.sort((a, b) => selectedScoresDigestsMap[b.pipeline_digest] - selectedScoresDigestsMap[a.pipeline_digest]);
+    } else if (sortPipelinesBy === constants.sortPipelineBy.pipeline_source){
+      newPipelines.sort((a, b) => selectedScoresDigestsMap[b.pipeline_digest] - selectedScoresDigestsMap[a.pipeline_digest]);
+      newPipelines.sort((a, b) => a.pipeline_source.name > b.pipeline_source.name ? 1 : (a.pipeline_source.name < b.pipeline_source.name ? -1 : 1));
+    }
+    return newPipelines;
+  }
+
+  computeSortedModuleNames(moduleNames, sortModulesBy, importances, infos){
+    let newModuleNames = [...moduleNames];
+    if (sortModulesBy === constants.sortModuleBy.importance){
+      newModuleNames.sort((a, b) => importances[b] - importances[a]);
+    } else if (sortModulesBy === constants.sortModuleBy.moduleType) {
+      newModuleNames.sort((a, b) => importances[b] - importances[a]);
+
+      const moduleTypeOrderMap = {};
+      constants.moduleTypeOrder.forEach((x, idx) => {
+        moduleTypeOrderMap[x] = idx;
+      });
+      newModuleNames.sort((a, b) => importances[b] - importances[a]);
+      newModuleNames.sort((a, b) => moduleTypeOrderMap[infos[a]['module_type']] - moduleTypeOrderMap[infos[b]['module_type']]);
+    }
+    return newModuleNames;
+  }
 
   createHyperparamTableDataFromNode(node){
     const tableData = [];
@@ -108,22 +141,6 @@ export class PipelineMatrixBundle extends Component {
       return <div/>;
     }
 
-    const selectedScores = extractMetric(this.state.pipelines, this.state.metricRequest);
-    const selectedScoresDigests = selectedScores.map((score, idx) => ({score, pipeline_digest: this.state.pipelines[idx].pipeline_digest}));
-    const selectedScoresDigestsMap = {};
-    selectedScoresDigests.forEach(x => {
-      selectedScoresDigestsMap[x.pipeline_digest] = x.score;
-    });
-
-    /*
-      if (sortColumnBy === constants.sortModuleBy.importance) {
-        moduleNames.sort((a, b) => importances[b] - importances[a]);
-      } else if (sortColumnBy === constants.sortModuleBy.moduleType) {
-        moduleNames.sort((a, b) => importances[b] - importances[a]);
-        moduleNames.sort((a, b) => moduleTypeOrderMap[infos[a]['module_type']] - moduleTypeOrderMap[infos[b]['module_type']]);
-      }
-    */
-
     return <div>
       <div>
         <div><strong>Sort primitives by:</strong></div>
@@ -132,8 +149,7 @@ export class PipelineMatrixBundle extends Component {
             <input type="radio" value={sortModuleBy.importance}
                    checked={this.state.sortColumnsBy === sortModuleBy.importance}
                    onClick={x=>{
-                     let newModuleNames = [...this.state.moduleNames];
-                     newModuleNames.sort((a, b) => this.state.importances[b] - this.state.importances[a]);
+                     const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, this.state.sortColumnsBy, this.state.importances, this.props.data.infos);
                      this.setState({sortColumnsBy: sortModuleBy.importance, moduleNames: newModuleNames});
                    }}
                    onChange={x=>{}}
@@ -146,14 +162,7 @@ export class PipelineMatrixBundle extends Component {
             <input type="radio" value={sortModuleBy.moduleType}
                    checked={this.state.sortColumnsBy === sortModuleBy.moduleType}
                    onClick={x=>{
-                     const infos = this.props.data.infos;
-                     const moduleTypeOrderMap = {};
-                     this.props.data.module_type_order.forEach((x, idx) => {
-                       moduleTypeOrderMap[x] = idx;
-                     });
-                     let newModuleNames = [...this.state.moduleNames];
-                     newModuleNames.sort((a, b) => this.state.importances[b] - this.state.importances[a]);
-                     newModuleNames.sort((a, b) => moduleTypeOrderMap[infos[a]['module_type']] - moduleTypeOrderMap[infos[b]['module_type']]);
+                     const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, this.state.sortColumnsBy, this.state.importances, this.props.data.infos);
                      this.setState({sortColumnsBy: sortModuleBy.moduleType, moduleNames: newModuleNames});
                    }}
                    onChange={x=>{}}
@@ -169,8 +178,8 @@ export class PipelineMatrixBundle extends Component {
           <input type="radio" value={sortPipelineBy.pipeline_score}
                  checked={this.state.sortRowsBy === sortPipelineBy.pipeline_score}
                  onClick={x=>{
-                   let newPipelines = [...this.state.pipelines];
-                   newPipelines.sort((a, b) => selectedScoresDigestsMap[b.pipeline_digest] - selectedScoresDigestsMap[a.pipeline_digest]);
+                   const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_score, this.state.metricRequest);
+                   console.log(newPipelines);
                    this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_score});
                  }}
                  onChange={x=>{}}
@@ -183,9 +192,8 @@ export class PipelineMatrixBundle extends Component {
           <input type="radio" value={sortPipelineBy.pipeline_source}
                  checked={this.state.sortRowsBy === sortPipelineBy.pipeline_source}
                  onClick={x=>{
-                   let newPipelines = [...this.state.pipelines];
-                   newPipelines.sort((a, b) => selectedScoresDigestsMap[b.pipeline_digest] - selectedScoresDigestsMap[a.pipeline_digest]);
-                   newPipelines.sort((a, b) => a.pipeline_source.name > b.pipeline_source.name ? 1 : (a.pipeline_source.name < b.pipeline_source.name ? -1 : 1));
+                   const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_source, this.state.metricRequest);
+                   console.log(newPipelines);
                    this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_source});
                  }}
                  onChange={x=>{}}
