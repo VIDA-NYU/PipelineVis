@@ -144,7 +144,7 @@ export class PipelineMatrixBundle extends Component {
       return <div/>;
     }
 
-    // TODO: fix console.log("Bundle props " + this.state.moduleNames[2]);
+    console.log("Bundle state [2]: " + this.state.moduleNames[2]); //TODO: FIX COMPONENT REnDERING WITH OLD PROPS
 
 
     let pipelineGraph = null;

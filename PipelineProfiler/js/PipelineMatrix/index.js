@@ -8,21 +8,17 @@ export class PipelineMatrix extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      selectedPipelines: [], // can be null, array of 0, 1 or more
-    }
     this.renderCount = 0;
   }
 
-  display(props, state){
-    const {data, pipelines, onClick} = props;
-    // TODO: FIX console.log("Pipeline Matrix props: " + this.props.moduleNames[2]);
-    plotPipelineMatrix(this.ref, data, pipelines, this.props.moduleNames, this.props.importances, this.props.selectedPipelines, onClick, this.props.metricRequest);
+  display(props){
+    const {data, pipelines, onClick, moduleNames, importances, selectedPipelines, metricRequest} = props;
+    plotPipelineMatrix(this.ref, data, pipelines, moduleNames, importances, selectedPipelines, onClick, metricRequest);
     console.log("Render " + (this.renderCount++));
   }
 
   shouldComponentUpdate(newprops, newstate){
-    this.display(newprops, newstate);
+    this.display(newprops);
     if (newprops.moduleNames.length !== this.props.moduleNames.length || this.props.pipelines.length !== newprops.pipelines.length){
       return true;
     }
@@ -30,11 +26,11 @@ export class PipelineMatrix extends Component {
   }
 
   componentDidMount(){
-    this.display(this.props, this.state);
+    this.display(this.props);
   }
 
   componentDidUpdate(prevProps, prevState){
-    this.display(this.props, this.state);
+    this.display(this.props);
   }
 
 
