@@ -411,14 +411,14 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
     );
 
 
+  /*
   const hyperparams = extractHyperparams(infos, pipelines);
 
   const hyperparamsArray = moduleNames.map(mname => ({key: mname, data: hyperparams[mname]}));
 
-  /*const verticalParCoord = VerticalParCoord()
+  const verticalParCoord = VerticalParCoord()
     .width(colScale.bandwidth())
     .height(constants.hyperparamsHeight);
-
 
   svg
     .selectAll(".paramcoords")

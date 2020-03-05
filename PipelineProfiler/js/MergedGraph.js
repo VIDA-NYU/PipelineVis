@@ -163,12 +163,11 @@ class MergedGraph extends PureComponent {
 }
 
 MergedGraph.propTypes = {
-  solution: PropTypes.object,
-  onClick: PropTypes.func
+  merged: PropTypes.object.isRequired,
 };
 
 MergedGraph.defaultProps = {
-  onClick: step => {}, // step of the pipeline that was clicked
+  //onClick: step => {}, // step of the pipeline that was clicked
 };
 
 export default MergedGraph;

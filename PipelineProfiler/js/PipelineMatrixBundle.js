@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {PipelineMatrix} from "./PipelineMatrix";
 import SolutionGraph from "./SolutionGraph";
 import {computePrimitiveImportances, constants, extractMetric, extractMetricNames} from "./helpers";
+import MergedGraph from "./MergedGraph";
 
 export class PipelineMatrixBundle extends Component {
 
@@ -30,6 +31,7 @@ export class PipelineMatrixBundle extends Component {
       metricOptions,
       importances,
       moduleNames,
+      mergedGraph: null,
     }
   }
 
@@ -89,20 +91,17 @@ export class PipelineMatrixBundle extends Component {
 
     let requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
 
+
     if (window.Jupyter !== undefined) {
       const comm = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {'foo': 6});
 
-      console.log(comm);
-
       requestMergeGraph = (pipelines) => {
-        console.log("sending merge message");
         comm.send({pipelines});
       };
 
       // Register a handler
-      comm.on_msg(function(msg) {
+      comm.on_msg(msg => {
         const mergedGraph = msg.content.data.merged;
-        console.log(mergedGraph);
         this.setState({mergedGraph});
       });
     }
@@ -147,6 +146,49 @@ export class PipelineMatrixBundle extends Component {
     }
 
     // TODO: fix console.log("Bundle props " + this.state.moduleNames[2]);
+
+
+    let pipelineGraph = null;
+
+    if (this.state.selectedPipelines && this.state.selectedPipelines.length > 0 ){
+      if (this.state.selectedPipelines.length === 1) {
+        pipelineGraph = <>
+          <p><strong>Pipeline Digest: </strong> {this.state.selectedPipelines[0].pipeline_digest}</p>
+          <SolutionGraph
+            solution={ {description: {
+                pipeline: this.state.selectedPipelines[0]
+              }} }
+            onClick={node => {
+              this.setState({selectedPrimitive: node})
+            }}
+          />
+        </>;
+      } else { //(this.state.selectedPipelines.length > 1)
+        if (this.state.mergedGraph) {
+          pipelineGraph = <MergedGraph
+            merged={this.state.mergedGraph}
+          />;
+        }
+      }
+    }
+    /*{
+        this.state.selectedPipelines && this.state.selectedPipelines.length > 0 ?
+        this.state.selectedPipelines.length === 1 ?
+        <>
+          <p><strong>Pipeline Digest: </strong> {this.state.selectedPipelines[0].pipeline_digest}</p>
+          <SolutionGraph
+            solution={ {description: {
+              pipeline: this.state.selectedPipelines[0]
+            }} }
+            onClick={node => {
+              this.setState({selectedPrimitive: node})
+            }}
+          />
+        </>
+          :
+          <p>Merging pipelines</p>
+        : null
+      }*/
 
 
     return <div>
@@ -216,7 +258,6 @@ export class PipelineMatrixBundle extends Component {
             if (!shift) {
               // Just set one item as the selected
               this.setState({selectedPipelines: [selectedPipeline], selectedPrimitive: null})
-              console.log([selectedPipeline]);
             } else {
               // Select multiple pipelines
               const digest = selectedPipeline.pipeline_digest;
@@ -225,7 +266,6 @@ export class PipelineMatrixBundle extends Component {
                 newSelectedPipelines.push(selectedPipeline);
               }
               requestMergeGraph(newSelectedPipelines);
-              console.log(newSelectedPipelines);
               this.setState({selectedPipelines: newSelectedPipelines, selectedPrimitive: null})
             }
           }
@@ -241,23 +281,7 @@ export class PipelineMatrixBundle extends Component {
         importances={this.state.importances}
         moduleNames={this.state.moduleNames}
       />
-      {this.state.selectedPipelines && this.state.selectedPipelines.length > 0 ?
-        this.state.selectedPipelines.length === 1 ?
-        <>
-          <p><strong>Pipeline Digest: </strong> {this.state.selectedPipelines[0].pipeline_digest}</p>
-          <SolutionGraph
-            solution={ {description: {
-              pipeline: this.state.selectedPipelines[0]
-            }} }
-            onClick={node => {
-              this.setState({selectedPrimitive: node})
-            }}
-          />
-        </>
-          :
-          <p>Merging pipelines</p>
-        : null
-      }
+      {pipelineGraph}
       {
         primitiveHyperparamsView
       }
