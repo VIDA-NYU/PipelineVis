@@ -2,16 +2,22 @@ import pkg_resources
 import string
 import numpy as np
 import json
+from ._graph_matching import pipeline_to_graph, merge_multiple_graphs
 
 def merge_graphs_comm_api(comm, open_msg): # this function is connected with the comm api on module load (__init__.py)
         # comm is the kernel Comm instance
-        # msg is the comm_open message
+        # open_msg is the comm_open message
 
         # Register handler for later messages
         @comm.on_msg
         def _recv(msg):
             # Use msg['content']['data'] for the data in the message
-            comm.send({'echo': msg['content']['data']})
+            pipelines = msg['content']['data']['pipelines']
+            print("ZZZ merging {} graphs".format(len(pipelines)))
+            graphs = [pipeline_to_graph(pipeline, pipeline['pipeline_digest']) for pipeline in pipelines]
+            merged = merge_multiple_graphs(graphs)
+            data_dict = nx.readwrite.json_graph.node_link_data(merged)
+            comm.send({'merged': data_dict})
 
 def id_generator(size=15):
     """Helper function to generate random div ids. This is useful for embedding

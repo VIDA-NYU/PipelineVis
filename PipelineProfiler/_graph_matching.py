@@ -159,3 +159,9 @@ def merge_graphs(g1, g2):
             dest = equivalence_g2[dest]
         G.add_edge(source, dest)
     return G
+
+def merge_multiple_graphs(graphs):
+    merged = merge_graphs(graphs[0], graphs[1])
+    for graph in graphs[2:]:
+        merged = merge_graphs(merged, graph)
+    return merged

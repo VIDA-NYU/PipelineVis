@@ -7,7 +7,7 @@ import {constants, extractHyperparams, extractMetric, computePrimitiveImportance
 import "d3-transition";
 import {axisLeft} from "d3-axis";
 
-export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importances, onClick, metricRequest) {
+export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importances, selectedPipelines, onClick, metricRequest) {
   const {infos, module_types: moduleTypes} = data;
   const {moduleTypeOrder}  = constants;
 
@@ -380,6 +380,28 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
         .attr("height", bottom - top)
         .attr("width", colScale.bandwidth())
         .style("fill", "#00000000")
+    );
+
+  const selectedDigests = selectedPipelines.map(pipeline => pipeline['pipeline_digest']);
+
+  const selectedGroup = svg.selectAll(".selectedGroup")
+    .data([selectedDigests], x=>"selectedGroup")
+    .join(
+      enter => enter
+        .append("g")
+        .attr("class", "selectedGroup")
+    );
+
+  selectedGroup.selectAll("rect")
+    .data(x=>x, x=>x)
+    .join(
+      enter => enter
+        .append("rect")
+        .attr("x", left)
+        .attr("y", digest => rowScale(digest) + top)
+        .attr("width", right - left)
+        .attr("height", rowScale.bandwidth())
+        .style("fill", "#00000033")
     );
 
 

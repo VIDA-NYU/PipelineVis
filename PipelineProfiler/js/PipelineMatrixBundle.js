@@ -23,7 +23,7 @@ export class PipelineMatrixBundle extends Component {
 
     this.state = {
       pipelines,
-      selectedPipelines: null,
+      selectedPipelines: [],
       sortColumnsBy,
       sortRowsBy,
       metricRequest,
@@ -87,18 +87,20 @@ export class PipelineMatrixBundle extends Component {
     const {selectedPrimitive} = this.state;
     const {sortModuleBy, sortPipelineBy} = constants;
 
-    let requestMergeGraph = () => {};
+    let requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
 
     if (window.Jupyter !== undefined) {
       const comm = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {});
 
       requestMergeGraph = (pipelines) => {
+        console.log("sending merge message");
         comm.send({pipelines});
       };
 
       // Register a handler
       comm.on_msg(function(msg) {
         const mergedGraph = msg.content.data.merged;
+        console.log(mergedGraph);
         this.setState({mergedGraph});
       });
     }
@@ -142,7 +144,7 @@ export class PipelineMatrixBundle extends Component {
       return <div/>;
     }
 
-    console.log("Bundle props " + this.state.moduleNames[2]);
+    // TODO: fix console.log("Bundle props " + this.state.moduleNames[2]);
 
 
     return <div>
@@ -206,6 +208,7 @@ export class PipelineMatrixBundle extends Component {
       <PipelineMatrix
         data={data}
         pipelines={this.state.pipelines}
+        selectedPipelines={this.state.selectedPipelines}
         onClick={
           (selectedPipeline, shift) => {
             if (!shift) {

@@ -16,8 +16,8 @@ export class PipelineMatrix extends Component {
 
   display(props, state){
     const {data, pipelines, onClick} = props;
-    console.log("Pipeline Matrix props: " + this.props.moduleNames[2]);
-    plotPipelineMatrix(this.ref, data, pipelines, this.props.moduleNames, this.props.importances, onClick, this.props.metricRequest);
+    // TODO: FIX console.log("Pipeline Matrix props: " + this.props.moduleNames[2]);
+    plotPipelineMatrix(this.ref, data, pipelines, this.props.moduleNames, this.props.importances, this.props.selectedPipelines, onClick, this.props.metricRequest);
   }
 
   shouldComponentUpdate(newprops, newstate){
@@ -74,6 +74,7 @@ PipelineMatrix.defaultProps = {
 PipelineMatrix.propTypes = {
   data: PropTypes.object.isRequired,
   onClick: PropTypes.func,
+  selectedPipelines: PropTypes.array.isRequired,
   pipelines: PropTypes.array.isRequired,
   importances: PropTypes.object.isRequired,
   metricRequestChange: PropTypes.func.isRequired,
