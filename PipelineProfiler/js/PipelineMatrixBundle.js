@@ -22,6 +22,22 @@ export class PipelineMatrixBundle extends Component {
     pipelines = this.computeSortedPipelines(pipelines, sortRowsBy, metricRequest);
     moduleNames = this.computeSortedModuleNames(moduleNames, sortColumnsBy, importances, this.props.data.infos);
 
+
+    this.requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
+    if (window.Jupyter !== undefined) {
+      const comm = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {'foo': 6});
+
+      this.requestMergeGraph = (pipelines) => {
+        comm.send({pipelines});
+      };
+
+      // Register a handler
+      comm.on_msg(msg => {
+        const mergedGraph = msg.content.data.merged;
+        this.setState({mergedGraph});
+      });
+    }
+
     this.state = {
       pipelines,
       selectedPipelines: [],
@@ -88,23 +104,6 @@ export class PipelineMatrixBundle extends Component {
     const {data} = this.props;
     const {selectedPrimitive} = this.state;
     const {sortModuleBy, sortPipelineBy} = constants;
-
-    let requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
-
-
-    if (window.Jupyter !== undefined) {
-      const comm = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {'foo': 6});
-
-      requestMergeGraph = (pipelines) => {
-        comm.send({pipelines});
-      };
-
-      // Register a handler
-      comm.on_msg(msg => {
-        const mergedGraph = msg.content.data.merged;
-        this.setState({mergedGraph});
-      });
-    }
 
     let primitiveName = "";
     let primitiveHyperparamsView = null;
@@ -265,7 +264,7 @@ export class PipelineMatrixBundle extends Component {
               if (newSelectedPipelines.length === this.state.selectedPipelines.length) {
                 newSelectedPipelines.push(selectedPipeline);
               }
-              requestMergeGraph(newSelectedPipelines);
+              this.requestMergeGraph(newSelectedPipelines);
               this.setState({selectedPipelines: newSelectedPipelines, selectedPrimitive: null})
             }
           }
