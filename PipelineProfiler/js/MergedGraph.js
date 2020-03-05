@@ -72,7 +72,7 @@ class MergedGraph extends PureComponent {
         <div style={{display: 'flex', fontSize: '12px'}}>
           {
             sourceGraphColorScale.domain().map(sourceGraph => {
-              return <div style={{display: 'flex', marginRight: 20}}>
+              return <div key={sourceGraph} style={{display: 'flex', marginRight: 20}}>
                 <div style={{width: 20, height: 20, background: sourceGraphColorScale(sourceGraph)}}/>
                 <div style={{marginLeft: 5}}>{sourceGraph}</div>
               </div>;
@@ -113,10 +113,9 @@ class MergedGraph extends PureComponent {
                           </div>;
                         }
 
-                        return <div>
+                        return <div key={idx}>
                             {sourceBars}
                           <div
-                            key={idx}
                             style={{
                               position: 'relative',
                               textAlign: 'center',

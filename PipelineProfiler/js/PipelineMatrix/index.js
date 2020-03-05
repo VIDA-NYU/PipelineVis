@@ -11,13 +11,14 @@ export class PipelineMatrix extends Component {
     this.state = {
       selectedPipelines: [], // can be null, array of 0, 1 or more
     }
-
+    this.renderCount = 0;
   }
 
   display(props, state){
     const {data, pipelines, onClick} = props;
     // TODO: FIX console.log("Pipeline Matrix props: " + this.props.moduleNames[2]);
     plotPipelineMatrix(this.ref, data, pipelines, this.props.moduleNames, this.props.importances, this.props.selectedPipelines, onClick, this.props.metricRequest);
+    console.log("Render " + (this.renderCount++));
   }
 
   shouldComponentUpdate(newprops, newstate){
@@ -25,7 +26,7 @@ export class PipelineMatrix extends Component {
     if (newprops.moduleNames.length !== this.props.moduleNames.length || this.props.pipelines.length !== newprops.pipelines.length){
       return true;
     }
-    return true;
+    return false;
   }
 
   componentDidMount(){
