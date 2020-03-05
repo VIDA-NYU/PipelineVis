@@ -401,7 +401,13 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
         .attr("y", digest => rowScale(digest) + top)
         .attr("width", right - left)
         .attr("height", rowScale.bandwidth())
-        .style("fill", "#00000033")
+        .style("fill", "#00000033"),
+      update => update
+        .attr("x", left)
+        .attr("y", digest => rowScale(digest) + top)
+        .attr("width", right - left)
+        .attr("height", rowScale.bandwidth())
+        .style("fill", "#00000033"),
     );
 
 

@@ -90,7 +90,9 @@ export class PipelineMatrixBundle extends Component {
     let requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
 
     if (window.Jupyter !== undefined) {
-      const comm = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {});
+      const comm = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {'foo': 6});
+
+      console.log(comm);
 
       requestMergeGraph = (pipelines) => {
         console.log("sending merge message");
