@@ -23,7 +23,7 @@ export class PipelineMatrixBundle extends Component {
 
     this.state = {
       pipelines,
-      pipeline: null,
+      selectedPipelines: null,
       sortColumnsBy,
       sortRowsBy,
       metricRequest,
@@ -46,18 +46,16 @@ export class PipelineMatrixBundle extends Component {
       newPipelines.sort((a, b) => selectedScoresDigestsMap[b.pipeline_digest] - selectedScoresDigestsMap[a.pipeline_digest]);
     } else if (sortPipelinesBy === constants.sortPipelineBy.pipeline_source){
       newPipelines.sort((a, b) => selectedScoresDigestsMap[b.pipeline_digest] - selectedScoresDigestsMap[a.pipeline_digest]);
-      newPipelines.sort((a, b) => a.pipeline_source.name > b.pipeline_source.name ? 1 : (a.pipeline_source.name < b.pipeline_source.name ? -1 : 1));
+      newPipelines.sort((a, b) => a.pipeline_source.name > b.pipeline_source.name ? 1 : (a.pipeline_source.name < b.pipeline_source.name ? -1 : 0));
     }
     return newPipelines;
   }
 
   computeSortedModuleNames(moduleNames, sortModulesBy, importances, infos){
     let newModuleNames = [...moduleNames];
-    if (sortModulesBy === constants.sortModuleBy.importance){
+    if (sortModulesBy === constants.sortModuleBy.importance) {
       newModuleNames.sort((a, b) => importances[b] - importances[a]);
     } else if (sortModulesBy === constants.sortModuleBy.moduleType) {
-      newModuleNames.sort((a, b) => importances[b] - importances[a]);
-
       const moduleTypeOrderMap = {};
       constants.moduleTypeOrder.forEach((x, idx) => {
         moduleTypeOrderMap[x] = idx;
@@ -89,17 +87,21 @@ export class PipelineMatrixBundle extends Component {
     const {selectedPrimitive} = this.state;
     const {sortModuleBy, sortPipelineBy} = constants;
 
-    /*if (window.Jupyter !== undefined) {
-      const comm = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {'foo': 6})
-      for (let i = 0; i < 10; ++i){
-        comm.send({'foo': i})
-      }
+    let requestMergeGraph = () => {};
+
+    if (window.Jupyter !== undefined) {
+      const comm = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {});
+
+      requestMergeGraph = (pipelines) => {
+        comm.send({pipelines});
+      };
 
       // Register a handler
       comm.on_msg(function(msg) {
-        console.log(msg.content.data.echo);
+        const mergedGraph = msg.content.data.merged;
+        this.setState({mergedGraph});
       });
-    }*/
+    }
 
     let primitiveName = "";
     let primitiveHyperparamsView = null;
@@ -134,12 +136,14 @@ export class PipelineMatrixBundle extends Component {
           <p>No hyperparameters set.</p>
           </>;
       }
-
     }
 
     if (!this.state.pipelines) {
       return <div/>;
     }
+
+    console.log("Bundle props " + this.state.moduleNames[2]);
+
 
     return <div>
       <div>
@@ -149,7 +153,7 @@ export class PipelineMatrixBundle extends Component {
             <input type="radio" value={sortModuleBy.importance}
                    checked={this.state.sortColumnsBy === sortModuleBy.importance}
                    onClick={x=>{
-                     const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, this.state.sortColumnsBy, this.state.importances, this.props.data.infos);
+                     const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.importance, this.state.importances, this.props.data.infos);
                      this.setState({sortColumnsBy: sortModuleBy.importance, moduleNames: newModuleNames});
                    }}
                    onChange={x=>{}}
@@ -162,7 +166,7 @@ export class PipelineMatrixBundle extends Component {
             <input type="radio" value={sortModuleBy.moduleType}
                    checked={this.state.sortColumnsBy === sortModuleBy.moduleType}
                    onClick={x=>{
-                     const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, this.state.sortColumnsBy, this.state.importances, this.props.data.infos);
+                     const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.moduleType, this.state.importances, this.props.data.infos);
                      this.setState({sortColumnsBy: sortModuleBy.moduleType, moduleNames: newModuleNames});
                    }}
                    onChange={x=>{}}
@@ -179,7 +183,6 @@ export class PipelineMatrixBundle extends Component {
                  checked={this.state.sortRowsBy === sortPipelineBy.pipeline_score}
                  onClick={x=>{
                    const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_score, this.state.metricRequest);
-                   console.log(newPipelines);
                    this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_score});
                  }}
                  onChange={x=>{}}
@@ -193,7 +196,6 @@ export class PipelineMatrixBundle extends Component {
                  checked={this.state.sortRowsBy === sortPipelineBy.pipeline_source}
                  onClick={x=>{
                    const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_source, this.state.metricRequest);
-                   console.log(newPipelines);
                    this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_source});
                  }}
                  onChange={x=>{}}
@@ -205,8 +207,22 @@ export class PipelineMatrixBundle extends Component {
         data={data}
         pipelines={this.state.pipelines}
         onClick={
-          (pipeline) => {
-            this.setState({pipeline, selectedPrimitive: null})
+          (selectedPipeline, shift) => {
+            if (!shift) {
+              // Just set one item as the selected
+              this.setState({selectedPipelines: [selectedPipeline], selectedPrimitive: null})
+              console.log([selectedPipeline]);
+            } else {
+              // Select multiple pipelines
+              const digest = selectedPipeline.pipeline_digest;
+              let newSelectedPipelines = this.state.selectedPipelines.filter(elem => elem.pipeline_digest !== digest);
+              if (newSelectedPipelines.length === this.state.selectedPipelines.length) {
+                newSelectedPipelines.push(selectedPipeline);
+              }
+              requestMergeGraph(newSelectedPipelines);
+              console.log(newSelectedPipelines);
+              this.setState({selectedPipelines: newSelectedPipelines, selectedPrimitive: null})
+            }
           }
         }
         metricRequestChange={metricRequest => {
@@ -220,18 +236,21 @@ export class PipelineMatrixBundle extends Component {
         importances={this.state.importances}
         moduleNames={this.state.moduleNames}
       />
-      {this.state.pipeline?
+      {this.state.selectedPipelines && this.state.selectedPipelines.length > 0 ?
+        this.state.selectedPipelines.length === 1 ?
         <>
-          <p><strong>Pipeline Digest: </strong> {this.state.pipeline.pipeline_digest}</p>
+          <p><strong>Pipeline Digest: </strong> {this.state.selectedPipelines[0].pipeline_digest}</p>
           <SolutionGraph
             solution={ {description: {
-              pipeline: this.state.pipeline
+              pipeline: this.state.selectedPipelines[0]
             }} }
             onClick={node => {
               this.setState({selectedPrimitive: node})
             }}
           />
         </>
+          :
+          <p>Merging pipelines</p>
         : null
       }
       {

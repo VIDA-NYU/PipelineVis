@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import PropTypes from 'prop-types';
 import {plotPipelineMatrix} from "./plotPipelineMatrix";
 import "./pipelineMatrix.css";
-import {constants, extractMetricNames, extractMetric} from "../helpers";
+import {constants} from "../helpers";
 
 export class PipelineMatrix extends Component {
 
@@ -15,30 +15,30 @@ export class PipelineMatrix extends Component {
   }
 
   display(props, state){
-    const {data, pipelines, onClick, sortColumnBy, sortRowBy} = props;
-    plotPipelineMatrix(this.ref, data, pipelines, this.props.moduleNames, this.props.importances, onClick, this.props.metricRequest, sortColumnBy, sortRowBy);
+    const {data, pipelines, onClick} = props;
+    console.log("Pipeline Matrix props: " + this.props.moduleNames[2]);
+    plotPipelineMatrix(this.ref, data, pipelines, this.props.moduleNames, this.props.importances, onClick, this.props.metricRequest);
   }
 
   shouldComponentUpdate(newprops, newstate){
     this.display(newprops, newstate);
-    return false;
+    if (newprops.moduleNames.length !== this.props.moduleNames.length || this.props.pipelines.length !== newprops.pipelines.length){
+      return true;
+    }
+    return true;
   }
 
   componentDidMount(){
     this.display(this.props, this.state);
   }
 
-  componentDidUpdate(){
+  componentDidUpdate(prevProps, prevState){
     this.display(this.props, this.state);
   }
 
 
-
   render(){
-    const {pipelines} = this.props;
-    const {infos} = this.props.data;
-
-    const moduleNames = Object.keys(infos);
+    const {pipelines, moduleNames} = this.props;
 
     const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
       constants.margin.left + constants.margin.right;

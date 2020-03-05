@@ -7,7 +7,7 @@ import {constants, extractHyperparams, extractMetric, computePrimitiveImportance
 import "d3-transition";
 import {axisLeft} from "d3-axis";
 
-export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importances, onClick, metricRequest, sortColumnBy = constants.sortModuleBy.moduleType, sortRowBy = constants.sortPipelineBy.pipeline_source) {
+export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importances, onClick, metricRequest) {
   const {infos, module_types: moduleTypes} = data;
   const {moduleTypeOrder}  = constants;
 
@@ -325,28 +325,6 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
     .text(x => x)
     .style("fill", "#9a9a9a");
 
-  /*
-  ====> Removed this text and used a select instead.
-  const legendPipelinePerformanceType = svg
-    .selectAll(".legend_pipeline_performance")
-    .data([metricRequest.name])
-    .join(
-      enter => enter
-        .append("text")
-        .attr("class", "legend_pipeline_performance")
-        .attr("text-anchor", "end")
-        .attr("x", constants.margin.left + constants.pipelineNameWidth + constants.cellWidth * moduleNames.length + constants.pipelineScoreWidth)
-        .attr("y", constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight - 5)
-        .text(x => x)
-        .style("fill", "#9a9a9a"),
-      update => update
-        .attr("text-anchor", "end")
-        .attr("x", constants.margin.left + constants.pipelineNameWidth + constants.cellWidth * moduleNames.length + constants.pipelineScoreWidth)
-        .attr("y", constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight - 5)
-        .text(x => x)
-        .style("fill", "#9a9a9a"),
-    );*/
-
   const legendPipelineSourceGroup = svg
     .selectAll("#legendPipelineSourceGroup")
     .data([pipelines])
@@ -471,6 +449,8 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
     }
   });
 
+  const getEvent = () => event;
+
   svg.on("click", function () {
     const mGlobal = mouse(this);
 
@@ -478,7 +458,7 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
       const pipelineIdx = Math.floor((mGlobal[1] - top) / constants.cellHeight);
       const colIdx = Math.floor((mGlobal[0] - left) / constants.cellHeight);
       const moduleName = moduleNames[colIdx];
-      onClick(pipelines[pipelineIdx]);
+      onClick(pipelines[pipelineIdx], getEvent().shiftKey);
     }
   });
 
