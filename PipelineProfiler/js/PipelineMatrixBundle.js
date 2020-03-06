@@ -10,6 +10,7 @@ import {
   extractMetricNames
 } from "./helpers";
 import MergedGraph from "./MergedGraph";
+import Table from "./Table";
 
 export class PipelineMatrixBundle extends Component {
 
@@ -55,6 +56,7 @@ export class PipelineMatrixBundle extends Component {
       metricOptions,
       importances,
       moduleNames,
+      primitiveMetadata,
       mergedGraph: null,
     }
   }
@@ -122,23 +124,17 @@ export class PipelineMatrixBundle extends Component {
         primitiveName = selectedPrimitive.name;
       }
       const tableData = this.createHyperparamTableDataFromNode(selectedPrimitive);
+      const columns = [{
+        Header: 'Parameter Name',
+        accessor: x => x.name
+      }, {
+        Header: 'Parameter Value',
+        accessor: x => JSON.stringify(x.value)
+      }];
       if (tableData) {
         primitiveHyperparamsView = <>
           <p><strong>Primitive Name:</strong> {primitiveName}</p>
-          <table>
-            <tbody>
-              <tr>
-                <th>Parameter Name</th>
-                <th>Parameter Value</th>
-              </tr>
-              {tableData.map(row => (
-                <tr key={row.name}>
-                  <td>{row.name}</td>
-                  <td>{JSON.stringify(row.value)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table columns={columns} data={tableData}/>
         </>;
       } else {
         primitiveHyperparamsView = <>

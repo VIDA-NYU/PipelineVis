@@ -155,7 +155,9 @@ export function extractMetricNames(pipelines) {
   return pipelines[0]['scores'].map(score => score['metric']['metric']);
 }
 
+
 export function computePrimitiveMetadata(pipelines) {
+  // Computes primitive metadata for hyperparameter table
   let metadata = {};
   pipelines.forEach(pipeline => {
     pipeline.steps.forEach(step => {
