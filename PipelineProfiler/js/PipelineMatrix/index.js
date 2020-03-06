@@ -31,7 +31,6 @@ export class PipelineMatrix extends Component {
     this.display(this.props);
   }
 
-
   render(){
     const {pipelines, moduleNames} = this.props;
 

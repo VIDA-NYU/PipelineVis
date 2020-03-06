@@ -155,6 +155,43 @@ export function extractMetricNames(pipelines) {
   return pipelines[0]['scores'].map(score => score['metric']['metric']);
 }
 
+export function computePrimitiveMetadata(pipelines) {
+  let metadata = {};
+  pipelines.forEach(pipeline => {
+    pipeline.steps.forEach(step => {
+      const python_path = step.primitive.python_path;
+      if (!(python_path in metadata)) {
+        metadata[python_path] = {
+          hyperparams: {},
+          pipelines: [],
+        }
+      }
+      metadata[python_path].pipelines.push(pipeline);
+      if ('hyperparams' in step){
+        Object.keys(step.hyperparams).forEach(hyperparamKey => {
+          const hyperparams = metadata[python_path].hyperparams;
+          if (!(hyperparamKey in hyperparams)) {
+            hyperparams[hyperparamKey] = {
+              values: {},
+              pipelines: []
+            }
+          }
+          hyperparams[hyperparamKey].pipelines.push(pipeline);
+
+          const value  =step.hyperparams[hyperparamKey].data;
+          if (!(value in hyperparams[hyperparamKey].values)) {
+            hyperparams[hyperparamKey].values[value] = {
+              pipelines: []
+            }
+          }
+          hyperparams[hyperparamKey].values[value].pipelines.push(pipeline)
+        });
+      }
+    });
+  });
+  return metadata;
+}
+
 export const constants = {
   moduleTypeOrder: ["Preprocessing", "Feature Extraction", "Operator", "Regression", "Classification"],
   scoreRequest: {

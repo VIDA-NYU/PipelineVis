@@ -2,7 +2,13 @@ import React, {Component} from "react";
 import PropTypes from 'prop-types';
 import {PipelineMatrix} from "./PipelineMatrix";
 import SolutionGraph from "./SolutionGraph";
-import {computePrimitiveImportances, constants, extractMetric, extractMetricNames} from "./helpers";
+import {
+  computePrimitiveImportances,
+  computePrimitiveMetadata,
+  constants,
+  extractMetric,
+  extractMetricNames
+} from "./helpers";
 import MergedGraph from "./MergedGraph";
 
 export class PipelineMatrixBundle extends Component {
@@ -22,6 +28,8 @@ export class PipelineMatrixBundle extends Component {
     pipelines = this.computeSortedPipelines(pipelines, sortRowsBy, metricRequest);
     moduleNames = this.computeSortedModuleNames(moduleNames, sortColumnsBy, importances, this.props.data.infos);
 
+    const primitiveMetadata = computePrimitiveMetadata(pipelines);
+    console.log(primitiveMetadata);
 
     this.requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
     if (window.Jupyter !== undefined) {
@@ -143,8 +151,6 @@ export class PipelineMatrixBundle extends Component {
     if (!this.state.pipelines) {
       return <div/>;
     }
-
-    console.log("Bundle state [2]: " + this.state.moduleNames[2]); //TODO: FIX COMPONENT REnDERING WITH OLD PROPS
 
 
     let pipelineGraph = null;
