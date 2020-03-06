@@ -270,7 +270,7 @@ export class PipelineMatrixBundle extends Component {
           }
         }
         metricRequestChange={metricRequest => {
-          const importances = computePrimitiveImportances(this.props.data.infos, this.state.pipelines, this.state.metricRequest);
+          const importances = computePrimitiveImportances(this.props.data.infos, this.state.pipelines, metricRequest);
           this.setState({metricRequest, importances});
         }}
         sortColumnBy={this.state.sortColumnsBy}

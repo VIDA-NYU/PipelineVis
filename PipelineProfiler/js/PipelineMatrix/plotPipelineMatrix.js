@@ -3,7 +3,7 @@ import {select, event, mouse} from "d3-selection";
 import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
 import {extent} from "d3-array";
 import {schemeCategory10} from "d3-scale-chromatic";
-import {constants, extractHyperparams, extractMetric, computePrimitiveImportances} from "../helpers";
+import {constants, extractMetric} from "../helpers";
 import "d3-transition";
 import {axisLeft} from "d3-axis";
 
@@ -227,11 +227,11 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
       enter => enter
         .append("text")
         .text(x => infos[x]['module_name'])
-        .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()}, ${constants.moduleNameHeight}) rotate(-90)`)
+        .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-45)`)
         .style("fill", x => moduleColorScale(infos[x].module_type)),
       update => update
         .call(update => update.transition(t)
-          .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()}, ${constants.moduleNameHeight}) rotate(-90)`)
+          .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-45)`)
         )
     );
 

@@ -8,13 +8,11 @@ export class PipelineMatrix extends Component {
 
   constructor(props) {
     super(props);
-    this.renderCount = 0;
   }
 
   display(props){
     const {data, pipelines, onClick, moduleNames, importances, selectedPipelines, metricRequest} = props;
     plotPipelineMatrix(this.ref, data, pipelines, moduleNames, importances, selectedPipelines, onClick, metricRequest);
-    console.log("Render " + (this.renderCount++));
   }
 
   shouldComponentUpdate(newprops, newstate){

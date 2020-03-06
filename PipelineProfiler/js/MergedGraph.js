@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 import {getPrimitiveLabel} from "./helpers";
 import {schemeCategory10} from 'd3-scale-chromatic';
 import {scaleOrdinal} from "d3-scale";
+import {zoom} from "d3-zoom";
+import {select} from "d3-selection";
 
 function preprocessNode(node) {
   let primitives = {}; // map that keep track of primitives and what graph uses them
@@ -35,6 +37,8 @@ function preprocessNode(node) {
 }
 
 class MergedGraph extends PureComponent {
+
+
   render() {
     const { merged } = this.props;
     const sourceGraphColorScale = scaleOrdinal(schemeCategory10);
@@ -79,7 +83,7 @@ class MergedGraph extends PureComponent {
             })
           }
         </div>
-        <svg style={{width, height}}>
+        <svg style={{width, height}} ref={(ref) => {this.svgRef = ref}}>
           <g transform={`translate(${margin.left},${margin.top})`}>
             {g.nodes().map(n => {
               return <g
