@@ -6,7 +6,9 @@ import {getPrimitiveLabel} from "./helpers";
 import {schemeCategory10} from 'd3-scale-chromatic';
 import {scaleOrdinal} from "d3-scale";
 import {zoom} from "d3-zoom";
-import {select} from "d3-selection";
+import {select, event} from "d3-selection";
+
+const getEvent = () => event;
 
 function preprocessNode(node) {
   let primitives = {}; // map that keep track of primitives and what graph uses them
@@ -38,6 +40,25 @@ function preprocessNode(node) {
 
 class MergedGraph extends PureComponent {
 
+  constructor(props) {
+    super(props);
+    this.zoomed = this.zoomed.bind(this);
+  }
+
+  zoomed () {
+    this.transformGroup.attr("transform", getEvent().transform);
+  }
+
+  setupDragZoom(ref, width, height) {
+    let svg = select(ref);
+    this.svg = svg;
+    this.transformGroup = svg.select("#transformGroup");
+    svg.call(zoom()
+      .extent([[0, 0], [width, height]])
+      .scaleExtent([0.1, 3])
+      .on("zoom", this.zoomed)
+    )
+  }
 
   render() {
     const { merged } = this.props;
@@ -83,8 +104,8 @@ class MergedGraph extends PureComponent {
             })
           }
         </div>
-        <svg style={{width, height}} ref={(ref) => {this.svgRef = ref}}>
-          <g transform={`translate(${margin.left},${margin.top})`}>
+        <svg style={{width, height}} ref={(ref) => {this.setupDragZoom(ref, width, height)}}>
+          <g id={"transformGroup"} transform={`translate(${margin.left},${margin.top})`}>
             {g.nodes().map(n => {
               return <g
                 key={n}
