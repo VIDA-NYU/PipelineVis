@@ -3,9 +3,33 @@ import dagre from 'dagre';
 import { startCase } from 'lodash';
 import PropTypes from 'prop-types';
 import {getPrimitiveLabel} from './helpers';
+import {select, event} from "d3-selection";
+import {zoom} from "d3-zoom";
+
+const getEvent = () => event;
 
 
 class SolutionGraph extends PureComponent {
+
+  constructor(props) {
+    super(props);
+    this.zoomed = this.zoomed.bind(this);
+  }
+
+  zoomed () {
+    this.transformGroup.attr("transform", getEvent().transform);
+  }
+
+  setupDragZoom(ref, width, height) {
+    let svg = select(ref);
+    this.svg = svg;
+    this.transformGroup = svg.select("#transformGroup");
+    svg.call(zoom()
+      .extent([[0, 0], [width, height]])
+      .scaleExtent([0.1, 3])
+      .on("zoom", this.zoomed)
+    )
+  }
 
   render() {
     const { solution } = this.props;
@@ -61,8 +85,8 @@ class SolutionGraph extends PureComponent {
     };
 
     return (
-        <svg style={{width, height}}>
-          <g transform={`translate(${margin},${margin})`}>
+        <svg style={{width, height}} ref={ref => {this.setupDragZoom(ref, width, height)}}>
+          <g id={"transformGroup"} transform={`translate(${margin},${margin})`}>
             {g.nodes().map(n => (
               <g
                 key={n}

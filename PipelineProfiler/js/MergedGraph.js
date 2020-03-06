@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import dagre from 'dagre';
-import { startCase } from 'lodash';
 import PropTypes from 'prop-types';
 import {getPrimitiveLabel} from "./helpers";
 import {schemeCategory10} from 'd3-scale-chromatic';
