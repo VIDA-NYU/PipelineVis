@@ -91,12 +91,13 @@ class MergedGraph extends PureComponent {
     const height =
       Math.max(...g.nodes().map(n => g.node(n).y + g.node(n).height)) + margin.top + margin.bottom;
 
+
     return (
       <div>
-        <div style={{display: 'flex', fontSize: '12px'}}>
+        <div style={{display: 'flex', alignContent: 'space-between', flexWrap:'wrap', fontSize: '12px', width: '100%'}}>
           {
             sourceGraphColorScale.domain().map(sourceGraph => {
-              return <div key={sourceGraph} style={{display: 'flex', marginRight: 20}}>
+              return <div key={sourceGraph} style={{display: 'flex', marginRight: 20, marginBottom: 20}}>
                 <div style={{width: 20, height: 20, background: sourceGraphColorScale(sourceGraph)}}/>
                 <div style={{marginLeft: 5}}>{sourceGraph}</div>
               </div>;
