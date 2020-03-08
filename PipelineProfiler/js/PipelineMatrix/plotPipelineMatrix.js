@@ -11,7 +11,7 @@ function initialCaptalize(txt) {
   return txt[0].toUpperCase();
 }
 
-export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importances, selectedPipelines, selectedPipelinesColorScale, onClick, metricRequest) {
+export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importances, selectedPipelines, selectedPipelinesColorScale, onClick, onHover, metricRequest) {
   const {infos, module_types: moduleTypes} = data;
   const {moduleTypeOrder}  = constants;
 
@@ -293,7 +293,7 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
           .style("fill", "#6b6b6b"),
         )
     );
-
+/*
   const legendModuleType = svg
     .selectAll(".legend_module_type")
     .data([moduleTypeOrder], x=>"module_type")
@@ -331,6 +331,7 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
     .text(x => x)
     .style("fill", "#9a9a9a");
 
+ */
   const legendPipelineSourceGroup = svg
     .selectAll("#legendPipelineSourceGroup")
     .data([pipelines])
@@ -452,9 +453,12 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
     if (mGlobal[0] >= left && mGlobal[0] <= right && mGlobal[1] >= top && mGlobal[1] <= bottom) {
       const row = Math.floor((mGlobal[1] - top) / constants.cellHeight);
       if (row < pipelines.length) {
-        const pipelineIdx = pipelines[Math.floor((mGlobal[1] - top) / constants.cellHeight)].pipeline_digest;
+        const pipelineRowIndex = Math.floor((mGlobal[1] - top) / constants.cellHeight);
+        const pipelineIdx = pipelines[pipelineRowIndex].pipeline_digest;
         const colIdx = Math.floor((mGlobal[0] - left) / constants.cellHeight);
         const moduleName = moduleNames[colIdx];
+
+        onHover(pipelines[pipelineRowIndex], moduleName, mGlobal);
 
         svg
           .select("#highlight_row")

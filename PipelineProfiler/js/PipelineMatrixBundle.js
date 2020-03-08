@@ -37,12 +37,8 @@ export class PipelineMatrixBundle extends Component {
     moduleNames = this.computeSortedModuleNames(moduleNames, sortColumnsBy, importances, this.props.data.infos);
 
     const primitiveMetadata = computePrimitiveMetadata(pipelines);
-    console.log(primitiveMetadata);
 
     const primitiveMetadata2 = computePrimitiveMetadata2(pipelines);
-    console.log(primitiveMetadata2);
-
-
 
     this.requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
     if (window.Jupyter !== undefined) {
@@ -282,6 +278,12 @@ export class PipelineMatrixBundle extends Component {
         metricOptions={this.state.metricOptions}
         importances={this.state.importances}
         moduleNames={this.state.moduleNames}
+        onHover={(pipeline, moduleName, mGlobal) => {
+          const step = pipeline.steps.find(step => step.primitive.python_path === moduleName);
+          if (step){
+            console.log(step)
+          }
+        }}
       />
       {pipelineGraph}
       {primitiveHyperparamsView}
