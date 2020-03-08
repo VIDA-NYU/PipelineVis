@@ -11,7 +11,7 @@ function initialCaptalize(txt) {
   return txt[0].toUpperCase();
 }
 
-export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importances, selectedPipelines, onClick, metricRequest) {
+export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importances, selectedPipelines, selectedPipelinesColorScale, onClick, metricRequest) {
   const {infos, module_types: moduleTypes} = data;
   const {moduleTypeOrder}  = constants;
 
@@ -143,8 +143,10 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
         .attr("class", "dot")
         .attr("cx", x => colScale(x.pythonPath) + bandOver2)
         .attr("cy", x => rowScale(x.pipelineID) + bandOver2)
-        .attr("r", 5)
-        .style("fill", x => moduleColorScale(infos[x.pythonPath].module_type)),
+        .attr("r", 4)
+        //.style("fill", x => moduleColorScale(infos[x.pythonPath].module_type)),
+        .style("fill", "#FF000033")
+        .style("stroke", "#550000"),
       update => update
         .call(update => update.transition(t)
           .attr("cx", x => colScale(x.pythonPath) + bandOver2)
@@ -231,11 +233,11 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
       enter => enter
         .append("text")
         .text(x => `(${initialCaptalize(infos[x].module_type)}) ${infos[x]['module_name']}`)
-        .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-45)`)
-        .style("fill", x => moduleColorScale(infos[x].module_type)),
+        .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`),
+        //.style("fill", x => moduleColorScale(infos[x].module_type)),
       update => update
         .call(update => update.transition(t)
-          .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-45)`)
+          .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
         )
     );
 
@@ -405,14 +407,17 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
         .attr("y", digest => rowScale(digest) + top)
         .attr("width", right - left)
         .attr("height", rowScale.bandwidth())
-        .style("fill", "#00000033"),
+        .style("fill", digest => selectedPipelinesColorScale(digest))
+        .style("opacity", 0.3),
       update => update
         .attr("x", left)
         .attr("y", digest => rowScale(digest) + top)
         .attr("width", right - left)
         .attr("height", rowScale.bandwidth())
-        .style("fill", "#00000033"),
+        .style("fill", digest => selectedPipelinesColorScale(digest))
+        .style("opacity", 0.3),
     );
+
 
 
   /*

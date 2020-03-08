@@ -4,6 +4,8 @@ import {PipelineMatrix} from "./PipelineMatrix";
 import SolutionGraph from "./SolutionGraph";
 import ReactTable from "react-table-v6";
 import "react-table-v6/react-table.css";
+import {schemeCategory10} from 'd3-scale-chromatic';
+import {scaleOrdinal} from "d3-scale";
 
 
 import {
@@ -19,7 +21,6 @@ import Table from "./Table";
 import PrimitiveTable from "./PrimitiveTable";
 
 export class PipelineMatrixBundle extends Component {
-
   constructor(props){
     super(props);
     let pipelines = props.data.pipelines;
@@ -41,6 +42,8 @@ export class PipelineMatrixBundle extends Component {
     const primitiveMetadata2 = computePrimitiveMetadata2(pipelines);
     console.log(primitiveMetadata2);
 
+
+
     this.requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
     if (window.Jupyter !== undefined) {
       const comm = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {'foo': 6});
@@ -59,6 +62,7 @@ export class PipelineMatrixBundle extends Component {
     this.state = {
       pipelines,
       selectedPipelines: [],
+      selectedPipelinesColorScale: () => {},
       sortColumnsBy,
       sortRowsBy,
       metricRequest,
@@ -179,6 +183,7 @@ export class PipelineMatrixBundle extends Component {
         if (this.state.mergedGraph) {
           pipelineGraph = <MergedGraph
             merged={this.state.mergedGraph}
+            selectedPipelinesColorScale={this.state.selectedPipelinesColorScale}
           />;
         }
       }
@@ -246,21 +251,25 @@ export class PipelineMatrixBundle extends Component {
         data={data}
         pipelines={this.state.pipelines}
         selectedPipelines={this.state.selectedPipelines}
+        selectedPipelinesColorScale={this.state.selectedPipelinesColorScale}
         onClick={
           (selectedPipeline, shift) => {
+            let selectedPipelinesColorScale = scaleOrdinal(schemeCategory10);
+            let newSelectedPipelines;
             if (!shift) {
               // Just set one item as the selected
-              this.setState({selectedPipelines: [selectedPipeline], selectedPrimitive: null})
+              newSelectedPipelines = [selectedPipeline];
             } else {
               // Select multiple pipelines
               const digest = selectedPipeline.pipeline_digest;
-              let newSelectedPipelines = this.state.selectedPipelines.filter(elem => elem.pipeline_digest !== digest);
+              newSelectedPipelines = this.state.selectedPipelines.filter(elem => elem.pipeline_digest !== digest);
               if (newSelectedPipelines.length === this.state.selectedPipelines.length) {
                 newSelectedPipelines.push(selectedPipeline);
               }
               this.requestMergeGraph(newSelectedPipelines);
-              this.setState({selectedPipelines: newSelectedPipelines, selectedPrimitive: null})
             }
+            newSelectedPipelines.forEach(pipeline => {selectedPipelinesColorScale(pipeline.pipeline_digest)});
+            this.setState({selectedPipelines: newSelectedPipelines, selectedPrimitive: null, selectedPipelinesColorScale})
           }
         }
         metricRequestChange={metricRequest => {
@@ -276,28 +285,6 @@ export class PipelineMatrixBundle extends Component {
       />
       {pipelineGraph}
       {primitiveHyperparamsView}
-      <ReactTable
-        data={this.state.primitiveMetadata2}
-        columns={[
-          {
-            Header: "Primitive ID",
-            accessor: "python_path"
-          },
-          {
-            Header: "Hyperparameter",
-            accessor: "hyperparam"
-          },
-          {
-            Header: "Value",
-            accessor: "value"
-          },
-          {
-            Header: "Pipeline ID",
-            accessor: "pipeline"
-          },
-        ]}
-        pivotBy={["python_path", "hyperparam", "value"]}
-      />
     </div>
   }
 }

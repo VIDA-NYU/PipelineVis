@@ -60,7 +60,7 @@ class MergedGraph extends PureComponent {
   }
 
   render() {
-    const { merged } = this.props;
+    const { merged, selectedPipelinesColorScale } = this.props;
     const sourceGraphColorScale = scaleOrdinal(schemeCategory10);
 
     var g = new dagre.graphlib.Graph();
@@ -91,19 +91,23 @@ class MergedGraph extends PureComponent {
     const height =
       Math.max(...g.nodes().map(n => g.node(n).y + g.node(n).height)) + margin.top + margin.bottom;
 
-
-    return (
-      <div>
-        <div style={{display: 'flex', alignContent: 'space-between', flexWrap:'wrap', fontSize: '12px', width: '100%'}}>
+    /*
+    // Removing legends since pipelines are color coded by selection now.
+    <div style={{display: 'flex', alignContent: 'space-between', flexWrap:'wrap', fontSize: '12px', width: '100%'}}>
           {
-            sourceGraphColorScale.domain().map(sourceGraph => {
+            selectedPipelinesColorScale.domain().map(sourceGraph => {
               return <div key={sourceGraph} style={{display: 'flex', marginRight: 20, marginBottom: 20}}>
-                <div style={{width: 20, height: 20, background: sourceGraphColorScale(sourceGraph)}}/>
+                <div style={{width: 20, height: 20, background: selectedPipelinesColorScale(sourceGraph)}}/>
                 <div style={{marginLeft: 5}}>{sourceGraph}</div>
               </div>;
             })
           }
         </div>
+     */
+
+    return (
+      <div>
+
         <svg style={{width, height}} ref={(ref) => {this.setupDragZoom(ref, width, height)}}>
           <g id={"transformGroup"} transform={`translate(${margin.left},${margin.top})`}>
             {g.nodes().map(n => {
@@ -188,6 +192,7 @@ class MergedGraph extends PureComponent {
 
 MergedGraph.propTypes = {
   merged: PropTypes.object.isRequired,
+  selectedPipelinesColorScale: PropTypes.func.isRequired,
 };
 
 MergedGraph.defaultProps = {
