@@ -49,15 +49,16 @@
     "dagre": "^0.8.4",
     "install": "^0.12.2",
     "lodash": "^4.17.15",
-    "npm": "^6.9.0",
+    "npm": "^6.14.2",
     "react-feather": "^1.1.6",
     "react-move": "^5.2.0",
     "react-redux": "^6.0.0",
     "react-select": "^2.4.1",
-    "react-table": "^6.9.0",
+    "react-table-v6": "^6.8.6",
     "react-tooltip": "^3.9.2",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
+    "styled-components": "^5.0.1",
     "typeface-roboto": "0.0.54"
   }
 }

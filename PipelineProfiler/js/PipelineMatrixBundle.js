@@ -2,15 +2,21 @@ import React, {Component} from "react";
 import PropTypes from 'prop-types';
 import {PipelineMatrix} from "./PipelineMatrix";
 import SolutionGraph from "./SolutionGraph";
+import ReactTable from "react-table-v6";
+import "react-table-v6/react-table.css";
+
+
 import {
   computePrimitiveImportances,
   computePrimitiveMetadata,
+  computePrimitiveMetadata2,
   constants,
   extractMetric,
   extractMetricNames
 } from "./helpers";
 import MergedGraph from "./MergedGraph";
 import Table from "./Table";
+import PrimitiveTable from "./PrimitiveTable";
 
 export class PipelineMatrixBundle extends Component {
 
@@ -31,6 +37,9 @@ export class PipelineMatrixBundle extends Component {
 
     const primitiveMetadata = computePrimitiveMetadata(pipelines);
     console.log(primitiveMetadata);
+
+    const primitiveMetadata2 = computePrimitiveMetadata2(pipelines);
+    console.log(primitiveMetadata2);
 
     this.requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
     if (window.Jupyter !== undefined) {
@@ -57,6 +66,7 @@ export class PipelineMatrixBundle extends Component {
       importances,
       moduleNames,
       primitiveMetadata,
+      primitiveMetadata2,
       mergedGraph: null,
     }
   }
@@ -111,6 +121,7 @@ export class PipelineMatrixBundle extends Component {
   }
 
   render(){
+    /*<PrimitiveTable primitiveMetadata={this.state.primitiveMetadata}/>*/
     const {data} = this.props;
     const {selectedPrimitive} = this.state;
     const {sortModuleBy, sortPipelineBy} = constants;
@@ -172,25 +183,6 @@ export class PipelineMatrixBundle extends Component {
         }
       }
     }
-    /*{
-        this.state.selectedPipelines && this.state.selectedPipelines.length > 0 ?
-        this.state.selectedPipelines.length === 1 ?
-        <>
-          <p><strong>Pipeline Digest: </strong> {this.state.selectedPipelines[0].pipeline_digest}</p>
-          <SolutionGraph
-            solution={ {description: {
-              pipeline: this.state.selectedPipelines[0]
-            }} }
-            onClick={node => {
-              this.setState({selectedPrimitive: node})
-            }}
-          />
-        </>
-          :
-          <p>Merging pipelines</p>
-        : null
-      }*/
-
 
     return <div>
       <div>
@@ -283,9 +275,29 @@ export class PipelineMatrixBundle extends Component {
         moduleNames={this.state.moduleNames}
       />
       {pipelineGraph}
-      {
-        primitiveHyperparamsView
-      }
+      {primitiveHyperparamsView}
+      <ReactTable
+        data={this.state.primitiveMetadata2}
+        columns={[
+          {
+            Header: "Primitive ID",
+            accessor: "python_path"
+          },
+          {
+            Header: "Hyperparameter",
+            accessor: "hyperparam"
+          },
+          {
+            Header: "Value",
+            accessor: "value"
+          },
+          {
+            Header: "Pipeline ID",
+            accessor: "pipeline"
+          },
+        ]}
+        pivotBy={["python_path", "hyperparam", "value"]}
+      />
     </div>
   }
 }

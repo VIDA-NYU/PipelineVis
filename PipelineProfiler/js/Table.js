@@ -17,7 +17,7 @@ class Table extends PureComponent {
           })}
         </tr>
         {data.map((row, idx) => (
-          <tr key={idx} onClick={onClick} onMouseEnter={onHover}>
+          <tr key={idx} onClick={() => onClick(row)} onMouseEnter={() => onHover(row)}>
             {
               columns.map((column,idx) => {
                 return <td key={idx}>{column.accessor(row)}</td>

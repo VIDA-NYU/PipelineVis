@@ -155,6 +155,28 @@ export function extractMetricNames(pipelines) {
   return pipelines[0]['scores'].map(score => score['metric']['metric']);
 }
 
+export function computePrimitiveMetadata2(pipelines) {
+  let metadata = [];
+  pipelines.forEach(pipeline => {
+    pipeline.steps.forEach(step => {
+      const python_path = step.primitive.python_path;
+      if ('hyperparams' in step){
+        Object.keys(step.hyperparams).forEach(hyperparamKey => {
+          const value  = JSON.stringify(step.hyperparams[hyperparamKey].data);
+          const row = {
+            pipeline: pipeline.pipeline_digest,
+            hyperparam: hyperparamKey,
+            value,
+            python_path,
+          };
+          metadata.push(row)
+        });
+      }
+    });
+  });
+  return metadata;
+}
+
 
 export function computePrimitiveMetadata(pipelines) {
   // Computes primitive metadata for hyperparameter table

@@ -17,7 +17,6 @@ export function VerticalParCoord(){
         let y = scalePoint()
           .domain(hyperparamNames)
           .range([0, params.height]),
-
           x = {},
           line = d3Line();
 

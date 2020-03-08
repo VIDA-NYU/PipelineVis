@@ -7,6 +7,10 @@ import {constants, extractMetric} from "../helpers";
 import "d3-transition";
 import {axisLeft} from "d3-axis";
 
+function initialCaptalize(txt) {
+  return txt[0].toUpperCase();
+}
+
 export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importances, selectedPipelines, onClick, metricRequest) {
   const {infos, module_types: moduleTypes} = data;
   const {moduleTypeOrder}  = constants;
@@ -226,7 +230,7 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
     .join(
       enter => enter
         .append("text")
-        .text(x => infos[x]['module_name'])
+        .text(x => `(${initialCaptalize(infos[x].module_type)}) ${infos[x]['module_name']}`)
         .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-45)`)
         .style("fill", x => moduleColorScale(infos[x].module_type)),
       update => update
