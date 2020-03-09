@@ -145,8 +145,8 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
         .attr("cy", x => rowScale(x.pipelineID) + bandOver2)
         .attr("r", 4)
         //.style("fill", x => moduleColorScale(infos[x.pythonPath].module_type)),
-        .style("fill", "#FF000033")
-        .style("stroke", "#550000"),
+        .style("fill", "#0072ff33")
+        .style("stroke", "#4a5670"),
       update => update
         .call(update => update.transition(t)
           .attr("cx", x => colScale(x.pythonPath) + bandOver2)
@@ -233,7 +233,8 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
       enter => enter
         .append("text")
         .text(x => `(${initialCaptalize(infos[x].module_type)}) ${infos[x]['module_name']}`)
-        .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`),
+        .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
+        .style("fill", "#6e6e6e"),
         //.style("fill", x => moduleColorScale(infos[x].module_type)),
       update => update
         .call(update => update.transition(t)
@@ -351,7 +352,7 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
         .attr("text-anchor", "end")
         .attr("transform", x => `translate(0, ${rowScale(x.pipeline_digest) + 3})`)
         .text(x => x.pipeline_source.name)
-        .style("fill", "#9a9a9a"),
+        .style("fill", "#6e6e6e"),
       update => update
         .call(update => update.transition(t)
           .attr("transform", x => `translate(0, ${rowScale(x.pipeline_digest) + 3})`)
@@ -384,7 +385,7 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
         .append("rect")
         .attr("id", "highlight_col")
         .attr("y", top - constants.moduleImportanceHeight)
-        .attr("height", bottom - top - constants.moduleImportanceHeight)
+        .attr("height", bottom - top + constants.moduleImportanceHeight)
         .attr("width", colScale.bandwidth())
         .style("fill", "#00000000")
     );

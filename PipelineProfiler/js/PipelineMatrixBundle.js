@@ -199,7 +199,7 @@ export class PipelineMatrixBundle extends Component {
         background: "#FFFFFF",
         position: 'fixed',
         borderWidth: 'thin',
-        borderColor: '#aaaaaa'
+        borderColor: '#aaaaaa',
       };
       if (tooltipTableData) {
         tooltip = <div style={{...tooltipStyle, left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
