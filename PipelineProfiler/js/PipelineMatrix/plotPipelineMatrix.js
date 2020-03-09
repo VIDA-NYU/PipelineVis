@@ -11,7 +11,17 @@ function initialCaptalize(txt) {
   return txt[0].toUpperCase();
 }
 
-export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importances, selectedPipelines, selectedPipelinesColorScale, onClick, onHover, onSelectPrimitive, metricRequest) {
+export function plotPipelineMatrix(ref,
+                                   data,
+                                   pipelines,
+                                   moduleNames,
+                                   importances,
+                                   selectedPipelines,
+                                   selectedPipelinesColorScale,
+                                   onClick,
+                                   onHover,
+                                   onSelectExpandedPrimitive,
+                                   metricRequest) {
   const {infos, module_types: moduleTypes} = data;
   const {moduleTypeOrder}  = constants;
 
@@ -241,8 +251,8 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
           .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
         )
     ).on("click", (x)=>{
-    onSelectPrimitive(x);
-  });
+    onSelectExpandedPrimitive(x);
+    });
 
   const scoreScale = scaleLinear()
     .domain(extent(selectedScores, x => x))

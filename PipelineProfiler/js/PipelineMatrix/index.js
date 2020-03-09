@@ -11,8 +11,32 @@ export class PipelineMatrix extends Component {
   }
 
   display(props){
-    const {data, pipelines, onClick, onHover, onSelectPrimitive, moduleNames, importances, selectedPipelines, metricRequest, selectedPipelinesColorScale} = props;
-    plotPipelineMatrix(this.ref, data, pipelines, moduleNames, importances, selectedPipelines, selectedPipelinesColorScale, onClick, onHover, onSelectPrimitive, metricRequest);
+    const {
+      data,
+      pipelines,
+      onClick,
+      onHover,
+      onSelectExpandedPrimitive,
+      moduleNames,
+      importances,
+      selectedPipelines,
+      metricRequest,
+      selectedPipelinesColorScale
+    } = props;
+    
+    plotPipelineMatrix(
+      this.ref,
+      data,
+      pipelines,
+      moduleNames,
+      importances,
+      selectedPipelines,
+      selectedPipelinesColorScale,
+      onClick,
+      onHover,
+      onSelectExpandedPrimitive,
+      metricRequest
+    );
   }
 
   shouldComponentUpdate(newprops, newstate){
@@ -62,14 +86,14 @@ PipelineMatrix.defaultProps = {
   onClick: ()=>{},
   onHover: ()=>{},
   selectedPipelinesColorScale: () => {},
-  onSelectPrimitive: ()=>{}
+  onSelectExpandedPrimitive: ()=>{}
 };
 
 PipelineMatrix.propTypes = {
   data: PropTypes.object.isRequired,
   onClick: PropTypes.func,
   onHover: PropTypes.func,
-  onSelectPrimitive: PropTypes.func,
+  onSelectExpandedPrimitive: PropTypes.func,
   selectedPipelines: PropTypes.array.isRequired,
   selectedPipelinesColorScale: PropTypes.func,
   pipelines: PropTypes.array.isRequired,

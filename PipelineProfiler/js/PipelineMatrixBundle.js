@@ -70,6 +70,7 @@ export class PipelineMatrixBundle extends Component {
       primitiveMetadata2,
       mergedGraph: null,
       hoveredPrimitive: null,
+      expandedPrimitive: null,
     }
   }
 
@@ -295,7 +296,7 @@ export class PipelineMatrixBundle extends Component {
         selectedPipelines={this.state.selectedPipelines}
         selectedPipelinesColorScale={this.state.selectedPipelinesColorScale}
         onSelectPrimitive={python_path=>{
-          console.log(python_path);
+          this.setState({expandedPrimitive: python_path})
         }}
         onClick={
           (selectedPipeline, shift) => {
