@@ -114,6 +114,52 @@ export class PipelineMatrixBundle extends Component {
     select(this.ref).select("#legendPipelineSourceGroup").selectAll("text").style("font-weight", "normal");
   }
 
+  createHyperparamInfo(){
+    const {hoveredPrimitive, tooltipPosition} = this.state;
+    let tooltip, primitiveName;
+    if (hoveredPrimitive.primitive) {
+      primitiveName = hoveredPrimitive.primitive.python_path;
+      primitiveName = primitiveName.split(".").slice(3).join(".");
+    } else if (hoveredPrimitive.name) {
+      primitiveName = hoveredPrimitive.name;
+    }
+    const tooltipTableData = createHyperparamTableDataFromNode(hoveredPrimitive);
+    const columns = [{
+      Header: 'Hyperparameter',
+      accessor: x => x.name
+    }, {
+      Header: 'Value',
+      accessor: x => JSON.stringify(x.value)
+    }];
+    const tooltipStyle = {
+      padding: 15,
+      borderRadius: 12,
+      borderStyle: 'solid',
+      background: "#FFFFFF",
+      position: 'fixed',
+      borderWidth: 'thin',
+      borderColor: '#aaaaaa',
+    };
+
+    const tooltipHeader = <>
+      <p><strong>Primitive Name:</strong> {primitiveName}</p>
+      <p><strong>Primitive Type:</strong> {this.props.data.infos[hoveredPrimitive.primitive.python_path].module_type}</p>
+    </>;
+
+    if (tooltipTableData) {
+      tooltip = <div style={{...tooltipStyle, left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
+        {tooltipHeader}
+        <Table columns={columns} data={tooltipTableData}/>
+      </div>;
+    } else {
+      tooltip = <div style={{...tooltipStyle, left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
+        {tooltipHeader}
+        <p>No hyperparameters set.</p>
+      </div>;
+    }
+    return tooltip;
+  }
+
   render(){
     /*<PrimitiveTable primitiveMetadata={this.state.primitiveMetadata}/>*/
     const {data} = this.props;
@@ -182,46 +228,7 @@ export class PipelineMatrixBundle extends Component {
 
     let tooltip = null;
     if (hoveredPrimitive) {
-      if (hoveredPrimitive.primitive) {
-        primitiveName = hoveredPrimitive.primitive.python_path;
-      } else if (hoveredPrimitive.name) {
-        primitiveName = hoveredPrimitive.name;
-      }
-      const tooltipTableData = createHyperparamTableDataFromNode(hoveredPrimitive);
-      const columns = [{
-        Header: 'Hyperparameter',
-        accessor: x => x.name
-      }, {
-        Header: 'Value',
-        accessor: x => JSON.stringify(x.value)
-      }];
-      const tooltipStyle = {
-        padding: 15,
-        borderRadius: 12,
-        borderStyle: 'solid',
-        background: "#FFFFFF",
-        position: 'fixed',
-        borderWidth: 'thin',
-        borderColor: '#aaaaaa',
-      };
-
-      const tooltipHeader = <>
-        <p><strong>Primitive Name:</strong> {primitiveName}</p>
-        <p><strong>Primitive Type:</strong> {this.props.data.infos[hoveredPrimitive.primitive.python_path].module_type}</p>
-      </>;
-
-      if (tooltipTableData) {
-        tooltip = <div style={{...tooltipStyle, left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
-          {tooltipHeader}
-          <Table columns={columns} data={tooltipTableData}/>
-        </div>;
-      } else {
-        tooltip = <div style={{...tooltipStyle, left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
-          {tooltipHeader}
-          <p>No hyperparameters set.</p>
-        </div>;
-      }
-
+      tooltip = this.createHyperparamInfo(hoveredPrimitive);
     }
 
     return <div ref={ref=>{this.ref = ref}}>

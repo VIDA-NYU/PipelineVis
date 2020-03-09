@@ -223,6 +223,14 @@ export function createHyperparamTableDataFromNode(node){
       let row = {};
       row['name'] = hyperparamName;
       row['value'] = node.hyperparams[hyperparamName].data;
+      while(true){
+        if (typeof row['value'] === 'object' && 'value' in row['value']){
+          row['value'] = row['value']['value']
+        } else {
+          break;
+        }
+      }
+
       tableData.push(row);
     }
   }
