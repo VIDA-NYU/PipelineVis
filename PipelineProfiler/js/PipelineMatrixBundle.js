@@ -109,6 +109,8 @@ export class PipelineMatrixBundle extends Component {
     this.setState({hoveredPrimitive: null, tooltipPosition: null});
     select(this.ref).select("#highlight_row").style("fill", "#00000000");
     select(this.ref).select("#highlight_col").style("fill", "#00000000");
+    select(this.ref).select("#module_names").selectAll("text").style("font-weight", "normal");
+    select(this.ref).select("#legendPipelineSourceGroup").selectAll("text").style("font-weight", "normal");
   }
 
   render(){

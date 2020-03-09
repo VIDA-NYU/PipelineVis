@@ -372,7 +372,7 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
         .append("rect")
         .attr("id", "highlight_row")
         .attr("x", left)
-        .attr("width", right - left)
+        .attr("width", right - left + constants.pipelineScoreWidth)
         .attr("height", rowScale.bandwidth())
         .style("fill", "#00000000")
     );
@@ -472,6 +472,17 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
           .select("#highlight_col")
           .attr("x", colScale(moduleName) + left)
           .style("fill", highlightColor);
+
+        svg
+          .select("#module_names")
+          .selectAll("text")
+          .style("font-weight", d => d === moduleName ? "bold" : "normal");
+
+        svg
+          .select("#legendPipelineSourceGroup")
+          .selectAll("text")
+          .style("font-weight", d => {return d.pipeline_digest === pipelineIdx ? "bold" : "normal"});
+
       } else {
         svg
           .select("#highlight_row")
@@ -480,6 +491,16 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
         svg
           .select("#highlight_col")
           .style("fill", "#00000000");
+
+        svg
+          .select("#module_names")
+          .selectAll("text")
+          .style("font-weight", "normal");
+
+        svg
+          .select("#legendPipelineSourceGroup")
+          .selectAll("text")
+          .style("font-weight", "normal");
       }
     } else {
       svg
@@ -489,6 +510,16 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
       svg
         .select("#highlight_col")
         .style("fill", "#00000000");
+
+      svg
+        .select("#module_names")
+        .selectAll("text")
+        .style("font-weight", "normal");
+
+      svg
+        .select("#legendPipelineSourceGroup")
+        .selectAll("text")
+        .style("font-weight", "normal");
       onHover(null, null, null);
     }
   });

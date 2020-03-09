@@ -246,7 +246,7 @@ export const constants = {
     pipeline_source: 'PIPELINE_SOURCE',
     pipeline_score: 'PIPELINE_SCORE',
   },
-  pipelineNameWidth: 200,
+  pipelineNameWidth: 100,
   moduleImportanceHeight: 100,
   moduleNameHeight: 150,
   hyperparamsHeight: 100,
