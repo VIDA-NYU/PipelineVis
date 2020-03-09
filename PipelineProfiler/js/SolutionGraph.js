@@ -46,10 +46,10 @@ class SolutionGraph extends PureComponent {
     });
     const nodeDimentions = { width: 120, height: 70 };
     solution.description.pipeline.inputs.forEach((input, idx) => {
-      g.setNode(`inputs.${idx}`, { label: input.name, ...nodeDimentions });
+      g.setNode(`inputs.${idx}`, { label: 'Input', ...nodeDimentions });
     });
     solution.description.pipeline.outputs.forEach((output, idx) => {
-      g.setNode(`outputs.${idx}`, { label: output.name, ...nodeDimentions });
+      g.setNode(`outputs.${idx}`, { label: 'Output', ...nodeDimentions });
     });
 
     solution.description.pipeline.steps.forEach((step, idx) => {
@@ -107,9 +107,7 @@ class SolutionGraph extends PureComponent {
                       alignItems: 'center',
                       height: '100%',
                       border: 'solid 1px black',
-                      borderColor: n.startsWith('inputs')
-                      ? '#40c176'
-                      : (n.startsWith('outputs') ? '#c14141' : '#c6c6c6'),
+                      borderColor: '#c6c6c6',
                       padding: '5px',
                     }}
                     onClick={() => onClick(n)}

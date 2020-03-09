@@ -127,10 +127,10 @@ export class PipelineMatrixBundle extends Component {
       }
       const tableData = createHyperparamTableDataFromNode(selectedPrimitive);
       const columns = [{
-        Header: 'Parameter Name',
+        Header: 'Hyperparameter',
         accessor: x => x.name
       }, {
-        Header: 'Parameter Value',
+        Header: 'Value',
         accessor: x => JSON.stringify(x.value)
       }];
       if (tableData) {
@@ -186,10 +186,10 @@ export class PipelineMatrixBundle extends Component {
       }
       const tooltipTableData = createHyperparamTableDataFromNode(hoveredPrimitive);
       const columns = [{
-        Header: 'Parameter Name',
+        Header: 'Hyperparameter',
         accessor: x => x.name
       }, {
-        Header: 'Parameter Value',
+        Header: 'Value',
         accessor: x => JSON.stringify(x.value)
       }];
       const tooltipStyle = {

@@ -383,8 +383,8 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
       enter => enter
         .append("rect")
         .attr("id", "highlight_col")
-        .attr("y", top)
-        .attr("height", bottom - top)
+        .attr("y", top - constants.moduleImportanceHeight)
+        .attr("height", bottom - top - constants.moduleImportanceHeight)
         .attr("width", colScale.bandwidth())
         .style("fill", "#00000000")
     );
