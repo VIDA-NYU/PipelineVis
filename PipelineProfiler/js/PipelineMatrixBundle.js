@@ -294,6 +294,9 @@ export class PipelineMatrixBundle extends Component {
         pipelines={this.state.pipelines}
         selectedPipelines={this.state.selectedPipelines}
         selectedPipelinesColorScale={this.state.selectedPipelinesColorScale}
+        onSelectPrimitive={python_path=>{
+          console.log(python_path);
+        }}
         onClick={
           (selectedPipeline, shift) => {
             let selectedPipelinesColorScale = scaleOrdinal(schemeCategory10);
@@ -340,24 +343,6 @@ export class PipelineMatrixBundle extends Component {
       {pipelineGraph}
       {primitiveHyperparamsView}
       </div>
-      <ReactTable
-        data={this.state.primitiveMetadata2}
-        columns={[
-          {
-            Header: "Primitive ID",
-            accessor: "python_path"
-          },
-          {
-            Header: "Hyperparameter",
-            accessor: "hyperparam"
-          },
-          {
-            Header: "Value",
-            accessor: "value"
-          },
-        ]}
-        pivotBy={["python_path", "hyperparam", "value"]}
-      />
     </div>
   }
 }
@@ -376,4 +361,23 @@ PipelineMatrixBundle.propTypes = {
 * - Reorder modules based on type
 * - link pipeline graph with matrix
 * - How to show hyperparameters - parallel coordinates
+*
+<ReactTable
+        data={this.state.primitiveMetadata2}
+        columns={[
+          {
+            Header: "Primitive ID",
+            accessor: "python_path"
+          },
+          {
+            Header: "Hyperparameter",
+            accessor: "hyperparam"
+          },
+          {
+            Header: "Value",
+            accessor: "value"
+          },
+        ]}
+        pivotBy={["python_path", "hyperparam", "value"]}
+      />
 * */
