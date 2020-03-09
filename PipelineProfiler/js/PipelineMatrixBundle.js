@@ -5,6 +5,7 @@ import SolutionGraph from "./SolutionGraph";
 import "react-table-v6/react-table.css";
 import {schemeCategory10} from 'd3-scale-chromatic';
 import {scaleOrdinal} from "d3-scale";
+import {select} from "d3-selection";
 
 import {
   computePrimitiveImportances,
@@ -104,6 +105,11 @@ export class PipelineMatrixBundle extends Component {
     return newModuleNames;
   }
 
+  cleanMouseOver() {
+    this.setState({hoveredPrimitive: null, tooltipPosition: null});
+    select(this.ref).select("#highlight_row").style("fill", "#00000000");
+    select(this.ref).select("#highlight_col").style("fill", "#00000000");
+  }
 
   render(){
     /*<PrimitiveTable primitiveMetadata={this.state.primitiveMetadata}/>*/
@@ -186,13 +192,22 @@ export class PipelineMatrixBundle extends Component {
         Header: 'Parameter Value',
         accessor: x => JSON.stringify(x.value)
       }];
+      const tooltipStyle = {
+        padding: 15,
+        borderRadius: 12,
+        borderStyle: 'solid',
+        background: "#FFFFFF",
+        position: 'fixed',
+        borderWidth: 'thin',
+        borderColor: '#aaaaaa'
+      };
       if (tooltipTableData) {
-        tooltip = <div style={{padding: 15, borderRadius: 12, background: "#FFFFFF", position: 'fixed', left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
+        tooltip = <div style={{...tooltipStyle, left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
           <p><strong>Primitive Name:</strong> {primitiveName}</p>
           <Table columns={columns} data={tooltipTableData}/>
         </div>;
       } else {
-        tooltip = <div style={{padding: 15, borderRadius: 12, background: "#FFFFFF", position: 'fixed', left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
+        tooltip = <div style={{...tooltipStyle, left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
           <p><strong>Primitive Name:</strong> {primitiveName}</p>
           <p>No hyperparameters set.</p>
         </div>;
@@ -200,7 +215,7 @@ export class PipelineMatrixBundle extends Component {
 
     }
 
-    return <div>
+    return <div ref={ref=>{this.ref = ref}}>
       <div>
         <div><strong>Sort primitives by:</strong></div>
         <div className="radio">
@@ -305,8 +320,10 @@ export class PipelineMatrixBundle extends Component {
         }}
       />
       {tooltip}
+      <div onMouseMove={()=>{this.cleanMouseOver()}}>
       {pipelineGraph}
       {primitiveHyperparamsView}
+      </div>
     </div>
   }
 }
