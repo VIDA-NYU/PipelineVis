@@ -306,45 +306,7 @@ export function plotPipelineMatrix(ref,
           .style("fill", "#6b6b6b"),
         )
     );
-/*
-  const legendModuleType = svg
-    .selectAll(".legend_module_type")
-    .data([moduleTypeOrder], x=>"module_type")
-    .join(
-      enter => enter
-        .append("g")
-        .attr("class", "legend_module_type")
-        .attr("transform", `translate(${constants.margin.left}, ${constants.margin.top})`)
-    );
 
-  const lengendRowGroup = legendModuleType
-    .selectAll("g")
-    .data(x => x, x => x)
-    .join(
-      enter => enter
-        .append("g")
-        .attr("transform", (x, idx) => `translate(0, ${idx * 14})`)
-        .attr("data", x => x)
-    );
-
-  lengendRowGroup.selectAll("*").remove();
-
-  lengendRowGroup
-    .append("rect")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("width", 12)
-    .attr("height", 12)
-    .style("fill", x => moduleColorScale(x));
-
-  lengendRowGroup
-    .append("text")
-    .attr("x", 14)
-    .attr("y", 10)
-    .text(x => x)
-    .style("fill", "#9a9a9a");
-
- */
   const legendPipelineSourceGroup = svg
     .selectAll("#legendPipelineSourceGroup")
     .data([pipelines])
@@ -431,32 +393,6 @@ export function plotPipelineMatrix(ref,
         .style("fill", digest => selectedPipelinesColorScale(digest))
         .style("opacity", 0.3),
     );
-
-
-
-  /*
-  const hyperparams = extractHyperparams(infos, pipelines);
-
-  const hyperparamsArray = moduleNames.map(mname => ({key: mname, data: hyperparams[mname]}));
-
-  const verticalParCoord = VerticalParCoord()
-    .width(colScale.bandwidth())
-    .height(constants.hyperparamsHeight);
-
-  svg
-    .selectAll(".paramcoords")
-    .data(hyperparamsArray, (d, idx) => d.key)
-    .join(
-      enter => enter
-        .append("g")
-        .attr("class", "paramcoords")
-        .attr("transform", (d, idx) => `translate(${left + colScale(d.key)}, ${top + pipelines.length * constants.cellHeight})`)
-        .call(verticalParCoord),
-      update => update
-        .call(update => update.transition(t)
-          .attr("transform", (d, idx) => `translate(${left + colScale(d.key)}, ${top + pipelines.length * constants.cellHeight})`)
-        )
-    );*/
 
   const getEvent = () => event;
 

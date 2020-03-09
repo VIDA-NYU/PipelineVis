@@ -23,7 +23,7 @@ export class PipelineMatrix extends Component {
       metricRequest,
       selectedPipelinesColorScale
     } = props;
-    
+
     plotPipelineMatrix(
       this.ref,
       data,
