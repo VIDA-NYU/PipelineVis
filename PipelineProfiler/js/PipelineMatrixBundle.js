@@ -7,15 +7,16 @@ import "react-table-v6/react-table.css";
 import {schemeCategory10} from 'd3-scale-chromatic';
 import {scaleOrdinal} from "d3-scale";
 
-
 import {
   computePrimitiveImportances,
   computePrimitiveMetadata,
   computePrimitiveMetadata2,
   constants,
   extractMetric,
-  extractMetricNames
+  extractMetricNames,
+  createHyperparamTableDataFromNode,
 } from "./helpers";
+
 import MergedGraph from "./MergedGraph";
 import Table from "./Table";
 import PrimitiveTable from "./PrimitiveTable";
@@ -68,6 +69,7 @@ export class PipelineMatrixBundle extends Component {
       primitiveMetadata,
       primitiveMetadata2,
       mergedGraph: null,
+      hoveredPrimitive: null,
     }
   }
 
@@ -104,26 +106,11 @@ export class PipelineMatrixBundle extends Component {
     return newModuleNames;
   }
 
-  createHyperparamTableDataFromNode(node){
-    const tableData = [];
-    if ('hyperparams' in node) {
-      for (const hyperparamName of Object.keys(node.hyperparams)) {
-        let row = {};
-        row['name'] = hyperparamName;
-        row['value'] = node.hyperparams[hyperparamName].data;
-        tableData.push(row);
-      }
-    }
-    if (tableData.length === 0) {
-      return null;
-    }
-    return tableData;
-  }
 
   render(){
     /*<PrimitiveTable primitiveMetadata={this.state.primitiveMetadata}/>*/
     const {data} = this.props;
-    const {selectedPrimitive} = this.state;
+    const {selectedPrimitive, hoveredPrimitive} = this.state;
     const {sortModuleBy, sortPipelineBy} = constants;
 
     let primitiveName = "";
@@ -134,7 +121,7 @@ export class PipelineMatrixBundle extends Component {
       } else if (selectedPrimitive.name) {
         primitiveName = selectedPrimitive.name;
       }
-      const tableData = this.createHyperparamTableDataFromNode(selectedPrimitive);
+      const tableData = createHyperparamTableDataFromNode(selectedPrimitive);
       const columns = [{
         Header: 'Parameter Name',
         accessor: x => x.name
@@ -183,6 +170,36 @@ export class PipelineMatrixBundle extends Component {
           />;
         }
       }
+    }
+
+
+    let tooltip = null;
+    if (hoveredPrimitive) {
+      if (hoveredPrimitive.primitive) {
+        primitiveName = hoveredPrimitive.primitive.python_path;
+      } else if (hoveredPrimitive.name) {
+        primitiveName = hoveredPrimitive.name;
+      }
+      const tableData = createHyperparamTableDataFromNode(hoveredPrimitive);
+      const columns = [{
+        Header: 'Parameter Name',
+        accessor: x => x.name
+      }, {
+        Header: 'Parameter Value',
+        accessor: x => JSON.stringify(x.value)
+      }];
+      if (tableData) {
+        tooltip = <>
+          <p><strong>Primitive Name:</strong> {primitiveName}</p>
+          <Table columns={columns} data={tableData}/>
+        </>;
+      } else {
+        tooltip = <>
+          <p><strong>Primitive Name:</strong> {primitiveName}</p>
+          <p>No hyperparameters set.</p>
+        </>;
+      }
+
     }
 
     return <div>
@@ -281,10 +298,13 @@ export class PipelineMatrixBundle extends Component {
         onHover={(pipeline, moduleName, mGlobal) => {
           const step = pipeline.steps.find(step => step.primitive.python_path === moduleName);
           if (step){
-            console.log(step)
+            this.setState({hoveredPrimitive: step})
+          } else {
+            this.setState({hoveredPrimitive: null})
           }
         }}
       />
+      {tooltip}
       {pipelineGraph}
       {primitiveHyperparamsView}
     </div>

@@ -216,6 +216,22 @@ export function computePrimitiveMetadata(pipelines) {
   return metadata;
 }
 
+export function createHyperparamTableDataFromNode(node){
+  const tableData = [];
+  if ('hyperparams' in node) {
+    for (const hyperparamName of Object.keys(node.hyperparams)) {
+      let row = {};
+      row['name'] = hyperparamName;
+      row['value'] = node.hyperparams[hyperparamName].data;
+      tableData.push(row);
+    }
+  }
+  if (tableData.length === 0) {
+    return null;
+  }
+  return tableData;
+}
+
 export const constants = {
   moduleTypeOrder: ["Preprocessing", "Feature Extraction", "Operator", "Regression", "Classification"],
   scoreRequest: {
