@@ -445,6 +445,8 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
         )
     );*/
 
+  const getEvent = () => event;
+
   const highlightColor = "#CCCCCC44";
 
   svg.on("mousemove", function () {
@@ -458,7 +460,7 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
         const colIdx = Math.floor((mGlobal[0] - left) / constants.cellHeight);
         const moduleName = moduleNames[colIdx];
 
-        onHover(pipelines[pipelineRowIndex], moduleName, mGlobal);
+        onHover(pipelines[pipelineRowIndex], moduleName, [getEvent().pageX, getEvent().pageY]);
 
         svg
           .select("#highlight_row")
@@ -486,11 +488,9 @@ export function plotPipelineMatrix(ref, data, pipelines, moduleNames, importance
       svg
         .select("#highlight_col")
         .style("fill", "#00000000");
-
+      onHover(null, null, null);
     }
   });
-
-  const getEvent = () => event;
 
   svg.on("click", function () {
     const mGlobal = mouse(this);

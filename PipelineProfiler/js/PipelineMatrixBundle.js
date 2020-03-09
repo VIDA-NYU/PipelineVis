@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import PropTypes from 'prop-types';
 import {PipelineMatrix} from "./PipelineMatrix";
 import SolutionGraph from "./SolutionGraph";
-import ReactTable from "react-table-v6";
 import "react-table-v6/react-table.css";
 import {schemeCategory10} from 'd3-scale-chromatic';
 import {scaleOrdinal} from "d3-scale";
@@ -19,7 +18,6 @@ import {
 
 import MergedGraph from "./MergedGraph";
 import Table from "./Table";
-import PrimitiveTable from "./PrimitiveTable";
 
 export class PipelineMatrixBundle extends Component {
   constructor(props){
@@ -110,7 +108,7 @@ export class PipelineMatrixBundle extends Component {
   render(){
     /*<PrimitiveTable primitiveMetadata={this.state.primitiveMetadata}/>*/
     const {data} = this.props;
-    const {selectedPrimitive, hoveredPrimitive} = this.state;
+    const {selectedPrimitive, hoveredPrimitive, tooltipPosition} = this.state;
     const {sortModuleBy, sortPipelineBy} = constants;
 
     let primitiveName = "";
@@ -180,7 +178,7 @@ export class PipelineMatrixBundle extends Component {
       } else if (hoveredPrimitive.name) {
         primitiveName = hoveredPrimitive.name;
       }
-      const tableData = createHyperparamTableDataFromNode(hoveredPrimitive);
+      const tooltipTableData = createHyperparamTableDataFromNode(hoveredPrimitive);
       const columns = [{
         Header: 'Parameter Name',
         accessor: x => x.name
@@ -188,16 +186,16 @@ export class PipelineMatrixBundle extends Component {
         Header: 'Parameter Value',
         accessor: x => JSON.stringify(x.value)
       }];
-      if (tableData) {
-        tooltip = <>
+      if (tooltipTableData) {
+        tooltip = <div style={{padding: 15, borderRadius: 12, background: "#FFFFFF", position: 'fixed', left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
           <p><strong>Primitive Name:</strong> {primitiveName}</p>
-          <Table columns={columns} data={tableData}/>
-        </>;
+          <Table columns={columns} data={tooltipTableData}/>
+        </div>;
       } else {
-        tooltip = <>
+        tooltip = <div style={{padding: 15, borderRadius: 12, background: "#FFFFFF", position: 'fixed', left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
           <p><strong>Primitive Name:</strong> {primitiveName}</p>
           <p>No hyperparameters set.</p>
-        </>;
+        </div>;
       }
 
     }
@@ -295,12 +293,14 @@ export class PipelineMatrixBundle extends Component {
         metricOptions={this.state.metricOptions}
         importances={this.state.importances}
         moduleNames={this.state.moduleNames}
-        onHover={(pipeline, moduleName, mGlobal) => {
-          const step = pipeline.steps.find(step => step.primitive.python_path === moduleName);
-          if (step){
-            this.setState({hoveredPrimitive: step})
-          } else {
-            this.setState({hoveredPrimitive: null})
+        onHover={(pipeline, moduleName, mouse) => {
+          if (pipeline && moduleName){
+            const step = pipeline.steps.find(step => step.primitive.python_path === moduleName);
+            if (step){
+              this.setState({hoveredPrimitive: step, tooltipPosition: mouse})
+            } else {
+              this.setState({hoveredPrimitive: null})
+            }
           }
         }}
       />
