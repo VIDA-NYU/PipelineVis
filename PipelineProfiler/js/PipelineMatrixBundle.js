@@ -6,6 +6,7 @@ import "react-table-v6/react-table.css";
 import {schemeCategory10} from 'd3-scale-chromatic';
 import {scaleOrdinal} from "d3-scale";
 import {select} from "d3-selection";
+import ReactTable from "react-table-v6";
 
 import {
   computePrimitiveImportances,
@@ -203,14 +204,20 @@ export class PipelineMatrixBundle extends Component {
         borderWidth: 'thin',
         borderColor: '#aaaaaa',
       };
+
+      const tooltipHeader = <>
+        <p><strong>Primitive Name:</strong> {primitiveName}</p>
+        <p><strong>Primitive Type:</strong> {this.props.data.infos[hoveredPrimitive.primitive.python_path].module_type}</p>
+      </>;
+
       if (tooltipTableData) {
         tooltip = <div style={{...tooltipStyle, left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
-          <p><strong>Primitive Name:</strong> {primitiveName}</p>
+          {tooltipHeader}
           <Table columns={columns} data={tooltipTableData}/>
         </div>;
       } else {
         tooltip = <div style={{...tooltipStyle, left: tooltipPosition[0] + 30, top: tooltipPosition[1]}}>
-          <p><strong>Primitive Name:</strong> {primitiveName}</p>
+          {tooltipHeader}
           <p>No hyperparameters set.</p>
         </div>;
       }
@@ -326,6 +333,24 @@ export class PipelineMatrixBundle extends Component {
       {pipelineGraph}
       {primitiveHyperparamsView}
       </div>
+      <ReactTable
+        data={this.state.primitiveMetadata2}
+        columns={[
+          {
+            Header: "Primitive ID",
+            accessor: "python_path"
+          },
+          {
+            Header: "Hyperparameter",
+            accessor: "hyperparam"
+          },
+          {
+            Header: "Value",
+            accessor: "value"
+          },
+        ]}
+        pivotBy={["python_path", "hyperparam", "value"]}
+      />
     </div>
   }
 }
