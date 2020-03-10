@@ -79,7 +79,7 @@ export function plotPipelineMatrix(ref,
   const left = constants.margin.left + constants.pipelineNameWidth,
     top = constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight,
     right = constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth,
-    bottom = constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight + pipelines.length * constants.cellHeight + constants.hyperparamsHeight;
+    bottom = constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight + pipelines.length * constants.cellHeight;
 
 
   //const moduleColorScale = scaleOrdinal(schemeCategory10);
@@ -392,6 +392,11 @@ export function plotPipelineMatrix(ref,
       ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`)
       );
 
+
+    groupHyperparams.append("text")
+      .text(`Hyperparameters for ${expandedPrimitiveName.split(".").slice(3).join(".")}`)
+      .attr("transform", `translate(${right + constants.widthSeparatorPrimitiveHyperparam - 5}, ${bottom}) rotate(-90)`)
+      .style("fill", "#6e6e6e");
 
     const hyperparamsGuideLinesGroup = groupHyperparams
       .selectAll("#hyperparamsGuideLinesGroup")
