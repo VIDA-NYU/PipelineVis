@@ -31,3 +31,8 @@ text {
     stroke: #636363;
     stroke-width: 1px;
 }
+
+.dot {
+    fill: #0072ff33;
+    stroke: #4a5670
+}

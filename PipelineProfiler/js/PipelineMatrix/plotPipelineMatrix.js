@@ -7,7 +7,7 @@ import {constants, extractMetric} from "../helpers";
 import "d3-transition";
 import {axisLeft} from "d3-axis";
 import order from "d3-selection/src/selection/order";
-import {line} from "d3-shape";
+import {line, symbols, symbol} from "d3-shape";
 
 function initialCaptalize(txt) {
   return txt[0].toUpperCase();
@@ -97,6 +97,14 @@ export function plotPipelineMatrix(ref,
     .paddingInner(0)
     .paddingOuter(0);
 
+  //symbols.map(s => d3.symbol().type(s)()
+
+  const shapeScale = scaleOrdinal(moduleTypeOrder)
+    .range(symbols.map(s => symbol()
+      .type(s)()
+    ));
+
+
   const importanceDomain = extent(moduleNames, x => importances[x]);
 
   const halfImportanceDomain = Math.max(Math.abs(importanceDomain[0]), Math.abs(importanceDomain[1]));
@@ -117,18 +125,11 @@ export function plotPipelineMatrix(ref,
     bottom = constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight + pipelines.length * constants.cellHeight;
 
 
-  //const moduleColorScale = scaleOrdinal(schemeCategory10);
-
   let hyperparameterWidth = 0;
 
   if (expandedPrimitiveData) {
     hyperparameterWidth = expandedPrimitiveData.orderedHeader.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam;
   }
-
-  /*moduleTypeOrder.forEach((x, idx) => {
-    moduleColorScale(x);
-  });*/
-
 
   let pipeline_steps = [];
 
@@ -208,19 +209,16 @@ export function plotPipelineMatrix(ref,
     .selectAll(".dot")
     .data(x => x, x => x.key)
     .join(
-      enter => enter.append("circle")
+      enter => enter.append("g")
         .attr("class", "dot")
-        .attr("cx", x => colScale(x.pythonPath) + bandOver2)
-        .attr("cy", x => rowScale(x.pipelineID) + bandOver2)
-        .attr("r", 4)
-        //.style("fill", x => moduleColorScale(infos[x.pythonPath].module_type)),
-        .style("fill", "#0072ff33")
-        .style("stroke", "#4a5670"),
+        .attr("transform", x => `translate(${colScale(x.pythonPath) + bandOver2}, ${rowScale(x.pipelineID) + bandOver2})`)
+        .append("path")
+        .attr("d", x => shapeScale(infos[x.pythonPath].module_type)),
       update => update
         .call(update => update.transition(t)
-          .attr("cx", x => colScale(x.pythonPath) + bandOver2)
-          .attr("cy", x => rowScale(x.pipelineID) + bandOver2)
+          .attr("transform", x => `translate(${colScale(x.pythonPath) + bandOver2}, ${rowScale(x.pipelineID) + bandOver2})`)
         ));
+
 
   const moduleImportanceBars = svg
     .selectAll("#module_importance_bars")
@@ -319,6 +317,46 @@ export function plotPipelineMatrix(ref,
     .range([0, constants.pipelineScoreWidth]);
 
   const paddingHyperparamColsWidth = expandedPrimitiveData ? expandedPrimitiveData.orderedHeader.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam : 0;
+
+  const legendModuleType = svg
+    .selectAll(".legend_module_type")
+    .data([moduleTypeOrder])
+    .join(
+      enter => enter
+        .append("g")
+        .attr("class", "legend_module_type")
+    )
+    .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + paddingHyperparamColsWidth + 50},
+        ${constants.margin.top + 140})`);
+
+  legendModuleType.selectAll("*").remove();
+
+  const lengendRowGroup = legendModuleType
+    .selectAll("g")
+    .data(x => x, x => x)
+    .join(
+      enter => enter
+        .append("g")
+        .attr("transform", (x, idx) => `translate(0, ${idx * 15})`)
+        .attr("data", x => x)
+    );
+
+
+  lengendRowGroup
+    .append("g")
+    .attr("transform", "translate(0,5)")
+    .append("path")
+    .classed("dot", true)
+    .attr("d", x => shapeScale(x))
+    .style("class", "visShape");
+
+  lengendRowGroup
+    .append("text")
+    .attr("x", 14)
+    .attr("y", 10)
+    .text(x => x)
+    .style("fill", "#9a9a9a");
+
 
   const pipelineScoreBars = svg
     .selectAll(".pipeline_score_bars")
