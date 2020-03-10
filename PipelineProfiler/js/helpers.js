@@ -259,7 +259,7 @@ export const constants = {
   moduleNameHeight: 150,
   cellWidth: 15,
   cellHeight: 15,
-  widthSeparatorPrimitiveHyperparam: 20,
+  widthSeparatorPrimitiveHyperparam: 30,
   pipelineScoreWidth: 200,
   margin: {
     left: 10,

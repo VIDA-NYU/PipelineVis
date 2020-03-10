@@ -6,16 +6,18 @@ import {schemeCategory10} from "d3-scale-chromatic";
 import {constants, extractMetric} from "../helpers";
 import "d3-transition";
 import {axisLeft} from "d3-axis";
+import order from "d3-selection/src/selection/order";
+import {line} from "d3-shape";
 
 function initialCaptalize(txt) {
   return txt[0].toUpperCase();
 }
 
-export function computePipelineMatrixWidthHeight(pipelines, moduleNames, expandedPrimitiveData){
+export function computePipelineMatrixWidthHeight(pipelines, moduleNames, expandedPrimitiveData) {
   let svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
     constants.margin.left + constants.margin.right;
 
-  if (expandedPrimitiveData){
+  if (expandedPrimitiveData) {
     svgWidth += expandedPrimitiveData.orderedHeader.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam;
   }
 
@@ -24,6 +26,33 @@ export function computePipelineMatrixWidthHeight(pipelines, moduleNames, expande
 
   return {svgWidth, svgHeight};
 }
+
+function computeBracketsHyperparams(orderedHeader) {
+
+  if (orderedHeader.length === 0) {
+    return [];
+  }
+
+  let currentBegin = orderedHeader[0];
+  let brackets = [];
+  const getKey = (x) => x.split(":")[0];
+
+  for (let i = 1; i < orderedHeader.length; ++i) {
+    if (getKey(currentBegin) !== getKey(orderedHeader[i])) {
+      brackets.push({
+        begin: currentBegin,
+        end: orderedHeader[i - 1]
+      });
+      currentBegin = orderedHeader[i]
+    }
+  }
+  // Adding last bracket
+  brackets.push({
+    begin: currentBegin,
+    end: orderedHeader[orderedHeader.length - 1]
+  });
+  return brackets;
+};
 
 const hoveredColor = "#720400";
 const unhoveredColor = "#797979";
@@ -43,9 +72,12 @@ export function plotPipelineMatrix(ref,
                                    metricRequest) {
 
   const {infos, module_types: moduleTypes} = data;
-  const {moduleTypeOrder}  = constants;
+  const {moduleTypeOrder} = constants;
   const selectedScores = extractMetric(pipelines, metricRequest);
-  const selectedScoresDigests = selectedScores.map((score, idx) => ({score, pipeline_digest: pipelines[idx].pipeline_digest}));
+  const selectedScoresDigests = selectedScores.map((score, idx) => ({
+    score,
+    pipeline_digest: pipelines[idx].pipeline_digest
+  }));
 
   const {svgWidth, svgHeight} = computePipelineMatrixWidthHeight(pipelines, moduleNames, expandedPrimitiveData);
 
@@ -71,7 +103,7 @@ export function plotPipelineMatrix(ref,
 
   const importanceScale = scaleLinear()
     .domain([0, halfImportanceDomain])
-    .range([0, constants.moduleImportanceHeight/2]);
+    .range([0, constants.moduleImportanceHeight / 2]);
 
   const importanceScaleVisible = scaleLinear() // Importance scale used in d3.axis
     .domain([-halfImportanceDomain, halfImportanceDomain])
@@ -239,7 +271,7 @@ export function plotPipelineMatrix(ref,
     );
 
   let moduleImportanceAxis = svg.selectAll(".axisImportance")
-    .data([1], x=>x)
+    .data([1], x => x)
     .join(
       enter => enter
         .append("g")
@@ -270,23 +302,23 @@ export function plotPipelineMatrix(ref,
       enter => enter
         .append("text")
         .text(x => `(${initialCaptalize(infos[x].module_type)}) ${infos[x]['module_name']}`)
-        .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
+        .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth() - 5}, ${constants.moduleNameHeight}) rotate(-60)`)
         .style("fill", "#6e6e6e")
         .style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal"),
       update => update
         .call(update => update.transition(t)
-          .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
+          .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth() - 5}, ${constants.moduleNameHeight}) rotate(-60)`)
           .style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal")
         )
-    ).on("click", (x)=>{
-      onSelectExpandedPrimitive(x);
-    });
+    ).on("click", (x) => {
+    onSelectExpandedPrimitive(x);
+  });
 
   const scoreScale = scaleLinear()
     .domain(extent(selectedScores, x => x))
     .range([0, constants.pipelineScoreWidth]);
 
-  const paddingHyperparamColsWidth = expandedPrimitiveData ? expandedPrimitiveData.orderedHeader.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam: 0;
+  const paddingHyperparamColsWidth = expandedPrimitiveData ? expandedPrimitiveData.orderedHeader.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam : 0;
 
   const pipelineScoreBars = svg
     .selectAll(".pipeline_score_bars")
@@ -383,7 +415,7 @@ export function plotPipelineMatrix(ref,
   svg.selectAll(".groupHyperparams").remove();
   let groupHyperparams = svg.append("g").attr("class", "groupHyperparams");
 
-   if (expandedPrimitiveData) {
+  if (expandedPrimitiveData) {
     const {orderedHeader, stepSamples} = expandedPrimitiveData;
     expandedColScale = scaleBand()
       .domain(orderedHeader)
@@ -462,9 +494,14 @@ export function plotPipelineMatrix(ref,
           .style("stroke", "#4a5670"),
         update => update
           .call(update => update.transition(t)
-          .attr("cx", x => expandedColScale(x.header_key) + bandOver2)
-          .attr("cy", x => rowScale(x.pipeline_digest) + bandOver2)
+            .attr("cx", x => expandedColScale(x.header_key) + bandOver2)
+            .attr("cy", x => rowScale(x.pipeline_digest) + bandOver2)
           ));
+
+    const hyperparamNameLabelsLeft = constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam;
+
+    const bracketHeight = 20;
+
 
     const hyperparamsNameLabels = groupHyperparams.selectAll("#hyperparam_names")
       .data([orderedHeader])
@@ -472,8 +509,8 @@ export function plotPipelineMatrix(ref,
         enter => enter
           .append("g")
           .attr("id", "hyperparam_names")
-          .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam},
-         ${constants.margin.top + constants.moduleImportanceHeight})`)
+          .attr("transform", `translate(${hyperparamNameLabelsLeft},
+         ${constants.margin.top + constants.moduleImportanceHeight - bracketHeight - 5})`)
       );
 
     hyperparamsNameLabels
@@ -485,8 +522,40 @@ export function plotPipelineMatrix(ref,
           .text(x => x)
           .style("fill", unhoveredColor),
       )
-      .attr("transform", x => `translate(${expandedColScale(x) + expandedColScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`);
+      .attr("transform", x => `translate(${expandedColScale(x) + expandedColScale.bandwidth() - 5}, ${constants.moduleNameHeight}) rotate(-60)`);
 
+    const bracketPadding = 3;
+
+    const lineGenerator = line()
+      .x(x => x[0])
+      .y(x => x[1]);
+
+    const bracketGenerator = (bracket) => {
+      const height = bracketHeight;
+      const width = expandedColScale(bracket.end) - expandedColScale(bracket.begin) + expandedColScale.bandwidth() - bracketPadding * 2;
+      return lineGenerator([
+        [0, 0],
+        [0, height],
+        [width, height],
+        [width, 0]
+      ])
+    };
+
+    let bracketsData = computeBracketsHyperparams(orderedHeader);
+
+    let bracketGroup = groupHyperparams.selectAll(".bracketGroup")
+      .data(bracketsData, x => x.begin + x.end)
+      .join(
+        enter => enter
+          .append("g")
+          .attr("transform", x => `translate(${hyperparamNameLabelsLeft + expandedColScale(x.begin) + bracketPadding}, 
+           ${constants.moduleNameHeight + constants.margin.top + constants.moduleImportanceHeight - bracketHeight})`)
+      );
+
+
+    bracketGroup.append("path")
+      .attr("d", bracketGenerator)
+      .attr("class", "bracket");
   }
 
 
@@ -507,7 +576,7 @@ export function plotPipelineMatrix(ref,
         .attr("height", rowScale.bandwidth())
         .style("fill", "#00000000")
     )
-    .attr("width", right - left + constants.pipelineScoreWidth +hyperparameterWidth);
+    .attr("width", right - left + constants.pipelineScoreWidth + hyperparameterWidth);
 
 
   svg
@@ -539,7 +608,7 @@ export function plotPipelineMatrix(ref,
   const selectedDigests = selectedPipelines.map(pipeline => pipeline['pipeline_digest']);
 
   const selectedGroup = svg.selectAll(".selectedGroup")
-    .data([selectedDigests], x=>"selectedGroup")
+    .data([selectedDigests], x => "selectedGroup")
     .join(
       enter => enter
         .append("g")
@@ -555,13 +624,13 @@ export function plotPipelineMatrix(ref,
         .attr("class", "SelectedExpandedPrimitive")
         .attr("width", colScale.bandwidth())
         .attr("y", top - constants.moduleImportanceHeight)
-        .attr("height", bottom-top + constants.moduleImportanceHeight)
+        .attr("height", bottom - top + constants.moduleImportanceHeight)
     )
     .attr("x", x => left + colScale(x))
     .attr("fill", () => expandedPrimitiveData ? "#33333333" : "#00000000");
 
   selectedGroup.selectAll("rect")
-    .data(x=>x, x=>x)
+    .data(x => x, x => x)
     .join(
       enter => enter
         .append("rect")
@@ -584,7 +653,7 @@ export function plotPipelineMatrix(ref,
 
   const highlightColor = "#CCCCCC44";
 
-  svg.on("mousemove", function(){
+  svg.on("mousemove", function () {
     const mGlobal = mouse(this);
     let inHyperparamterMatrixRect = false;
     let inPrimitiveMatrixRect = false;
@@ -593,7 +662,7 @@ export function plotPipelineMatrix(ref,
       const leftHyperparam = constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam;
       const rightHyperparam = leftHyperparam + orderedHeader.length * constants.cellWidth;
       inHyperparamterMatrixRect = mGlobal[0] >= leftHyperparam && mGlobal[0] <= rightHyperparam && mGlobal[1] >= top && mGlobal[1] <= bottom;
-      if (inHyperparamterMatrixRect){
+      if (inHyperparamterMatrixRect) {
         const row = Math.floor((mGlobal[1] - top) / constants.cellHeight);
         if (row < pipelines.length) {
           const pipelineRowIndex = Math.floor((mGlobal[1] - top) / constants.cellHeight);
@@ -626,7 +695,7 @@ export function plotPipelineMatrix(ref,
       }
     }
 
-    inPrimitiveMatrixRect = mGlobal[0] >= left && mGlobal[0] <= right && mGlobal[1] >= top && mGlobal[1] <= bottom ;
+    inPrimitiveMatrixRect = mGlobal[0] >= left && mGlobal[0] <= right && mGlobal[1] >= top && mGlobal[1] <= bottom;
 
     if (inPrimitiveMatrixRect) {
       const row = Math.floor((mGlobal[1] - top) / constants.cellHeight);
@@ -656,13 +725,15 @@ export function plotPipelineMatrix(ref,
         svg
           .select("#legendPipelineSourceGroup")
           .selectAll("text")
-          .style("fill", d => {return d.pipeline_digest === pipelineIdx ? hoveredColor : unhoveredColor});
+          .style("fill", d => {
+            return d.pipeline_digest === pipelineIdx ? hoveredColor : unhoveredColor
+          });
 
 
       }
     }
 
-    if (!inPrimitiveMatrixRect && !inHyperparamterMatrixRect){
+    if (!inPrimitiveMatrixRect && !inHyperparamterMatrixRect) {
       svg
         .select("#highlight_row")
         .style("fill", "#00000000");

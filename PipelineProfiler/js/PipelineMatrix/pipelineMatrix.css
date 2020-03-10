@@ -25,3 +25,9 @@ text {
     -ms-user-select: none;      /* IE 10+ */
     user-select: none;          /* Likely future */
 }
+
+.bracket {
+    fill: none;
+    stroke: #636363;
+    stroke-width: 1px;
+}
