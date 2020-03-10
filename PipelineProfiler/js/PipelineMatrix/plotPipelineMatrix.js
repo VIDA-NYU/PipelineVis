@@ -25,6 +25,9 @@ export function computePipelineMatrixWidthHeight(pipelines, moduleNames, expande
   return {svgWidth, svgHeight};
 }
 
+const hoveredColor = "#720400";
+const unhoveredColor = "#797979";
+
 export function plotPipelineMatrix(ref,
                                    data,
                                    pipelines,
@@ -268,12 +271,12 @@ export function plotPipelineMatrix(ref,
         .append("text")
         .text(x => `(${initialCaptalize(infos[x].module_type)}) ${infos[x]['module_name']}`)
         .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
-        .style("fill", "#6e6e6e"),
-        //.style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal"),
+        .style("fill", "#6e6e6e")
+        .style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal"),
       update => update
         .call(update => update.transition(t)
           .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
-          //.style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal")
+          .style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal")
         )
     ).on("click", (x)=>{
       onSelectExpandedPrimitive(x);
@@ -347,6 +350,11 @@ export function plotPipelineMatrix(ref,
         .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight + bandOver2})`)
     );
 
+  const selectedPipelinesMap = {};
+  selectedPipelines.forEach(pipeline => {
+    selectedPipelinesMap[pipeline.pipeline_digest] = true;
+  });
+
   legendPipelineSourceGroup
     .selectAll("text")
     .data(x => x, x => x.pipeline_digest)
@@ -355,13 +363,13 @@ export function plotPipelineMatrix(ref,
         .append("text")
         .attr("text-anchor", "end")
         .attr("transform", x => `translate(0, ${rowScale(x.pipeline_digest) + 3})`)
-        .text(x => x.pipeline_source.name)
-        .style("fill", "#6e6e6e"),
+        .text(x => x.pipeline_source.name),
       update => update
         .call(update => update.transition(t)
           .attr("transform", x => `translate(0, ${rowScale(x.pipeline_digest) + 3})`)
         )
-    );
+    )
+    .style("font-weight", x => x.pipeline_digest in selectedPipelinesMap ? "bold" : "normal");
 
   /*
   *
@@ -475,12 +483,9 @@ export function plotPipelineMatrix(ref,
         enter => enter
           .append("text")
           .text(x => x)
-          .style("fill", "#6e6e6e"),
+          .style("fill", unhoveredColor),
       )
-      .attr("transform", x => `translate(${expandedColScale(x) + expandedColScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
-      .on("click", (x)=>{
-        onSelectExpandedPrimitive(x);
-      });
+      .attr("transform", x => `translate(${expandedColScale(x) + expandedColScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`);
 
   }
 
@@ -609,12 +614,14 @@ export function plotPipelineMatrix(ref,
           svg
             .select("#legendPipelineSourceGroup")
             .selectAll("text")
-            .style("font-weight", d => d.pipeline_digest === pipelineIdx ? "bold" : "normal");
+            .style("fill", d => d.pipeline_digest === pipelineIdx ? hoveredColor : unhoveredColor);
 
           svg
             .selectAll("#hyperparam_names")
             .selectAll("text")
-            .style("font-weight", d => d === hyperparamName ? "bold" : "normal");
+            .style("fill", d => {
+              return d === hyperparamName ? hoveredColor : unhoveredColor
+            });
         }
       }
     }
@@ -644,12 +651,12 @@ export function plotPipelineMatrix(ref,
         svg
           .select("#module_names")
           .selectAll("text")
-          .style("font-weight", d => d === moduleName ? "bold" : "normal");
+          .style("fill", d => d === moduleName ? hoveredColor : unhoveredColor);
 
         svg
           .select("#legendPipelineSourceGroup")
           .selectAll("text")
-          .style("font-weight", d => {return d.pipeline_digest === pipelineIdx ? "bold" : "normal"});
+          .style("fill", d => {return d.pipeline_digest === pipelineIdx ? hoveredColor : unhoveredColor});
 
 
       }
@@ -671,17 +678,17 @@ export function plotPipelineMatrix(ref,
       svg
         .select("#module_names")
         .selectAll("text")
-        .style("font-weight", "normal");
+        .style("fill", unhoveredColor);
 
       svg
         .select("#legendPipelineSourceGroup")
         .selectAll("text")
-        .style("font-weight", "normal");
+        .style("fill", unhoveredColor);
 
       svg
         .selectAll("#hyperparam_names")
         .selectAll("text")
-        .style("font-weight", "normal");
+        .style("fill", unhoveredColor);
       onHover(null, null, null);
     }
 

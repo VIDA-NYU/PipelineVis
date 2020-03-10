@@ -337,6 +337,8 @@ export class PipelineMatrixBundle extends Component {
             } else {
               this.setState({hoveredPrimitive: null})
             }
+          } else {
+            this.setState({hoveredPrimitive: null});
           }
         }}
       />
