@@ -65,7 +65,7 @@ export class PipelineMatrix extends Component {
 
     const {svgWidth, svgHeight} = computePipelineMatrixWidthHeight(pipelines, moduleNames, expandedPrimitiveData);
 
-    const paddingHyperparamColsWidth = expandedPrimitiveData ? expandedPrimitiveData.orderedHeader.length * constants.cellWidth : 0;
+    const paddingHyperparamColsWidth = expandedPrimitiveData ? expandedPrimitiveData.orderedHeader.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam: 0;
 
 
     return <div style={{position: 'relative', height: svgHeight, width: svgWidth}}>

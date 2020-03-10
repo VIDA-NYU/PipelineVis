@@ -253,6 +253,7 @@ export const constants = {
   hyperparamsHeight: 100,
   cellWidth: 15,
   cellHeight: 15,
+  widthSeparatorPrimitiveHyperparam: 15,
   pipelineScoreWidth: 200,
   margin: {
     left: 10,

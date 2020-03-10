@@ -16,7 +16,7 @@ export function computePipelineMatrixWidthHeight(pipelines, moduleNames, expande
     constants.margin.left + constants.margin.right;
 
   if (expandedPrimitiveData){
-    svgWidth += expandedPrimitiveData.orderedHeader.length * constants.cellWidth;
+    svgWidth += expandedPrimitiveData.orderedHeader.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam;
   }
 
   const svgHeight = pipelines.length * constants.cellHeight + constants.moduleNameHeight + constants.moduleImportanceHeight +
@@ -275,7 +275,7 @@ export function plotPipelineMatrix(ref,
     .domain(extent(selectedScores, x => x))
     .range([0, constants.pipelineScoreWidth]);
 
-  const paddingHyperparamColsWidth = expandedPrimitiveData ? expandedPrimitiveData.orderedHeader.length * constants.cellWidth : 0;
+  const paddingHyperparamColsWidth = expandedPrimitiveData ? expandedPrimitiveData.orderedHeader.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam: 0;
 
   const pipelineScoreBars = svg
     .selectAll(".pipeline_score_bars")
@@ -374,7 +374,7 @@ export function plotPipelineMatrix(ref,
       .join(
         enter => enter.append("g")
           .attr("id", "hyperdots")
-          .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth},
+          .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam},
       ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`)
       );
 
@@ -386,7 +386,7 @@ export function plotPipelineMatrix(ref,
         enter => enter
           .append("g")
           .attr("id", "hyperparamsGuideLinesGroup")
-          .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth},
+          .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam},
       ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`),
         update => update
       );
@@ -445,7 +445,7 @@ export function plotPipelineMatrix(ref,
         enter => enter
           .append("g")
           .attr("id", "hyperparam_names")
-          .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth},
+          .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam},
          ${constants.margin.top})`)
       );
 
