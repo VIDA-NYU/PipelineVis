@@ -36,6 +36,7 @@ export function plotPipelineMatrix(ref,
                                    onHover,
                                    onSelectExpandedPrimitive,
                                    expandedPrimitiveData,
+                                   expandedPrimitiveName,
                                    metricRequest) {
 
   const {infos, module_types: moduleTypes} = data;
@@ -52,7 +53,7 @@ export function plotPipelineMatrix(ref,
   const colScale = scaleBand()
     .domain(moduleNames)
     .range([0, moduleNames.length * constants.cellWidth])
-    .paddingInner(0.0001)
+    .paddingInner(0)
     .paddingOuter(0);
 
   const rowScale = scaleBand()
@@ -74,6 +75,12 @@ export function plotPipelineMatrix(ref,
     .range([constants.moduleImportanceHeight, 0]); // order is switched to put positive numbers on top
 
   const bandOver2 = rowScale.bandwidth() / 2;
+
+  const left = constants.margin.left + constants.pipelineNameWidth,
+    top = constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight,
+    right = constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth,
+    bottom = constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight + pipelines.length * constants.cellHeight + constants.hyperparamsHeight;
+
 
   //const moduleColorScale = scaleOrdinal(schemeCategory10);
 
@@ -199,12 +206,12 @@ export function plotPipelineMatrix(ref,
     .join(
       enter => enter
         .append("rect")
-        .attr("x", x => colScale(x) + 3)
+        .attr("x", x => colScale(x) + 2)
         .attr("y", x => importances[x] > 0 ?
           halfImportanceHeight - importanceScale(importances[x])
           : halfImportanceHeight
         )
-        .attr("width", colScale.bandwidth() - 3)
+        .attr("width", colScale.bandwidth() - 4)
         .attr("height", x => importances[x] > 0 ?
           importanceScale(importances[x])
           : importanceScale(-importances[x])
@@ -213,12 +220,12 @@ export function plotPipelineMatrix(ref,
       update => update
         .call(update => {
             return update.transition(t)
-              .attr("x", x => colScale(x) + 3)
+              .attr("x", x => colScale(x) + 2)
               .attr("y", x => importances[x] > 0 ?
                 halfImportanceHeight - importanceScale(importances[x])
                 : halfImportanceHeight
               )
-              .attr("width", colScale.bandwidth() - 3)
+              .attr("width", colScale.bandwidth() - 4)
               .attr("height", x => importances[x] > 0 ?
                 importanceScale(importances[x])
                 : importanceScale(-importances[x])
@@ -262,10 +269,11 @@ export function plotPipelineMatrix(ref,
         .text(x => `(${initialCaptalize(infos[x].module_type)}) ${infos[x]['module_name']}`)
         .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
         .style("fill", "#6e6e6e"),
-        //.style("fill", x => moduleColorScale(infos[x].module_type)),
+        //.style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal"),
       update => update
         .call(update => update.transition(t)
           .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
+          //.style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal")
         )
     ).on("click", (x)=>{
       onSelectExpandedPrimitive(x);
@@ -457,10 +465,14 @@ export function plotPipelineMatrix(ref,
       .join(
         enter => enter
           .append("text")
+          .attr("class", "colLabel")
           .text(x => x)
           .attr("transform", x => `translate(${expandedColScale(x) + expandedColScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
           .style("fill", "#6e6e6e"),
-      );
+      )
+      .on("click", (x)=>{
+        onSelectExpandedPrimitive(x);
+      });
 
   }
 
@@ -470,11 +482,6 @@ export function plotPipelineMatrix(ref,
   * Dealing with selections and hovers
   *
   * */
-
-  const left = constants.margin.left + constants.pipelineNameWidth,
-    top = constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight,
-    right = constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth,
-    bottom = constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight + pipelines.length * constants.cellHeight + constants.hyperparamsHeight;
 
   svg
     .selectAll("#highlight_row")
@@ -525,6 +532,20 @@ export function plotPipelineMatrix(ref,
         .append("g")
         .attr("class", "selectedGroup")
     );
+
+  //.style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal"),
+  svg.selectAll(".SelectedExpandedPrimitive")
+    .data([expandedPrimitiveName])
+    .join(
+      enter => enter
+        .append("rect")
+        .attr("class", "SelectedExpandedPrimitive")
+        .attr("width", colScale.bandwidth())
+        .attr("y", top - constants.moduleImportanceHeight)
+        .attr("height", bottom-top + constants.moduleImportanceHeight)
+    )
+    .attr("x", x => left + colScale(x))
+    .attr("fill", () => expandedPrimitiveData ? "#33333333" : "#00000000");
 
   selectedGroup.selectAll("rect")
     .data(x=>x, x=>x)

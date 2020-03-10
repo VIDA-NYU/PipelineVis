@@ -17,3 +17,11 @@
     background-color: #FFF;
     color: #BABABA;
 }
+
+.colLabel {
+    font-weight: normal;
+}
+
+.colLabel:hover {
+    font-weight: bold;
+}

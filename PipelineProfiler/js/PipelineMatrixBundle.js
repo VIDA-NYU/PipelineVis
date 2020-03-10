@@ -294,6 +294,7 @@ export class PipelineMatrixBundle extends Component {
           this.setState({expandedPrimitive: python_path, expandedPrimitiveData});
         }}
         expandedPrimitiveData={this.state.expandedPrimitiveData}
+        expandedPrimitiveName={this.state.expandedPrimitive}
         onClick={
           (selectedPipeline, shift) => {
             let selectedPipelinesColorScale = scaleOrdinal(schemeCategory10);

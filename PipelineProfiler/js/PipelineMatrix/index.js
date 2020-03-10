@@ -18,6 +18,7 @@ export class PipelineMatrix extends Component {
       onHover,
       onSelectExpandedPrimitive,
       expandedPrimitiveData,
+      expandedPrimitiveName,
       moduleNames,
       importances,
       selectedPipelines,
@@ -37,6 +38,7 @@ export class PipelineMatrix extends Component {
       onHover,
       onSelectExpandedPrimitive,
       expandedPrimitiveData,
+      expandedPrimitiveName,
       metricRequest
     );
   }
@@ -106,6 +108,7 @@ PipelineMatrix.propTypes = {
   onHover: PropTypes.func,
   onSelectExpandedPrimitive: PropTypes.func,
   expandedPrimitiveData: PropTypes.object,
+  expandedPrimitiveName: PropTypes.string,
   selectedPipelines: PropTypes.array.isRequired,
   selectedPipelinesColorScale: PropTypes.func,
   pipelines: PropTypes.array.isRequired,
