@@ -290,8 +290,12 @@ export class PipelineMatrixBundle extends Component {
         selectedPipelines={this.state.selectedPipelines}
         selectedPipelinesColorScale={this.state.selectedPipelinesColorScale}
         onSelectExpandedPrimitive={python_path=>{
-          const expandedPrimitiveData = computePrimitiveHyperparameterData(this.state.pipelines, python_path);
-          this.setState({expandedPrimitive: python_path, expandedPrimitiveData});
+          if (this.state.expandedPrimitive === python_path){
+            this.setState({expandedPrimitive: null, expandedPrimitiveData: null});
+          } else{
+            const expandedPrimitiveData = computePrimitiveHyperparameterData(this.state.pipelines, python_path);
+            this.setState({expandedPrimitive: python_path, expandedPrimitiveData});
+          }
         }}
         expandedPrimitiveData={this.state.expandedPrimitiveData}
         expandedPrimitiveName={this.state.expandedPrimitive}

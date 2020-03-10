@@ -371,12 +371,12 @@ export function plotPipelineMatrix(ref,
 
   let expandedColScale;
 
-  if (expandedPrimitiveData) {
+   if (expandedPrimitiveData) {
     const {orderedHeader, stepSamples} = expandedPrimitiveData;
     expandedColScale = scaleBand()
       .domain(orderedHeader)
       .range([0, orderedHeader.length * constants.cellWidth])
-      .paddingInner(0.0001)
+      .paddingInner(0)
       .paddingOuter(0);
 
     const hyperparamDots = svg.selectAll("#hyperdots")
@@ -465,11 +465,10 @@ export function plotPipelineMatrix(ref,
       .join(
         enter => enter
           .append("text")
-          .attr("class", "colLabel")
           .text(x => x)
-          .attr("transform", x => `translate(${expandedColScale(x) + expandedColScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
           .style("fill", "#6e6e6e"),
       )
+      .attr("transform", x => `translate(${expandedColScale(x) + expandedColScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
       .on("click", (x)=>{
         onSelectExpandedPrimitive(x);
       });
