@@ -75,11 +75,17 @@ export function plotPipelineMatrix(ref,
 
   const bandOver2 = rowScale.bandwidth() / 2;
 
-  const moduleColorScale = scaleOrdinal(schemeCategory10);
+  //const moduleColorScale = scaleOrdinal(schemeCategory10);
 
-  moduleTypeOrder.forEach((x, idx) => {
+  let hyperparameterWidth = 0;
+
+  if (expandedPrimitiveData) {
+    hyperparameterWidth = expandedPrimitiveData.orderedHeader.length * constants.cellWidth;
+  }
+
+  /*moduleTypeOrder.forEach((x, idx) => {
     moduleColorScale(x);
-  });
+  });*/
 
 
   let pipeline_steps = [];
@@ -113,7 +119,7 @@ export function plotPipelineMatrix(ref,
       ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`),
       update => update
     );
-  
+
   guideLinesGroup
     .selectAll(".row")
     .data(pipelines)
@@ -269,14 +275,19 @@ export function plotPipelineMatrix(ref,
     .domain(extent(selectedScores, x => x))
     .range([0, constants.pipelineScoreWidth]);
 
+  const paddingHyperparamColsWidth = expandedPrimitiveData ? expandedPrimitiveData.orderedHeader.length * constants.cellWidth : 0;
+
   const pipelineScoreBars = svg
-    .selectAll("#pipeline_score_bars")
+    .selectAll(".pipeline_score_bars")
     .data([selectedScoresDigests])
     .join(
       enter => enter
         .append("g")
-        .attr("id", "pipeline_score_bars")
-        .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth},
+        .attr("class", "pipeline_score_bars")
+        .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + paddingHyperparamColsWidth},
+        ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`),
+      update => update
+        .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + paddingHyperparamColsWidth},
         ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`)
     );
 
@@ -344,6 +355,120 @@ export function plotPipelineMatrix(ref,
         )
     );
 
+  /*
+  *
+  * <PlottingHyperparameters>
+  *
+  * */
+
+  if (expandedPrimitiveData) {
+    const {orderedHeader, stepSamples} = expandedPrimitiveData;
+    const expandedColScale = scaleBand()
+      .domain(orderedHeader)
+      .range([0, orderedHeader.length * constants.cellWidth])
+      .paddingInner(0.0001)
+      .paddingOuter(0);
+
+    const hyperparamDots = svg.selectAll("#hyperdots")
+      .data([stepSamples])
+      .join(
+        enter => enter.append("g")
+          .attr("id", "hyperdots")
+          .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth},
+      ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`)
+      );
+
+
+    const hyperparamsGuideLinesGroup = svg
+      .selectAll("#hyperparamsGuideLinesGroup")
+      .data([1])
+      .join(
+        enter => enter
+          .append("g")
+          .attr("id", "hyperparamsGuideLinesGroup")
+          .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth},
+      ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`),
+        update => update
+      );
+
+    hyperparamsGuideLinesGroup
+      .selectAll(".row")
+      .data(pipelines)
+      .join(
+        enter => enter
+          .append("line")
+          .attr("class", "row")
+          .style("stroke", "#bababa")
+          .style("stroke-width", 1)
+      )
+      .attr("x1", 0)
+      .attr("y1", (x) => rowScale(x.pipeline_digest) + bandOver2)
+      .attr("x2", constants.cellWidth * orderedHeader.length)
+      .attr("y2", (x) => rowScale(x.pipeline_digest) + bandOver2);
+
+    hyperparamsGuideLinesGroup
+      .selectAll(".col")
+      .data(orderedHeader)
+      .join(
+        enter => enter
+          .append("line")
+          .attr("class", "col")
+          .style("stroke", "#bababa")
+          .style("stroke-width", 1)
+      )
+      .attr("x1", (x) => expandedColScale(x) + bandOver2)
+      .attr("y1", 0)
+      .attr("x2", (x) => expandedColScale(x) + bandOver2)
+      .attr("y2", constants.cellHeight * pipelines.length);
+
+
+    hyperparamDots
+      .selectAll(".dot")
+      .data(x => x, x => x.unique_key)
+      .join(
+        enter => enter.append("circle")
+          .attr("class", "dot")
+          .attr("cx", x => expandedColScale(x.header_key) + bandOver2)
+          .attr("cy", x => rowScale(x.pipeline_digest) + bandOver2)
+          .attr("r", 4)
+          .style("fill", "#0072ff33")
+          .style("stroke", "#4a5670"),
+        update => update
+          .call(update => update.transition(t)
+          .attr("cx", x => expandedColScale(x.header_key) + bandOver2)
+          .attr("cy", x => rowScale(x.pipeline_digest) + bandOver2)
+          ));
+
+    const hyperparamsNameLabels = svg.selectAll("#hyperparam_names")
+      .data([orderedHeader])
+      .join(
+        enter => enter
+          .append("g")
+          .attr("id", "hyperparam_names")
+          .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth},
+         ${constants.margin.top})`)
+      );
+
+    hyperparamsNameLabels
+      .selectAll("text")
+      .data(x => x, x => x)
+      .join(
+        enter => enter
+          .append("text")
+          .text(x => x)
+          .attr("transform", x => `translate(${expandedColScale(x) + expandedColScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
+          .style("fill", "#6e6e6e"),
+      );
+
+  }
+
+  /*
+  *
+  * </PlottingHyperparameters>
+  *
+  * */
+
+
   const left = constants.margin.left + constants.pipelineNameWidth,
     top = constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight,
     right = constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth,
@@ -357,10 +482,11 @@ export function plotPipelineMatrix(ref,
         .append("rect")
         .attr("id", "highlight_row")
         .attr("x", left)
-        .attr("width", right - left + constants.pipelineScoreWidth)
         .attr("height", rowScale.bandwidth())
         .style("fill", "#00000000")
-    );
+    )
+    .attr("width", right - left + constants.pipelineScoreWidth +hyperparameterWidth);
+
 
   svg
     .selectAll("#highlight_col")
@@ -392,14 +518,14 @@ export function plotPipelineMatrix(ref,
         .append("rect")
         .attr("x", left)
         .attr("y", digest => rowScale(digest) + top)
-        .attr("width", right - left)
+        .attr("width", right - left + hyperparameterWidth)
         .attr("height", rowScale.bandwidth())
         .style("fill", digest => selectedPipelinesColorScale(digest))
         .style("opacity", 0.3),
       update => update
         .attr("x", left)
         .attr("y", digest => rowScale(digest) + top)
-        .attr("width", right - left)
+        .attr("width", right - left + hyperparameterWidth)
         .attr("height", rowScale.bandwidth())
         .style("fill", digest => selectedPipelinesColorScale(digest))
         .style("opacity", 0.3),
@@ -486,10 +612,8 @@ export function plotPipelineMatrix(ref,
   svg.on("click", function () {
     const mGlobal = mouse(this);
 
-    if (mGlobal[0] >= left && mGlobal[0] <= right && mGlobal[1] >= top && mGlobal[1] <= bottom) {
+    if (mGlobal[1] >= top && mGlobal[1] <= bottom) {
       const pipelineIdx = Math.floor((mGlobal[1] - top) / constants.cellHeight);
-      const colIdx = Math.floor((mGlobal[0] - left) / constants.cellHeight);
-      const moduleName = moduleNames[colIdx];
       onClick(pipelines[pipelineIdx], getEvent().shiftKey);
     }
   });

@@ -135,7 +135,6 @@ export function getPrimitiveLabel(name) {
   if (name.split('.').length > 2) {
     name = nameParts.pop();
   }
-  // name =name.split(' ').slice(0,3).join(' ');
   return startCase(name);
 }
 

@@ -42,8 +42,14 @@ export class PipelineMatrix extends Component {
   }
 
   shouldComponentUpdate(newprops, newstate){
-    this.display(newprops);
-    return newprops.moduleNames.length !== this.props.moduleNames.length || this.props.pipelines.length !== newprops.pipelines.length;
+    if (newprops.moduleNames.length !== this.props.moduleNames.length ||
+      this.props.pipelines.length !== newprops.pipelines.length ||
+      this.props.expandedPrimitiveData !== newprops.expandedPrimitiveData) {
+      return true;
+    } else {
+      this.display(newprops);
+      return false;
+    }
   }
 
   componentDidMount(){
@@ -59,12 +65,15 @@ export class PipelineMatrix extends Component {
 
     const {svgWidth, svgHeight} = computePipelineMatrixWidthHeight(pipelines, moduleNames, expandedPrimitiveData);
 
+    const paddingHyperparamColsWidth = expandedPrimitiveData ? expandedPrimitiveData.orderedHeader.length * constants.cellWidth : 0;
+
+
     return <div style={{position: 'relative', height: svgHeight, width: svgWidth}}>
         <svg style={{position: 'absolute', left: 0, top: 0}} ref={ref => this.ref = ref}/>
         <select style={{
           position: 'absolute',
           width: constants.pipelineScoreWidth,
-          left: constants.margin.left + constants.pipelineNameWidth + constants.cellWidth * moduleNames.length,
+          left: constants.margin.left + constants.pipelineNameWidth + constants.cellWidth * moduleNames.length + paddingHyperparamColsWidth,
           top: constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight - 25
         }} className={"selectMetric"} onChange={
           event => {
