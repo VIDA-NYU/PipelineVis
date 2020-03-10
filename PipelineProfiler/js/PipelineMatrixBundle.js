@@ -14,6 +14,7 @@ import {
   extractMetric,
   extractMetricNames,
   createHyperparamTableDataFromNode,
+  computePrimitiveHyperparameterData
 } from "./helpers";
 
 import MergedGraph from "./MergedGraph";
@@ -63,6 +64,7 @@ export class PipelineMatrixBundle extends Component {
       mergedGraph: null,
       hoveredPrimitive: null,
       expandedPrimitive: null,
+      expandedPrimitiveData: null,
     }
   }
 
@@ -287,9 +289,11 @@ export class PipelineMatrixBundle extends Component {
         pipelines={this.state.pipelines}
         selectedPipelines={this.state.selectedPipelines}
         selectedPipelinesColorScale={this.state.selectedPipelinesColorScale}
-        onSelectPrimitive={python_path=>{
-          this.setState({expandedPrimitive: python_path})
+        onSelectExpandedPrimitive={python_path=>{
+          const expandedPrimitiveData = computePrimitiveHyperparameterData(this.state.pipelines, python_path);
+          this.setState({expandedPrimitive: python_path, expandedPrimitiveData});
         }}
+        expandedPrimitiveData={this.state.expandedPrimitiveData}
         onClick={
           (selectedPipeline, shift) => {
             let selectedPipelinesColorScale = scaleOrdinal(schemeCategory10);

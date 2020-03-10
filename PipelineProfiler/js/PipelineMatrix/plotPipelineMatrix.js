@@ -11,6 +11,20 @@ function initialCaptalize(txt) {
   return txt[0].toUpperCase();
 }
 
+export function computePipelineMatrixWidthHeight(pipelines, moduleNames, expandedPrimitiveData){
+  let svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
+    constants.margin.left + constants.margin.right;
+
+  if (expandedPrimitiveData){
+    svgWidth += expandedPrimitiveData.orderedHeader.length * constants.cellWidth;
+  }
+
+  const svgHeight = pipelines.length * constants.cellHeight + constants.moduleNameHeight + constants.moduleImportanceHeight +
+    constants.margin.top + constants.margin.bottom;
+
+  return {svgWidth, svgHeight};
+}
+
 export function plotPipelineMatrix(ref,
                                    data,
                                    pipelines,
@@ -21,17 +35,15 @@ export function plotPipelineMatrix(ref,
                                    onClick,
                                    onHover,
                                    onSelectExpandedPrimitive,
+                                   expandedPrimitiveData,
                                    metricRequest) {
+
   const {infos, module_types: moduleTypes} = data;
   const {moduleTypeOrder}  = constants;
-
   const selectedScores = extractMetric(pipelines, metricRequest);
   const selectedScoresDigests = selectedScores.map((score, idx) => ({score, pipeline_digest: pipelines[idx].pipeline_digest}));
 
-  const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
-    constants.margin.left + constants.margin.right;
-  const svgHeight = pipelines.length * constants.cellHeight + constants.moduleNameHeight + constants.moduleImportanceHeight +
-    constants.margin.top + constants.margin.bottom;
+  const {svgWidth, svgHeight} = computePipelineMatrixWidthHeight(pipelines, moduleNames, expandedPrimitiveData);
 
   const svg = select(ref)
     .style("width", svgWidth + "px")
@@ -251,7 +263,7 @@ export function plotPipelineMatrix(ref,
           .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth()-5}, ${constants.moduleNameHeight}) rotate(-60)`)
         )
     ).on("click", (x)=>{
-    onSelectExpandedPrimitive(x);
+      onSelectExpandedPrimitive(x);
     });
 
   const scoreScale = scaleLinear()

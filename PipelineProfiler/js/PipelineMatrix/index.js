@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from 'prop-types';
-import {plotPipelineMatrix} from "./plotPipelineMatrix";
+import {plotPipelineMatrix, computePipelineMatrixWidthHeight} from "./plotPipelineMatrix";
 import "./pipelineMatrix.css";
 import {constants} from "../helpers";
 
@@ -17,6 +17,7 @@ export class PipelineMatrix extends Component {
       onClick,
       onHover,
       onSelectExpandedPrimitive,
+      expandedPrimitiveData,
       moduleNames,
       importances,
       selectedPipelines,
@@ -35,6 +36,7 @@ export class PipelineMatrix extends Component {
       onClick,
       onHover,
       onSelectExpandedPrimitive,
+      expandedPrimitiveData,
       metricRequest
     );
   }
@@ -53,12 +55,9 @@ export class PipelineMatrix extends Component {
   }
 
   render(){
-    const {pipelines, moduleNames} = this.props;
+    const {pipelines, moduleNames, expandedPrimitiveData} = this.props;
 
-    const svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
-      constants.margin.left + constants.margin.right;
-    const svgHeight = pipelines.length * constants.cellHeight + constants.moduleNameHeight + constants.moduleImportanceHeight +
-      constants.margin.top + constants.margin.bottom;
+    const {svgWidth, svgHeight} = computePipelineMatrixWidthHeight(pipelines, moduleNames, expandedPrimitiveData);
 
     return <div style={{position: 'relative', height: svgHeight, width: svgWidth}}>
         <svg style={{position: 'absolute', left: 0, top: 0}} ref={ref => this.ref = ref}/>
@@ -94,6 +93,7 @@ PipelineMatrix.propTypes = {
   onClick: PropTypes.func,
   onHover: PropTypes.func,
   onSelectExpandedPrimitive: PropTypes.func,
+  expandedPrimitiveData: PropTypes.object,
   selectedPipelines: PropTypes.array.isRequired,
   selectedPipelinesColorScale: PropTypes.func,
   pipelines: PropTypes.array.isRequired,

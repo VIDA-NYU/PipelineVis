@@ -155,65 +155,67 @@ export function extractMetricNames(pipelines) {
   return pipelines[0]['scores'].map(score => score['metric']['metric']);
 }
 
-export function computePrimitiveMetadata2(pipelines) {
-  let metadata = [];
-  pipelines.forEach(pipeline => {
-    pipeline.steps.forEach(step => {
-      const python_path = step.primitive.python_path;
-      if ('hyperparams' in step){
-        Object.keys(step.hyperparams).forEach(hyperparamKey => {
-          const value  = JSON.stringify(step.hyperparams[hyperparamKey].data);
-          const row = {
-            pipeline: pipeline.pipeline_digest,
-            hyperparam: hyperparamKey,
-            value,
-            python_path,
-          };
-          metadata.push(row)
-        });
-      }
-    });
-  });
-  return metadata;
-}
-
-
-export function computePrimitiveMetadata(pipelines) {
-  // Computes primitive metadata for hyperparameter table
-  let metadata = {};
-  pipelines.forEach(pipeline => {
-    pipeline.steps.forEach(step => {
-      const python_path = step.primitive.python_path;
-      if (!(python_path in metadata)) {
-        metadata[python_path] = {
-          hyperparams: {},
-          pipelines: [],
+/*
+row['value'] = node.hyperparams[hyperparamName].data;
+      while(true){
+        if (row['value'] && typeof row['value'] === 'object' && 'value' in row['value']){
+          row['value'] = row['value']['value']
+        } else {
+          break;
         }
       }
-      metadata[python_path].pipelines.push(pipeline);
-      if ('hyperparams' in step){
-        Object.keys(step.hyperparams).forEach(hyperparamKey => {
-          const hyperparams = metadata[python_path].hyperparams;
-          if (!(hyperparamKey in hyperparams)) {
-            hyperparams[hyperparamKey] = {
-              values: {},
-              pipelines: []
-            }
-          }
-          hyperparams[hyperparamKey].pipelines.push(pipeline);
+ */
 
-          const value  =step.hyperparams[hyperparamKey].data;
-          if (!(value in hyperparams[hyperparamKey].values)) {
-            hyperparams[hyperparamKey].values[value] = {
-              pipelines: []
+function accessHyperparamValue(hyperparam) {
+  let data = hyperparam.data;
+  while(true){
+    if (data && typeof data === 'object' && 'value' in data){
+      data = data['value']
+    } else {
+      break;
+    }
+  }
+  return data;
+}
+
+function createHyperparamTxtDesc(hyperparam, value){
+  return `${hyperparam}: ${value}`;
+}
+
+export function computePrimitiveHyperparameterData(pipelines, pythonPath){
+  let stepSamples = [];
+  let unique_checker = {};
+  let allHyperparamsHeader = {};
+
+  pipelines.forEach(pipeline => {
+    pipeline.steps.forEach(step => {
+      const python_path = step.primitive.python_path;
+      const pipeline_digest  = pipeline.pipeline_digest;
+      if (python_path === pythonPath){
+        if ('hyperparams' in step){
+          Object.keys(step.hyperparams).forEach(hyperparamKey => {
+            const value  = JSON.stringify(accessHyperparamValue(step.hyperparams[hyperparamKey]));
+            const unique_key = pipeline_digest + hyperparamKey + value;
+            const header_key = createHyperparamTxtDesc(hyperparamKey, value);
+            allHyperparamsHeader[header_key] = true;
+            if (!(unique_key in unique_checker)){
+              stepSamples.push({
+                pipeline_digest: pipeline_digest,
+                hyperparam: hyperparamKey,
+                value,
+                unique_key,
+                header_key,
+              });
+              unique_checker[unique_key] = true;
             }
-          }
-          hyperparams[hyperparamKey].values[value].pipelines.push(pipeline)
-        });
+          });
+        }
       }
     });
   });
-  return metadata;
+  let orderedHeader = Object.keys(allHyperparamsHeader);
+  orderedHeader.sort();
+  return {orderedHeader, stepSamples};
 }
 
 export function createHyperparamTableDataFromNode(node){
@@ -222,15 +224,7 @@ export function createHyperparamTableDataFromNode(node){
     for (const hyperparamName of Object.keys(node.hyperparams)) {
       let row = {};
       row['name'] = hyperparamName;
-      row['value'] = node.hyperparams[hyperparamName].data;
-      while(true){
-        if (row['value'] && typeof row['value'] === 'object' && 'value' in row['value']){
-          row['value'] = row['value']['value']
-        } else {
-          break;
-        }
-      }
-
+      row['value'] = accessHyperparamValue(node.hyperparams[hyperparamName]);
       tableData.push(row);
     }
   }
