@@ -80,7 +80,7 @@ export function plotPipelineMatrix(ref,
   let hyperparameterWidth = 0;
 
   if (expandedPrimitiveData) {
-    hyperparameterWidth = expandedPrimitiveData.orderedHeader.length * constants.cellWidth;
+    hyperparameterWidth = expandedPrimitiveData.orderedHeader.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam;
   }
 
   /*moduleTypeOrder.forEach((x, idx) => {
@@ -441,12 +441,12 @@ export function plotPipelineMatrix(ref,
           .attr("cy", x => rowScale(x.pipeline_digest) + bandOver2)
           ));
 
-    const hyperparamsNameLabels = svg.selectAll(".hyperparam_names")
+    const hyperparamsNameLabels = svg.selectAll("#hyperparam_names")
       .data([orderedHeader])
       .join(
         enter => enter
           .append("g")
-          .attr("class", "hyperparam_names")
+          .attr("id", "hyperparam_names")
           .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam},
          ${constants.margin.top + constants.moduleImportanceHeight})`)
       );
@@ -569,9 +569,8 @@ export function plotPipelineMatrix(ref,
             .selectAll("text")
             .style("font-weight", d => d.pipeline_digest === pipelineIdx ? "bold" : "normal");
 
-
           svg
-            .selectAll(".hyperparam_names")
+            .selectAll("#hyperparam_names")
             .selectAll("text")
             .style("font-weight", d => d === hyperparamName ? "bold" : "normal");
         }
@@ -610,6 +609,7 @@ export function plotPipelineMatrix(ref,
           .selectAll("text")
           .style("font-weight", d => {return d.pipeline_digest === pipelineIdx ? "bold" : "normal"});
 
+
       }
     }
 
@@ -629,6 +629,11 @@ export function plotPipelineMatrix(ref,
 
       svg
         .select("#legendPipelineSourceGroup")
+        .selectAll("text")
+        .style("font-weight", "normal");
+
+      svg
+        .selectAll("#hyperparam_names")
         .selectAll("text")
         .style("font-weight", "normal");
       onHover(null, null, null);
