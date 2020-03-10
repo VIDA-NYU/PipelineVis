@@ -113,8 +113,7 @@ export function plotPipelineMatrix(ref,
       ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight})`),
       update => update
     );
-
-
+  
   guideLinesGroup
     .selectAll(".row")
     .data(pipelines)
