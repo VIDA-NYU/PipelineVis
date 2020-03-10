@@ -200,7 +200,9 @@ export function computePrimitiveHyperparameterData(pipelines, pythonPath){
       if (python_path === pythonPath){
         if ('hyperparams' in step){
           Object.keys(step.hyperparams).forEach(hyperparamKey => {
-            const value  = JSON.stringify(accessHyperparamValue(step.hyperparams[hyperparamKey]), JSONStringReplacer).replace(/"/g, '');
+            const value  = JSON.stringify(accessHyperparamValue(step.hyperparams[hyperparamKey]), JSONStringReplacer)
+              .replace(/"/g, '')
+              .replace(/https:\/\/metadata.datadrivendiscovery.org\/types\//g, "");
             const unique_key = pipeline_digest + hyperparamKey + value;
             const header_key = createHyperparamTxtDesc(hyperparamKey, value);
             allHyperparamsHeader[header_key] = true;
