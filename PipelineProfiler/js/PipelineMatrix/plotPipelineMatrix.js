@@ -361,9 +361,11 @@ export function plotPipelineMatrix(ref,
   *
   * */
 
+  let expandedColScale;
+
   if (expandedPrimitiveData) {
     const {orderedHeader, stepSamples} = expandedPrimitiveData;
-    const expandedColScale = scaleBand()
+    expandedColScale = scaleBand()
       .domain(orderedHeader)
       .range([0, orderedHeader.length * constants.cellWidth])
       .paddingInner(0.0001)
@@ -549,10 +551,29 @@ export function plotPipelineMatrix(ref,
         if (row < pipelines.length) {
           const pipelineRowIndex = Math.floor((mGlobal[1] - top) / constants.cellHeight);
           const pipelineIdx = pipelines[pipelineRowIndex].pipeline_digest;
+          const colIdx = Math.floor((mGlobal[0] - leftHyperparam) / constants.cellHeight);
+          const hyperparamName = orderedHeader[colIdx];
+
           svg
             .select("#highlight_row")
             .attr("y", rowScale(pipelineIdx) + top)
             .style("fill", highlightColor);
+
+          svg
+            .select("#highlight_col")
+            .attr("x", expandedColScale(hyperparamName) + leftHyperparam)
+            .style("fill", highlightColor);
+
+          svg
+            .select("#legendPipelineSourceGroup")
+            .selectAll("text")
+            .style("font-weight", d => d.pipeline_digest === pipelineIdx ? "bold" : "normal");
+
+
+          svg
+            .selectAll(".hyperparam_names")
+            .selectAll("text")
+            .style("font-weight", d => d === hyperparamName ? "bold" : "normal");
         }
       }
     }
