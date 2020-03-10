@@ -10,8 +10,6 @@ import ReactTable from "react-table-v6";
 
 import {
   computePrimitiveImportances,
-  computePrimitiveMetadata,
-  computePrimitiveMetadata2,
   constants,
   extractMetric,
   extractMetricNames,
@@ -36,10 +34,6 @@ export class PipelineMatrixBundle extends Component {
 
     pipelines = this.computeSortedPipelines(pipelines, sortRowsBy, metricRequest);
     moduleNames = this.computeSortedModuleNames(moduleNames, sortColumnsBy, importances, this.props.data.infos);
-
-    const primitiveMetadata = computePrimitiveMetadata(pipelines);
-
-    const primitiveMetadata2 = computePrimitiveMetadata2(pipelines);
 
     this.requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
     if (window.Jupyter !== undefined) {
@@ -66,8 +60,6 @@ export class PipelineMatrixBundle extends Component {
       metricOptions,
       importances,
       moduleNames,
-      primitiveMetadata,
-      primitiveMetadata2,
       mergedGraph: null,
       hoveredPrimitive: null,
       expandedPrimitive: null,

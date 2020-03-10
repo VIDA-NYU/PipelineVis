@@ -57,7 +57,7 @@ export function plotPipelineMatrix(ref,
     .domain([0, halfImportanceDomain])
     .range([0, constants.moduleImportanceHeight/2]);
 
-  const importanceScaleVisible = scaleLinear()
+  const importanceScaleVisible = scaleLinear() // Importance scale used in d3.axis
     .domain([-halfImportanceDomain, halfImportanceDomain])
     .range([constants.moduleImportanceHeight, 0]); // order is switched to put positive numbers on top
 
