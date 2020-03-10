@@ -503,6 +503,19 @@ export function plotPipelineMatrix(ref,
         .style("fill", "#00000000")
     );
 
+  svg
+    .selectAll("#highlight_col_hyperparam")
+    .data([1])
+    .join(
+      enter => enter
+        .append("rect")
+        .attr("id", "highlight_col_hyperparam")
+        .attr("y", top)
+        .attr("height", bottom - top)
+        .attr("width", colScale.bandwidth())
+        .style("fill", "#00000000")
+    );
+
   const selectedDigests = selectedPipelines.map(pipeline => pipeline['pipeline_digest']);
 
   const selectedGroup = svg.selectAll(".selectedGroup")
@@ -560,7 +573,7 @@ export function plotPipelineMatrix(ref,
             .style("fill", highlightColor);
 
           svg
-            .select("#highlight_col")
+            .select("#highlight_col_hyperparam")
             .attr("x", expandedColScale(hyperparamName) + leftHyperparam)
             .style("fill", highlightColor);
 
@@ -620,6 +633,10 @@ export function plotPipelineMatrix(ref,
 
       svg
         .select("#highlight_col")
+        .style("fill", "#00000000");
+
+      svg
+        .select("#highlight_col_hyperparam")
         .style("fill", "#00000000");
 
       svg
