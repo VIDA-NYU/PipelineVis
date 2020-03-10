@@ -549,7 +549,7 @@ export function plotPipelineMatrix(ref,
         enter => enter
           .append("g")
           .attr("transform", x => `translate(${hyperparamNameLabelsLeft + expandedColScale(x.begin) + bracketPadding}, 
-           ${constants.moduleNameHeight + constants.margin.top + constants.moduleImportanceHeight - bracketHeight})`)
+           ${constants.moduleNameHeight + constants.margin.top + constants.moduleImportanceHeight - bracketHeight - bracketPadding})`)
       );
 
 
