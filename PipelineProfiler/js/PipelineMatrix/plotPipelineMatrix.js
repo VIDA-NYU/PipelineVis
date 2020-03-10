@@ -371,6 +371,10 @@ export function plotPipelineMatrix(ref,
 
   let expandedColScale;
 
+
+  svg.selectAll(".groupHyperparams").remove();
+  let groupHyperparams = svg.append("g").attr("class", "groupHyperparams");
+
    if (expandedPrimitiveData) {
     const {orderedHeader, stepSamples} = expandedPrimitiveData;
     expandedColScale = scaleBand()
@@ -379,7 +383,7 @@ export function plotPipelineMatrix(ref,
       .paddingInner(0)
       .paddingOuter(0);
 
-    const hyperparamDots = svg.selectAll("#hyperdots")
+    const hyperparamDots = groupHyperparams.selectAll("#hyperdots")
       .data([stepSamples])
       .join(
         enter => enter.append("g")
@@ -389,7 +393,7 @@ export function plotPipelineMatrix(ref,
       );
 
 
-    const hyperparamsGuideLinesGroup = svg
+    const hyperparamsGuideLinesGroup = groupHyperparams
       .selectAll("#hyperparamsGuideLinesGroup")
       .data([1])
       .join(
@@ -449,7 +453,7 @@ export function plotPipelineMatrix(ref,
           .attr("cy", x => rowScale(x.pipeline_digest) + bandOver2)
           ));
 
-    const hyperparamsNameLabels = svg.selectAll("#hyperparam_names")
+    const hyperparamsNameLabels = groupHyperparams.selectAll("#hyperparam_names")
       .data([orderedHeader])
       .join(
         enter => enter
