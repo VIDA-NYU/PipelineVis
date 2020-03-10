@@ -33,6 +33,6 @@ text {
 }
 
 .dot {
-    fill: #0072ff33;
-    stroke: #4a5670
+    fill: rgba(34, 34, 75, 0.37);
+    stroke: #4a4a4a
 }

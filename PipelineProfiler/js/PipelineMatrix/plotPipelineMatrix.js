@@ -97,12 +97,12 @@ export function plotPipelineMatrix(ref,
     .paddingInner(0)
     .paddingOuter(0);
 
-  //symbols.map(s => d3.symbol().type(s)()
 
-  const shapeScale = scaleOrdinal(moduleTypeOrder)
+  const shapeScale = scaleOrdinal()
     .range(symbols.map(s => symbol()
       .type(s)()
-    ));
+    ))
+    .domain(moduleTypeOrder);
 
 
   const importanceDomain = extent(moduleNames, x => importances[x]);
