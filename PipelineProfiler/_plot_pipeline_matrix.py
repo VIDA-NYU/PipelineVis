@@ -90,7 +90,7 @@ def transform_module_type(module_type):
     if module_type in map:
         return map[module_type]
     else:
-        return module_type
+        return ' '.join([n.capitalize() for n in module_type.split("_")])
 
 def extract_primitive_info(pipelines, enet_alpha, enet_l1):
     pipelines = sorted(pipelines, key=lambda x: x['scores'][0]['normalized'], reverse=True)

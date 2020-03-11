@@ -95,7 +95,7 @@ export function plotPipelineMatrix(ref,
     .paddingInner(0)
     .paddingOuter(0);
 
-  const mySymbols = [symbolCircle, symbolCross, symbolDiamond, symbolSquare, symbolTriangle, symbolWye];
+  const mySymbols = [symbolCircle, symbolCross, symbolDiamond, symbolSquare, symbolTriangle, symbolWye, symbolStar];
 
   const shapeScale = scaleOrdinal()
     .range(mySymbols.map(s => symbol()
