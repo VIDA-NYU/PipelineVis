@@ -4,7 +4,7 @@ import {PipelineMatrix} from "./PipelineMatrix";
 import SolutionGraph from "./SolutionGraph";
 import {scaleOrdinal} from "d3-scale";
 import {select} from "d3-selection";
-
+import {schemeCategory10} from "d3-scale-chromatic";
 import {
   computePrimitiveImportances,
   constants,
@@ -17,7 +17,7 @@ import {
 import MergedGraph from "./MergedGraph";
 import Table from "./Table";
 
-const newSchemeCategory10 = [
+/*const newSchemeCategory10 = [
   "#7f7f7f",
   "#1f77b4",
   "#ff7f0e",
@@ -28,7 +28,9 @@ const newSchemeCategory10 = [
   "#e377c2",
   "#bcbd22",
   "#17becf",
-];
+];*/
+
+const newSchemeCategory10 = schemeCategory10;
 
 export class PipelineMatrixBundle extends Component {
   constructor(props){
