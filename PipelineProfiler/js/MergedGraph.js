@@ -2,8 +2,6 @@ import React, { PureComponent } from 'react';
 import dagre from 'dagre';
 import PropTypes from 'prop-types';
 import {getPrimitiveLabel} from "./helpers";
-import {schemeCategory10} from 'd3-scale-chromatic';
-import {scaleOrdinal} from "d3-scale";
 import {zoom} from "d3-zoom";
 import {select, event} from "d3-selection";
 
@@ -61,7 +59,6 @@ class MergedGraph extends PureComponent {
 
   render() {
     const { merged, selectedPipelinesColorScale } = this.props;
-    const sourceGraphColorScale = scaleOrdinal(schemeCategory10);
 
     var g = new dagre.graphlib.Graph();
 
@@ -72,11 +69,6 @@ class MergedGraph extends PureComponent {
     const nodeDimentions = { width: 100, height: 55 };
     merged.nodes.forEach(node => {
       const preprocessed = preprocessNode(node);
-      preprocessed.forEach(subnode => {
-        subnode.origins.forEach(origin => {
-          sourceGraphColorScale(origin);
-        });
-      });
       g.setNode(node.id, {data: preprocessed, width: nodeDimentions.width, height: preprocessed.length*nodeDimentions.height})
     });
 
@@ -90,20 +82,6 @@ class MergedGraph extends PureComponent {
       Math.max(...g.nodes().map(n => g.node(n).x + g.node(n).width)) + margin.left + margin.right;
     const height =
       Math.max(...g.nodes().map(n => g.node(n).y + g.node(n).height)) + margin.top + margin.bottom;
-
-    /*
-    // Removing legends since pipelines are color coded by selection now.
-    <div style={{display: 'flex', alignContent: 'space-between', flexWrap:'wrap', fontSize: '12px', width: '100%'}}>
-          {
-            selectedPipelinesColorScale.domain().map(sourceGraph => {
-              return <div key={sourceGraph} style={{display: 'flex', marginRight: 20, marginBottom: 20}}>
-                <div style={{width: 20, height: 20, background: selectedPipelinesColorScale(sourceGraph)}}/>
-                <div style={{marginLeft: 5}}>{sourceGraph}</div>
-              </div>;
-            })
-          }
-        </div>
-     */
 
     return (
       <div>
@@ -126,7 +104,7 @@ class MergedGraph extends PureComponent {
                       g.node(n).data.map((node, idx) => {
                         const sourceBarWidth = nodeDimentions.width/node.origins.length;
                         let sourceBars = null;
-                        if (node.origins.length < sourceGraphColorScale.domain().length){
+                        if (node.origins.length < selectedPipelinesColorScale.domain().length){
                           sourceBars = <div style={{display: 'flex', width:nodeDimentions.width, height: 5}}>
                             {
                               node.origins.map(origin => {
@@ -134,7 +112,7 @@ class MergedGraph extends PureComponent {
                                             style={{
                                               width: sourceBarWidth,
                                               height: 5,
-                                              background: sourceGraphColorScale(origin)
+                                              background: selectedPipelinesColorScale(origin)
                                             }}
                                 />
                               })
@@ -196,7 +174,6 @@ MergedGraph.propTypes = {
 };
 
 MergedGraph.defaultProps = {
-  //onClick: step => {}, // step of the pipeline that was clicked
 };
 
 export default MergedGraph;

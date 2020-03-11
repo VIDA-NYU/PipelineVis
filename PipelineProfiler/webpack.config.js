@@ -39,5 +39,5 @@ const config = {
       inline: false,
     },
     mode: 'development'
-}
+};
 module.exports = config;

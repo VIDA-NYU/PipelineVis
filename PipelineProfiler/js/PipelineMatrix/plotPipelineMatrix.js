@@ -2,11 +2,9 @@ import "d3-selection";
 import {select, event, mouse} from "d3-selection";
 import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
 import {extent} from "d3-array";
-import {schemeCategory10} from "d3-scale-chromatic";
 import {constants, extractMetric} from "../helpers";
 import "d3-transition";
 import {axisLeft} from "d3-axis";
-import order from "d3-selection/src/selection/order";
 import {line, symbols, symbol, symbolCircle, symbolCross, symbolDiamond, symbolSquare, symbolStar, symbolTriangle, symbolWye} from "d3-shape";
 
 function initialCaptalize(txt) {
@@ -52,7 +50,7 @@ function computeBracketsHyperparams(orderedHeader) {
     end: orderedHeader[orderedHeader.length - 1]
   });
   return brackets;
-};
+}
 
 const hoveredColor = "#720400";
 const unhoveredColor = "#797979";
@@ -175,8 +173,6 @@ export function plotPipelineMatrix(ref,
         .attr("y1", (x) => rowScale(x.pipeline_digest) + bandOver2)
         .attr("x2", constants.cellWidth * moduleNames.length)
         .attr("y2", (x) => rowScale(x.pipeline_digest) + bandOver2)
-        .style("stroke", "#bababa")
-        .style("stroke-width", 1)
     );
 
   guideLinesGroup
@@ -190,8 +186,6 @@ export function plotPipelineMatrix(ref,
         .attr("y1", 0)
         .attr("x2", (x) => colScale(x) + bandOver2)
         .attr("y2", constants.cellHeight * pipelines.length)
-        .style("stroke", "#bababa")
-        .style("stroke-width", 1)
     );
 
   const t = svg.transition()
@@ -529,8 +523,7 @@ export function plotPipelineMatrix(ref,
           .attr("cx", x => expandedColScale(x.header_key) + bandOver2)
           .attr("cy", x => rowScale(x.pipeline_digest) + bandOver2)
           .attr("r", 4)
-          .style("fill", "#0072ff33")
-          .style("stroke", "#4a5670"),
+          .style("fill", "#00000000"),
         update => update
           .call(update => update.transition(t)
             .attr("cx", x => expandedColScale(x.header_key) + bandOver2)
@@ -654,7 +647,6 @@ export function plotPipelineMatrix(ref,
         .attr("class", "selectedGroup")
     );
 
-  //.style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal"),
   svg.selectAll(".SelectedExpandedPrimitive")
     .data([expandedPrimitiveName])
     .join(

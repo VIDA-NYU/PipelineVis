@@ -26,7 +26,7 @@ function createPrimitiveTableData(primitiveMetadata) {
     };
     return row;
   });
-  data.sort((a,b) => b.numHyperparameters - a.numHyperparameters)
+  data.sort((a,b) => b.numHyperparameters - a.numHyperparameters);
   return {data, columns};
 }
 

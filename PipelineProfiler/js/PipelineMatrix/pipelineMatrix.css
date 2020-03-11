@@ -36,3 +36,13 @@ text {
     fill: rgba(34, 34, 75, 0.37);
     stroke: #4a4a4a
 }
+
+.row {
+    stroke: #bababa;
+    stroke-width: 1;
+}
+
+.col {
+    stroke: #bababa;
+    stroke-width: 1;
+}

@@ -2,11 +2,8 @@ import React, {Component} from "react";
 import PropTypes from 'prop-types';
 import {PipelineMatrix} from "./PipelineMatrix";
 import SolutionGraph from "./SolutionGraph";
-import "react-table-v6/react-table.css";
-import {schemeCategory10} from 'd3-scale-chromatic';
 import {scaleOrdinal} from "d3-scale";
 import {select} from "d3-selection";
-import ReactTable from "react-table-v6";
 
 import {
   computePrimitiveImportances,
@@ -19,6 +16,19 @@ import {
 
 import MergedGraph from "./MergedGraph";
 import Table from "./Table";
+
+const newSchemeCategory10 = [
+  "#7f7f7f",
+  "#1f77b4",
+  "#ff7f0e",
+  "#2ca02c",
+  "#d62728",
+  "#9467bd",
+  "#8c564b",
+  "#e377c2",
+  "#bcbd22",
+  "#17becf",
+];
 
 export class PipelineMatrixBundle extends Component {
   constructor(props){
@@ -42,6 +52,7 @@ export class PipelineMatrixBundle extends Component {
 
       this.requestMergeGraph = (pipelines) => {
         comm.send({pipelines});
+        this.setState({mergedGraph: null});
       };
 
       // Register a handler
@@ -301,7 +312,7 @@ export class PipelineMatrixBundle extends Component {
         expandedPrimitiveName={this.state.expandedPrimitive}
         onClick={
           (selectedPipeline, shift) => {
-            let selectedPipelinesColorScale = scaleOrdinal(schemeCategory10);
+            let selectedPipelinesColorScale = scaleOrdinal(newSchemeCategory10);
             let newSelectedPipelines;
             if (!shift) {
               // Just set one item as the selected
