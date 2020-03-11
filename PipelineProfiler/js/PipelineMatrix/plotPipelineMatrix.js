@@ -7,7 +7,7 @@ import {constants, extractMetric} from "../helpers";
 import "d3-transition";
 import {axisLeft} from "d3-axis";
 import order from "d3-selection/src/selection/order";
-import {line, symbols, symbol} from "d3-shape";
+import {line, symbols, symbol, symbolCircle, symbolCross, symbolDiamond, symbolSquare, symbolStar, symbolTriangle, symbolWye} from "d3-shape";
 
 function initialCaptalize(txt) {
   return txt[0].toUpperCase();
@@ -97,9 +97,10 @@ export function plotPipelineMatrix(ref,
     .paddingInner(0)
     .paddingOuter(0);
 
+  const mySymbols = [symbolCircle, symbolCross, symbolDiamond, symbolSquare, symbolTriangle, symbolWye];
 
   const shapeScale = scaleOrdinal()
-    .range(symbols.map(s => symbol()
+    .range(mySymbols.map(s => symbol()
       .type(s)()
     ))
     .domain(moduleTypeOrder);
