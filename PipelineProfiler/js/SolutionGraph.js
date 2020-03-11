@@ -53,7 +53,7 @@ class SolutionGraph extends PureComponent {
     });
 
     solution.description.pipeline.steps.forEach((step, idx) => {
-      g.setNode(`steps.${idx}`, { label: getPrimitiveLabel(step.primitive.name), ...nodeDimentions });
+      g.setNode(`steps.${idx}`, { label: getPrimitiveLabel(step.primitive.python_path), ...nodeDimentions });
     });
 
     solution.description.pipeline.steps.forEach((step, idx) => {

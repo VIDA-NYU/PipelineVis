@@ -148,8 +148,8 @@ export class PipelineMatrixBundle extends Component {
     };
 
     const tooltipHeader = <>
-      <p><strong>Primitive Name:</strong> {primitiveName}</p>
-      <p><strong>Primitive Type:</strong> {this.props.data.infos[hoveredPrimitive.primitive.python_path].module_type}</p>
+      <p><strong>Path:</strong> {primitiveName}</p>
+      <p><strong>Type:</strong> {this.props.data.infos[hoveredPrimitive.primitive.python_path].module_type}</p>
     </>;
 
     if (tooltipTableData) {

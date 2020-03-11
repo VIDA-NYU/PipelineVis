@@ -130,12 +130,18 @@ function computePrimitiveImportance(pipelinePrimitiveLookup, scores, primitive) 
   return median(arrayUsing) - median(arrayNotUsing);
 }
 
-export function getPrimitiveLabel(name) {
-  const nameParts = name.split('.');
-  if (name.split('.').length > 2) {
-    name = nameParts.pop();
+export function getPrimitiveLabel(python_path) {
+  const capitalize = (s) => s[0].toUpperCase() + s.slice(1);
+
+  const path_parts = python_path.split('.');
+  let name;
+  if (path_parts.length > 3){
+    name = path_parts[3];
+    name = name.split("_").map(x=>capitalize(x)).join(" ")
+  } else {
+    name = python_path;
   }
-  return startCase(name);
+  return name;
 }
 
 export function computePrimitiveImportances(infos, pipelines, scoreRequest) {

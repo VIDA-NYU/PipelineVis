@@ -22,7 +22,7 @@ function preprocessNode(node) {
     let subnode = {
       id: node.id,
       python_path: python_path,
-      node_name: primitives[python_path][0]['node_name'],
+      node_name: getPrimitiveLabel(python_path),
       origins: [],
       hyperparams: [],
     };
@@ -136,7 +136,7 @@ class MergedGraph extends PureComponent {
                               padding: '5px',
                             }}
                           >
-                            {getPrimitiveLabel(node.node_name)}
+                            {node.node_name}
                           </div>
                         </div>
                       })

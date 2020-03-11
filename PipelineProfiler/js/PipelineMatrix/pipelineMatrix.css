@@ -37,6 +37,11 @@ text {
     stroke: #4a4a4a
 }
 
+.hyperparamDot {
+    fill: rgba(0, 0, 0, 0);
+    stroke: #4a4a4a;
+}
+
 .row {
     stroke: #bababa;
     stroke-width: 1;

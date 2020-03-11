@@ -2,7 +2,7 @@ import "d3-selection";
 import {select, event, mouse} from "d3-selection";
 import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
 import {extent} from "d3-array";
-import {constants, extractMetric} from "../helpers";
+import {constants, extractMetric, getPrimitiveLabel} from "../helpers";
 import "d3-transition";
 import {axisLeft} from "d3-axis";
 import {line, symbols, symbol, symbolCircle, symbolCross, symbolDiamond, symbolSquare, symbolStar, symbolTriangle, symbolWye} from "d3-shape";
@@ -294,7 +294,7 @@ export function plotPipelineMatrix(ref,
     .join(
       enter => enter
         .append("text")
-        .text(x => `(${initialCaptalize(infos[x].module_type)}) ${infos[x]['module_name']}`)
+        .text(x => `(${initialCaptalize(infos[x].module_type)}) ${getPrimitiveLabel(x)}`)
         .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth() - 5}, ${constants.moduleNameHeight}) rotate(-60)`)
         .style("fill", "#6e6e6e")
         .style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal"),
@@ -515,15 +515,14 @@ export function plotPipelineMatrix(ref,
 
 
     hyperparamDots
-      .selectAll(".dot")
+      .selectAll(".hyperparamDot")
       .data(x => x, x => x.unique_key)
       .join(
         enter => enter.append("circle")
-          .attr("class", "dot")
+          .attr("class", "hyperparamDot")
           .attr("cx", x => expandedColScale(x.header_key) + bandOver2)
           .attr("cy", x => rowScale(x.pipeline_digest) + bandOver2)
-          .attr("r", 4)
-          .style("fill", "#00000000"),
+          .attr("r", 4),
         update => update
           .call(update => update.transition(t)
             .attr("cx", x => expandedColScale(x.header_key) + bandOver2)
