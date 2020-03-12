@@ -292,34 +292,41 @@ export function plotPipelineMatrix(ref,
 
   moduleImportanceAxis.call(axisObject);
 
-  const moduleNameLabels = svg.selectAll("#module_names")
-    .data([moduleNames])
+  const moduleNameGroups = svg.selectAll(".moduleNameGroup")
+    .data(moduleNames, x => x)
     .join(
-      enter => enter
-        .append("g")
-        .attr("id", "module_names")
-        .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth},
-         ${constants.margin.top})`)
+      enter => {
+        enter = enter
+          .append("g")
+          .attr("class", "moduleNameGroup")
+          .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth},
+         ${constants.margin.top})`);
+
+        enter
+          .append("text")
+          .text(x => getPrimitiveLabel(x))
+          .style("fill", "#6e6e6e")
+          .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth() - 5}, ${constants.moduleNameHeight - constants.moduleTypeHeight}) rotate(-60)`);
+
+        enter
+          .append("g")
+          .attr("class", "dot")
+          .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth() - 7}, ${constants.moduleNameHeight - 10})`)
+          .append("path")
+          .attr("d", x => shapeScale(infos[x].module_type));
+
+
+        return enter;
+      }
     );
 
-  moduleNameLabels
-    .selectAll("text")
-    .data(x => x, x => x)
-    .join(
-      enter => enter
-        .append("text")
-        .text(x => `(${initialCaptalize(infos[x].module_type)}) ${getPrimitiveLabel(x)}`)
-        .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth() - 5}, ${constants.moduleNameHeight}) rotate(-60)`)
-        .style("fill", "#6e6e6e")
-        .style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal"),
-      update => update
-        .call(update => update.transition(t)
-          .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth() - 5}, ${constants.moduleNameHeight}) rotate(-60)`)
-          .style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal")
-        )
-    ).on("click", (x) => {
-    onSelectExpandedPrimitive(x);
-  });
+  moduleNameGroups.selectAll("text")
+    .transition(t)
+    .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth() - 5}, ${constants.moduleNameHeight - constants.moduleTypeHeight}) rotate(-60)`);
+
+  moduleNameGroups.selectAll("g")
+    .transition(t)
+    .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth() - 7}, ${constants.moduleNameHeight - 10})`);
 
   const scoreScale = scaleLinear()
     .domain(extent(selectedScores, x => x))
@@ -335,10 +342,17 @@ export function plotPipelineMatrix(ref,
         .append("g")
         .attr("class", "legend_module_type")
     )
-    .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + paddingHyperparamColsWidth + 50},
-        ${constants.margin.top + 140})`);
+    .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + paddingHyperparamColsWidth + 70},
+        ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight - 50 - usedModuleTypes.length * 15})`);
 
   legendModuleType.selectAll("*").remove();
+
+  legendModuleType.append("text")
+    .attr("x", -5)
+    .attr("y", -15)
+    .text("Primitive Type")
+    .style("fill", "#9a9a9a")
+    .style("font-weight", "bold");
 
   const lengendRowGroup = legendModuleType
     .selectAll("g")
