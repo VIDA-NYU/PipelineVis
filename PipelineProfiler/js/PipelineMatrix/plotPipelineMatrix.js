@@ -288,9 +288,26 @@ export function plotPipelineMatrix(ref,
     );
 
   let axisObject = axisLeft()
+    .ticks(5)
     .scale(importanceScaleVisible);
 
   moduleImportanceAxis.call(axisObject);
+
+  const zeroLineHeight = constants.margin.top + constants.moduleNameHeight + halfImportanceHeight;
+
+  svg.selectAll(".zeroLine")
+    .data([1], x => x)
+    .join(
+      enter => enter
+        .append("line")
+        .attr("class", "zeroLine")
+        .attr("x1", constants.margin.left + constants.pipelineNameWidth)
+        .attr("x2", constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth)
+        .attr("y1", zeroLineHeight)
+        .attr("y2", zeroLineHeight)
+        .style("stroke", "#bababa")
+        .style("stroke-width", 1)
+    );
 
   const moduleNameGroups = svg.selectAll(".moduleNameGroup")
     .data(moduleNames, x => x)
