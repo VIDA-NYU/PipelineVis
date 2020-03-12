@@ -104,10 +104,7 @@ export class PipelineMatrixBundle extends Component {
     if (sortModulesBy === constants.sortModuleBy.importance) {
       newModuleNames.sort((a, b) => importances[b] - importances[a]);
     } else if (sortModulesBy === constants.sortModuleBy.moduleType) {
-      const moduleTypeOrderMap = {};
-      constants.moduleTypeOrder.forEach((x, idx) => {
-        moduleTypeOrderMap[x] = idx;
-      });
+      const {moduleTypeOrderMap} = constants;
       newModuleNames.sort((a, b) => importances[b] - importances[a]);
       newModuleNames.sort((a, b) => moduleTypeOrderMap[infos[a]['module_type']] - moduleTypeOrderMap[infos[b]['module_type']]);
     }

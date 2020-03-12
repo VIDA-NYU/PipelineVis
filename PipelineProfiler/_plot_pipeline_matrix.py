@@ -85,7 +85,8 @@ def transform_module_type(module_type):
         'data_cleaning': 'Preprocessing',
         'regression': 'Regression',
         'operator': 'Operator',
-        'feature_selection': 'Feature Extraction'
+        'feature_selection': 'Feature Extraction',
+        'semisupervised_classification': 'Classification',
     }
     if module_type in map:
         return map[module_type]

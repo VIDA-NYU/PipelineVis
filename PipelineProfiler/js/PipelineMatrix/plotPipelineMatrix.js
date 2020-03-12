@@ -7,6 +7,16 @@ import "d3-transition";
 import {axisLeft} from "d3-axis";
 import {line, symbols, symbol, symbolCircle, symbolCross, symbolDiamond, symbolSquare, symbolStar, symbolTriangle, symbolWye} from "d3-shape";
 
+const mySymbols = [
+  symbolCircle,
+  symbolCross,
+  symbolDiamond,
+  symbolSquare,
+  symbolTriangle,
+  symbolWye,
+  symbolStar
+];
+
 function initialCaptalize(txt) {
   return txt[0].toUpperCase();
 }
@@ -70,7 +80,7 @@ export function plotPipelineMatrix(ref,
                                    metricRequest) {
 
   const {infos, module_types: moduleTypes} = data;
-  const {moduleTypeOrder} = constants;
+  const {moduleTypeOrder, moduleTypeOrderMap} = constants;
   const selectedScores = extractMetric(pipelines, metricRequest);
   const selectedScoresDigests = selectedScores.map((score, idx) => ({
     score,
@@ -94,15 +104,6 @@ export function plotPipelineMatrix(ref,
     .range([0, pipelines.length * constants.cellHeight])
     .paddingInner(0)
     .paddingOuter(0);
-
-  const mySymbols = [symbolCircle, symbolCross, symbolDiamond, symbolSquare, symbolTriangle, symbolWye, symbolStar];
-
-  const shapeScale = scaleOrdinal()
-    .range(mySymbols.map(s => symbol()
-      .type(s)()
-    ))
-    .domain(moduleTypeOrder);
-
 
   const importanceDomain = extent(moduleNames, x => importances[x]);
 
@@ -134,6 +135,8 @@ export function plotPipelineMatrix(ref,
 
   let deduplicateChecker = {};
 
+  const _usedModuleTypesObj = {};
+
   pipelines.forEach((pipeline) => {
     pipeline['steps'].forEach((step) => {
       const pythonPath = step.primitive.python_path;
@@ -146,9 +149,20 @@ export function plotPipelineMatrix(ref,
           pipelineID,
           key
         });
+        const moduleType = infos[pythonPath].module_type;
+        _usedModuleTypesObj[moduleType] = true;
       }
     });
   });
+
+  const usedModuleTypes = Object.keys(_usedModuleTypesObj);
+  usedModuleTypes.sort((a,b) => moduleTypeOrderMap[a] - moduleTypeOrderMap[b]);
+
+  const shapeScale = scaleOrdinal()
+    .range(mySymbols.map(s => symbol()
+      .type(s)()
+    ))
+    .domain(usedModuleTypes);
 
   const guideLinesGroup = svg
     .selectAll("#guideLinesGroup")
@@ -315,7 +329,7 @@ export function plotPipelineMatrix(ref,
 
   const legendModuleType = svg
     .selectAll(".legend_module_type")
-    .data([moduleTypeOrder])
+    .data([usedModuleTypes])
     .join(
       enter => enter
         .append("g")

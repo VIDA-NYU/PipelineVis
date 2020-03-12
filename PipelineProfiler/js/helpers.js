@@ -248,8 +248,23 @@ export function createHyperparamTableDataFromNode(node){
   return tableData;
 }
 
+const moduleTypeOrder = [
+  "Preprocessing",
+  "Feature Extraction",
+  "Operator",
+  "Regression",
+  "Classification"
+];
+
+const moduleTypeOrderMap = {};
+
+moduleTypeOrder.forEach((x, idx) => {
+  moduleTypeOrderMap[x] = idx;
+});
+
 export const constants = {
-  moduleTypeOrder: ["Preprocessing", "Feature Extraction", "Operator", "Regression", "Classification"],
+  moduleTypeOrder,
+  moduleTypeOrderMap,
   scoreRequest: {
     TIME: 'TIME',
     D3MSCORE: 'D3MSCORE'
