@@ -250,10 +250,12 @@ export function createHyperparamTableDataFromNode(node){
 
 const moduleTypeOrder = [
   "Preprocessing",
+  "NLP",
   "Feature Extraction",
   "Operator",
   "Regression",
-  "Classification"
+  "Classification",
+  "Time Series",
 ];
 
 const moduleTypeOrderMap = {};
