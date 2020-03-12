@@ -332,12 +332,16 @@ export function plotPipelineMatrix(ref,
           .append("path")
           .attr("d", x => shapeScale(infos[x].module_type));
 
+        enter.on("click", (x) => {
+          onSelectExpandedPrimitive(x);
+        });
 
         return enter;
       }
     );
 
   moduleNameGroups.selectAll("text")
+    .style("font-weight", x => expandedPrimitiveName === x ? "bold" : "normal")
     .transition(t)
     .attr("transform", x => `translate(${colScale(x) + colScale.bandwidth() - 5}, ${constants.moduleNameHeight - constants.moduleTypeHeight}) rotate(-60)`);
 

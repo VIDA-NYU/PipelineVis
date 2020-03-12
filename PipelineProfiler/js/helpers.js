@@ -279,7 +279,7 @@ export const constants = {
   },
   pipelineNameWidth: 100,
   moduleImportanceHeight: 100,
-  moduleNameHeight: 150,
+  moduleNameHeight: 180,
   cellWidth: 15,
   cellHeight: 15,
   widthSeparatorPrimitiveHyperparam: 30,
