@@ -144,6 +144,7 @@ export class PipelineMatrixBundle extends Component {
       position: 'fixed',
       borderWidth: 'thin',
       borderColor: '#aaaaaa',
+      zIndex: 99999,
     };
 
     const tooltipHeader = <>
@@ -356,7 +357,9 @@ export class PipelineMatrixBundle extends Component {
       <div onMouseMove={()=>{this.cleanMouseOver()}}>
       {pipelineGraph}
       {primitiveHyperparamsView}
+      <div style={{height: 100, width:"100%"}}/>
       </div>
+
     </div>
   }
 }
