@@ -1,4 +1,4 @@
-import { median } from 'd3-array';
+import { mean, median, deviation } from 'd3-array';
 import {startCase} from "lodash";
 
 export function createGettersSetters(container, parameterDict){
@@ -115,6 +115,28 @@ export function extractMetric (pipelines, scoreRequest) { // scoreRequest: {type
 }
 
 function computePrimitiveImportance(pipelinePrimitiveLookup, scores, primitive) {
+  // using correlation of primitives and scores
+  const usages = [];
+  pipelinePrimitiveLookup.forEach((hash, idx) => {
+    usages.push(primitive in hash ? 1 : 0);
+  });
+  const devScores = deviation(scores);
+  const devUsages = deviation(usages);
+  const meanScores = mean(scores);
+  const meanUsages = mean(usages);
+  let accum = 0;
+  for (let i = 0; i < scores.length; ++i){
+    accum += (scores[i] - meanScores) * (usages[i] - meanUsages);
+  }
+  const corr = accum / ((scores.length - 1)*devScores*devUsages);
+  if (isFinite(corr)){
+    return corr;
+  } else {
+    return 0;
+  }
+}
+
+/*function computePrimitiveImportance(pipelinePrimitiveLookup, scores, primitive) {
   let arrayUsing = [];
   let arrayNotUsing = [];
   pipelinePrimitiveLookup.forEach((hash, idx) => {
@@ -128,7 +150,7 @@ function computePrimitiveImportance(pipelinePrimitiveLookup, scores, primitive) 
     return 0;
   }
   return median(arrayUsing) - median(arrayNotUsing);
-}
+}*/
 
 export function getPrimitiveLabel(python_path) {
   const capitalize = (s) => s[0].toUpperCase() + s.slice(1);
