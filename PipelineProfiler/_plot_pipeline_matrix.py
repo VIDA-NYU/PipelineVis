@@ -88,7 +88,9 @@ def transform_module_type(module_type):
         'feature_selection': 'Feature Extraction',
         'semisupervised_classification': 'Classification',
         'natural_language_processing': 'NLP',
-        'time_series_forecasting': 'Time Series',
+        'time_series_forecasting': 'Forecasting',
+        'time_series_classification': 'Classification',
+        'time_series_segmentation': 'Feature Extraction'
     }
     if module_type in map:
         return map[module_type]

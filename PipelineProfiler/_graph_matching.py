@@ -66,7 +66,7 @@ def compute_node_similarity_matrix(g1, g2):
                     n_g1_proc = '.'.join(n_g1.split(".")[-2:])
                     n_g2_proc = '.'.join(n_g2.split(".")[-2:])
                     if n_g1_proc == n_g2_proc:
-                        path_similarity += 0.1
+                        path_similarity += 0.05
                     similarities.append(path_similarity)
             similarity[idx_g1, idx_g2] = np.mean(similarities)
     return similarity
