@@ -516,7 +516,7 @@ export function plotPipelineMatrix(ref,
 
 
     groupHyperparams.append("text")
-      .text(`Hyperparameters for ${expandedPrimitiveName.split(".").slice(3).join(".")}`)
+      .text(`${getPrimitiveLabel(expandedPrimitiveName)} Hyperparameters`)
       .attr("transform", `translate(${right + constants.widthSeparatorPrimitiveHyperparam - 5}, ${bottom}) rotate(-90)`)
       .style("fill", "#6e6e6e");
 
