@@ -50,7 +50,7 @@ export function extractHyperparams(infos, pipelines){
         const moduleName = step.primitive.python_path;
         const moduleParams = {};
         Object.keys(step['hyperparams']).forEach(paramName => {
-          const hValue = JSON.stringify(step['hyperparams'][paramName]['data']);
+          const hValue = JSON.stringify(step['hyperparams'][paramName]['data'], JSONStringReplacer);
 
           if (! (moduleName in uniqueHyperparams)) {
             uniqueHyperparams[moduleName] = {};
@@ -96,6 +96,13 @@ function computePipelinePrimitiveHashTable(pipelines) {
 }
 
 
+function JSONStringReplacer(key, value) {
+  if (typeof value === 'number') {
+    return value.toFixed(2);
+  }
+  return value;
+}
+
 
 export function extractMetric (pipelines, scoreRequest) { // scoreRequest: {type: constants.scoreRequest, name: str}
   if (scoreRequest['type'] === constants.scoreRequest.TIME){
@@ -114,43 +121,33 @@ export function extractMetric (pipelines, scoreRequest) { // scoreRequest: {type
   }
 }
 
-function computePrimitiveImportance(pipelinePrimitiveLookup, scores, primitive) {
-  // using correlation of primitives and scores
-  const usages = [];
+function computePrimitiveImportanceBiserialCorrelation(pipelinePrimitiveLookup, scores, primitive) {
+  // using bisserial correlation of primitives and scores
+  const used = [];
+  const notUsed= [];
+
   pipelinePrimitiveLookup.forEach((hash, idx) => {
-    usages.push(primitive in hash ? 1 : 0);
+    if (primitive in hash){
+      used.push(scores[idx]);
+    } else {
+      notUsed.push(scores[idx]);
+    }
   });
-  const devScores = deviation(scores);
-  const devUsages = deviation(usages);
-  const meanScores = mean(scores);
-  const meanUsages = mean(usages);
-  let accum = 0;
-  for (let i = 0; i < scores.length; ++i){
-    accum += (scores[i] - meanScores) * (usages[i] - meanUsages);
-  }
-  const corr = accum / ((scores.length - 1)*devScores*devUsages);
+
+  const meanUsed = mean(used);
+  const meanNotUsed = mean(notUsed);
+
+  const dev = deviation(scores);
+
+  const n = scores.length;
+
+  const corr = ((meanUsed - meanNotUsed)/dev) * Math.sqrt((used.length * notUsed.length) / (n * (n-1)));
   if (isFinite(corr)){
     return corr;
   } else {
     return 0;
   }
 }
-
-/*function computePrimitiveImportance(pipelinePrimitiveLookup, scores, primitive) {
-  let arrayUsing = [];
-  let arrayNotUsing = [];
-  pipelinePrimitiveLookup.forEach((hash, idx) => {
-    if (primitive in hash) {
-      arrayUsing.push(scores[idx]);
-    } else {
-      arrayNotUsing.push(scores[idx]);
-    }
-  });
-  if (arrayUsing.length === scores.length || arrayNotUsing.length === scores.length) {
-    return 0;
-  }
-  return median(arrayUsing) - median(arrayNotUsing);
-}*/
 
 export function getPrimitiveLabel(python_path) {
   const capitalize = (s) => s[0].toUpperCase() + s.slice(1);
@@ -173,7 +170,7 @@ export function computePrimitiveImportances(infos, pipelines, scoreRequest) {
   const hashTable = computePipelinePrimitiveHashTable(pipelines);
   const primitiveImportances = {};
   primitiveNames.forEach(name => {
-    primitiveImportances[name] = computePrimitiveImportance(hashTable, scores, name);
+    primitiveImportances[name] = computePrimitiveImportanceBiserialCorrelation(hashTable, scores, name);
   });
   return primitiveImportances;
 }
@@ -202,14 +199,8 @@ function accessHyperparamValue(hyperparam) {
       break;
     }
   }
-  return data;
-}
-
-function JSONStringReplacer(key, value) {
-  if (typeof value === 'number') {
-    return value.toFixed(2);
-  }
-  return value;
+  return JSON.stringify(data).replace(/"/g, '')
+    .replace(/https:\/\/metadata.datadrivendiscovery.org\/types\//g, "");;
 }
 
 function createHyperparamTxtDesc(hyperparam, value){
@@ -228,9 +219,7 @@ export function computePrimitiveHyperparameterData(pipelines, pythonPath){
       if (python_path === pythonPath){
         if ('hyperparams' in step){
           Object.keys(step.hyperparams).forEach(hyperparamKey => {
-            const value  = JSON.stringify(accessHyperparamValue(step.hyperparams[hyperparamKey]), JSONStringReplacer)
-              .replace(/"/g, '')
-              .replace(/https:\/\/metadata.datadrivendiscovery.org\/types\//g, "");
+            const value  = accessHyperparamValue(step.hyperparams[hyperparamKey]);
             const unique_key = pipeline_digest + hyperparamKey + value;
             const header_key = createHyperparamTxtDesc(hyperparamKey, value);
             allHyperparamsHeader[header_key] = true;
