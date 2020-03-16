@@ -69,7 +69,6 @@ def compute_node_similarity_matrix(g1, g2):
                         path_similarity += 0.05
                     similarities.append(path_similarity)
             similarity[idx_g1, idx_g2] = np.mean(similarities)
-    print(similarity)
     return similarity
 
 def compute_edit_cost_matrix(similarity_matrix, add_cost, del_cost):
