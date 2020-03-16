@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import {getPrimitiveLabel} from "./helpers";
 import {zoom} from "d3-zoom";
 import {select, event} from "d3-selection";
+import {scaleOrdinal} from "d3-scale";
+import {schemeCategory10} from "d3-scale-chromatic";
 
 const getEvent = () => event;
 
@@ -168,12 +170,13 @@ class MergedGraph extends PureComponent {
   }
 }
 
-MergedGraph.propTypes = {
-  merged: PropTypes.object.isRequired,
-  selectedPipelinesColorScale: PropTypes.func.isRequired,
+MergedGraph.defaultProps = {
+  selectedPipelinesColorScale: scaleOrdinal(schemeCategory10)
 };
 
-MergedGraph.defaultProps = {
+MergedGraph.propTypes = {
+  merged: PropTypes.object.isRequired,
+  selectedPipelinesColorScale: PropTypes.func,
 };
 
 export default MergedGraph;

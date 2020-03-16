@@ -69,6 +69,7 @@ def compute_node_similarity_matrix(g1, g2):
                         path_similarity += 0.05
                     similarities.append(path_similarity)
             similarity[idx_g1, idx_g2] = np.mean(similarities)
+    print(similarity)
     return similarity
 
 def compute_edit_cost_matrix(similarity_matrix, add_cost, del_cost):
@@ -117,7 +118,7 @@ def dict_append(dictionary, key, value):
         dictionary[key] = [value]
 
 def merge_graphs(g1, g2):
-    equivalence_g1, equivalence_g2 = compute_node_equivalence(g1, g1)
+    equivalence_g1, equivalence_g2 = compute_node_equivalence(g1, g2)
     G = nx.DiGraph()
     # Adding g1 node data
     for node in g1.nodes:
