@@ -62,6 +62,15 @@ class MergedGraph extends PureComponent {
   render() {
     const { merged, selectedPipelinesColorScale } = this.props;
 
+    if (selectedPipelinesColorScale.domain().length === 0){
+      // case when rendering graph outside of Pipeline Matrix (standalone node-link graph)
+      merged.nodes.forEach(node => {
+        node.data.forEach(d => {
+          selectedPipelinesColorScale(d.graph_name);
+        })
+      });
+    }
+
     var g = new dagre.graphlib.Graph();
 
     g.setGraph({ rankdir: 'LR', nodesep: 20, ranksep: 20 });
