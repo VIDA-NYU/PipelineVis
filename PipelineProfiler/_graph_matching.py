@@ -93,6 +93,7 @@ def compute_edit_cost_matrix(similarity_matrix, add_cost, del_cost):
 
 
 def compute_node_equivalence(g1, g2):
+    helper_graph = nx.union(g1, g2, rename=('g1-','g2-')) #nodes start with `rename` prefix. Used to check for cycles
     equivalence_g1 = {} # maps nodes from g1 to g2
     equivalence_g2 = {} # maps nodes from g2 to g1
     len_g1 = len(g1.nodes)
@@ -108,8 +109,16 @@ def compute_node_equivalence(g1, g2):
             # nodes are equivalent
             eq_g1 = nodes_g1[pairs[0]]
             eq_g2 = nodes_g2[pairs[1]]
-            equivalence_g2[eq_g2] = eq_g1
-            equivalence_g1[eq_g1] = eq_g2
+            merged_helper = nx.algorithms.minors.contracted_nodes(helper_graph, 'g1-'+eq_g1, 'g2-'+eq_g2, self_loops=False)
+            try:
+                if 'g1-inputs.0' in merged_helper:
+                    cycles = nx.algorithms.cycles.find_cycle(merged_helper, source = 'g1-inputs.0')
+                if 'g2-inputs.0' in merged_helper:
+                    cycles = nx.algorithms.cycles.find_cycle(merged_helper, source = 'g2-inputs.0')
+            except nx.NetworkXNoCycle as n:
+                equivalence_g2[eq_g2] = eq_g1
+                equivalence_g1[eq_g1] = eq_g2
+                helper_graph = merged_helper
     return equivalence_g1, equivalence_g2
 
 def dict_append(dictionary, key, value):
