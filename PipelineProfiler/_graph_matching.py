@@ -98,7 +98,7 @@ def compute_node_equivalence(g1, g2):
     len_g1 = len(g1.nodes)
     len_g2 = len(g2.nodes)
     similarity_matrix = compute_node_similarity_matrix(g1, g2)
-    similarity_matrix = similarity_flooding(similarity_matrix, g1, g2, alpha = 0.01, n_iter = 100)
+    similarity_matrix = similarity_flooding(similarity_matrix, g1, g2, alpha = 0.1, n_iter = 50)
     edit_cost_matrix = compute_edit_cost_matrix(similarity_matrix, 0.7, 0.7)
     rows, cols = linear_sum_assignment(edit_cost_matrix)
     nodes_g1 = list(g1.nodes)

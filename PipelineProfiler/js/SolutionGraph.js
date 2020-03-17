@@ -44,7 +44,7 @@ class SolutionGraph extends PureComponent {
     g.setDefaultEdgeLabel(function() {
       return {};
     });
-    const nodeDimentions = { width: 120, height: 70 };
+    const nodeDimentions = { width: 100, height: 55 };
     solution.description.pipeline.inputs.forEach((input, idx) => {
       g.setNode(`inputs.${idx}`, { label: 'Input', ...nodeDimentions });
     });
@@ -86,6 +86,15 @@ class SolutionGraph extends PureComponent {
 
     return (
         <svg style={{width, height}} ref={ref => {this.setupDragZoom(ref, width, height)}}>
+          <defs>
+            <marker id="triangle" viewBox="0 0 10 10"
+                    refX="8" refY="5"
+                    markerUnits="strokeWidth"
+                    markerWidth="5" markerHeight="5"
+                    orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#333"/>
+            </marker>
+          </defs>
           <g id={"transformGroup"} transform={`translate(${margin},${margin})`}>
             {g.nodes().map(n => (
               <g
@@ -101,7 +110,7 @@ class SolutionGraph extends PureComponent {
                   <div
                     style={{
                       textAlign: 'center',
-                      fontSize: '12px',
+                      fontSize: '10px',
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
@@ -121,6 +130,7 @@ class SolutionGraph extends PureComponent {
               return (
                 <g key={e.v + e.w}>
                   <path
+                    markerEnd="url(#triangle)"
                     stroke="black"
                     fill="none"
                     d={`${g

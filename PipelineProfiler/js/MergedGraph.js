@@ -98,6 +98,15 @@ class MergedGraph extends PureComponent {
       <div>
 
         <svg style={{width, height}} ref={(ref) => {this.setupDragZoom(ref, width, height)}}>
+          <defs>
+            <marker id="triangle" viewBox="0 0 10 10"
+                    refX="8" refY="5"
+                    markerUnits="strokeWidth"
+                    markerWidth="5" markerHeight="5"
+                    orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#333"/>
+            </marker>
+          </defs>
           <g id={"transformGroup"} transform={`translate(${margin.left},${margin.top})`}>
             {g.nodes().map(n => {
               return <g
@@ -160,6 +169,7 @@ class MergedGraph extends PureComponent {
               return (
                 <g key={e.v + e.w}>
                   <path
+                    markerEnd="url(#triangle)"
                     stroke="black"
                     fill="none"
                     d={`${g
