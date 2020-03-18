@@ -103,7 +103,7 @@ def compute_node_equivalence(g1, g2):
         similarity_matrix = similarity_flooding(similarity_matrix, g1, g2, alpha = 0.1, n_iter = 50)
     except Exception:
         print("Similarity flooding failed. PCG graph has no nodes or edges.")
-    edit_cost_matrix = compute_edit_cost_matrix(similarity_matrix, 0.7, 0.7)
+    edit_cost_matrix = compute_edit_cost_matrix(similarity_matrix, 0.4, 0.4)
     rows, cols = linear_sum_assignment(edit_cost_matrix)
     nodes_g1 = list(g1.nodes)
     nodes_g2 = list(g2.nodes)
