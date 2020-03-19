@@ -253,6 +253,15 @@ export function createHyperparamTableDataFromNode(node){
       tableData.push(row);
     }
   }
+  tableData.sort((a,b) => {
+    if (a['name'] > b['name']) {
+      return 1;
+    } else if (a['name'] < b['name']) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
   if (tableData.length === 0) {
     return null;
   }
