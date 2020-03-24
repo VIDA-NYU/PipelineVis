@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from 'prop-types';
 import {PipelineMatrix} from "./PipelineMatrix";
 import SolutionGraph from "./SolutionGraph";
@@ -16,6 +16,7 @@ import {
 
 import MergedGraph from "./MergedGraph";
 import Table from "./Table";
+import {MyDropdown} from "./MyDropdown";
 
 /*const newSchemeCategory10 = [
   "#7f7f7f",
@@ -78,6 +79,8 @@ export class PipelineMatrixBundle extends Component {
       hoveredPrimitive: null,
       expandedPrimitive: null,
       expandedPrimitiveData: null,
+      sortColumnsDropdownHidden: true,
+      sortRowsDropdownHidden: true,
     }
   }
 
@@ -178,7 +181,7 @@ export class PipelineMatrixBundle extends Component {
   render(){
     /*<PrimitiveTable primitiveMetadata={this.state.primitiveMetadata}/>*/
     const {data} = this.props;
-    const {selectedPrimitive, hoveredPrimitive, tooltipPosition} = this.state;
+    const {selectedPrimitive, hoveredPrimitive, tooltipPosition, drop} = this.state;
     const {sortModuleBy, sortPipelineBy} = constants;
 
     let primitiveName = "";
@@ -247,63 +250,49 @@ export class PipelineMatrixBundle extends Component {
     }
 
     return <div ref={ref=>{this.ref = ref}}>
-      <div>
-        <div><strong>Sort primitives by:</strong></div>
-        <div className="radio">
-          <label>
-            <input type="radio" value={sortModuleBy.importance}
-                   checked={this.state.sortColumnsBy === sortModuleBy.importance}
-                   onClick={x=>{
-                     const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.importance, this.state.importances, this.props.data.infos);
-                     this.setState({sortColumnsBy: sortModuleBy.importance, moduleNames: newModuleNames});
-                   }}
-                   onChange={x=>{}}
-            />
-            Module Importance
-          </label>
-        </div>
-        <div className="radio">
-          <label>
-            <input type="radio" value={sortModuleBy.moduleType}
-                   checked={this.state.sortColumnsBy === sortModuleBy.moduleType}
-                   onClick={x=>{
-                     const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.moduleType, this.state.importances, this.props.data.infos);
-                     this.setState({sortColumnsBy: sortModuleBy.moduleType, moduleNames: newModuleNames});
-                   }}
-                   onChange={x=>{}}
-            />
-            Module Type
-          </label>
-        </div>
+      <div style={{display: 'flex'}}>
+        <MyDropdown
+          buttonText={"Sort Primitives"}
+          options={[
+            {
+              name: 'By importance',
+              action: () => {
+                const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.importance, this.state.importances, this.props.data.infos);
+                this.setState({sortColumnsBy: sortModuleBy.importance, moduleNames: newModuleNames});
+              }
+            },
+            {
+              name: 'By type',
+              action: () => {
+                const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.moduleType, this.state.importances, this.props.data.infos);
+                this.setState({sortColumnsBy: sortModuleBy.moduleType, moduleNames: newModuleNames});
+              }
+            }
+          ]}
+        />
+        <div style={{marginLeft: 10}}/>
+        <MyDropdown
+          buttonText={"Sort Pipelines"}
+          options={[
+            {
+              name: 'By score',
+              action: () => {
+                const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_score, this.state.metricRequest);
+                this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_score});
+              }
+            },
+            {
+              name: 'By source',
+              action: () => {
+                const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_source, this.state.metricRequest);
+                this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_source});
+              }
+            }
+          ]}
+        />
       </div>
 
-      <p><strong>Sort pipelines by:</strong></p>
-      <div className="radio">
-        <label>
-          <input type="radio" value={sortPipelineBy.pipeline_score}
-                 checked={this.state.sortRowsBy === sortPipelineBy.pipeline_score}
-                 onClick={x=>{
-                   const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_score, this.state.metricRequest);
-                   this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_score});
-                 }}
-                 onChange={x=>{}}
-          />
-          Pipeline score
-        </label>
-      </div>
-      <div className="radio">
-        <label>
-          <input type="radio" value={sortPipelineBy.pipeline_source}
-                 checked={this.state.sortRowsBy === sortPipelineBy.pipeline_source}
-                 onClick={x=>{
-                   const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_source, this.state.metricRequest);
-                   this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_source});
-                 }}
-                 onChange={x=>{}}
-          />
-          Pipeline source
-        </label>
-      </div>
+
       <PipelineMatrix
         data={data}
         pipelines={this.state.pipelines}
