@@ -2,6 +2,12 @@ import React, {Component} from "react";
 import {Button} from "styled-button-component";
 import {Dropdown, DropdownItem, DropdownMenu} from "styled-dropdown-component";
 import PropTypes from "prop-types";
+import styled from "styled-components";
+
+const Font = styled.div`
+  font-size: 12px;
+`;
+
 
 export class MyDropdown extends Component {
   constructor(props) {
@@ -16,14 +22,14 @@ export class MyDropdown extends Component {
     const { buttonText, options } = this.props;
     return <Dropdown>
       <Button dropdownToggle onClick={() => this.setState({hidden: !hidden})}>
-        {buttonText}
+        <Font>{buttonText}</Font>
       </Button>
       <DropdownMenu hidden={hidden} toggle={() => this.setState({hidden: !hidden})}>
         {options.map((option,idx) => <DropdownItem key={idx} onClick={()=>{
           this.setState({hidden: true});
           option.action();
         }}>
-          {option.name}
+          <Font>{option.name}</Font>
         </DropdownItem>)}
       </DropdownMenu>
     </Dropdown>
