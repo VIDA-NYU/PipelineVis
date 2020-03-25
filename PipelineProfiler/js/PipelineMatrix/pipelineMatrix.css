@@ -15,7 +15,7 @@
     border-left-style: hidden;
     border-bottom-style: hidden;
     background-color: #FFF;
-    color: #BABABA;
+    color: #4a4a4a;
 }
 
 text {
@@ -33,13 +33,13 @@ text {
 }
 
 .dot {
-    fill: rgba(34, 34, 75, 0.37);
-    stroke: #4a4a4a
+    fill: #7a7a7a;
+    stroke: #adadad;
 }
 
 .hyperparamDot {
     fill: rgba(0, 0, 0, 0);
-    stroke: #4a4a4a;
+    stroke: rgba(74, 74, 74, 0.67);
 }
 
 .row {
@@ -50,4 +50,20 @@ text {
 .col {
     stroke: #bababa;
     stroke-width: 1;
+}
+
+#module_importance_bars rect {
+    stroke: #828489;
+    fill: #9d989e;
+    stroke-width: 1px;
+}
+
+.pipeline_score_bars rect {
+    stroke: #828489;
+    fill: #9d989e;
+    stroke-width: 1px;
+}
+
+.pipeline_score_bars text {
+    fill: #4a4a4a;
 }

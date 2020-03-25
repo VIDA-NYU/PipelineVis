@@ -257,8 +257,7 @@ export function plotPipelineMatrix(ref,
         .attr("height", x => importances[x] > 0 ?
           importanceScale(importances[x])
           : importanceScale(-importances[x])
-        )
-        .style("fill", "#bababa"),
+        ),
       update => update
         .call(update => {
             return update.transition(t)
@@ -272,7 +271,6 @@ export function plotPipelineMatrix(ref,
                 importanceScale(importances[x])
                 : importanceScale(-importances[x])
               )
-              .style("fill", "#bababa")
           }
         )
     );
@@ -424,14 +422,12 @@ export function plotPipelineMatrix(ref,
         .append("rect")
         .attr("transform", x => `translate(0, ${rowScale(x.pipeline_digest) + 3})`)
         .attr("width", (x) => scoreScale(x.score))
-        .attr("height", rowScale.bandwidth() - 4)
-        .style("fill", "#bababa"),
+        .attr("height", rowScale.bandwidth() - 4),
       update => update
         .call(update => update.transition(t)
           .attr("transform", x => `translate(0, ${rowScale(x.pipeline_digest) + 3})`)
           .attr("width", (x) => scoreScale(x.score))
           .attr("height", rowScale.bandwidth() - 4)
-          .style("fill", "#bababa"),
         )
     );
 
@@ -443,14 +439,12 @@ export function plotPipelineMatrix(ref,
         .append("text")
         .attr("transform", x => `translate(${constants.pipelineScoreWidth}, ${rowScale(x.pipeline_digest) + rowScale.bandwidth()})`)
         .attr("text-anchor", "end")
-        .text(x => x.score.toFixed(2))
-        .style("fill", "#6b6b6b"),
+        .text(x => x.score.toFixed(2)),
       update => update
         .call(update => update.transition(t)
           .attr("transform", x => `translate(${constants.pipelineScoreWidth}, ${rowScale(x.pipeline_digest) + rowScale.bandwidth()})`)
           .attr("text-anchor", "end")
           .text(x => x.score.toFixed(2))
-          .style("fill", "#6b6b6b"),
         )
     );
 
@@ -797,7 +791,7 @@ export function plotPipelineMatrix(ref,
           .style("fill", highlightColor);
 
         svg
-          .select("#module_names")
+          .selectAll(".moduleNameGroup")
           .selectAll("text")
           .style("fill", d => d === moduleName ? hoveredColor : unhoveredColor);
 
@@ -826,7 +820,7 @@ export function plotPipelineMatrix(ref,
         .style("fill", "#00000000");
 
       svg
-        .select("#module_names")
+        .selectAll(".moduleNameGroup")
         .selectAll("text")
         .style("fill", unhoveredColor);
 
