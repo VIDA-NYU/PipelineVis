@@ -292,11 +292,12 @@ export class PipelineMatrixBundle extends Component {
             }
           ]}
         />
-        <div style={{marginLeft: 10}}/>
+        <div style={{marginLeft: 10, marginTop: -4}}>
         <FormControlLabel
           control={
             <Checkbox
               checked={keepSorted}
+              inputProps={{ 'aria-label': 'primary checkbox' }}
               onChange={() => {
                 if (!keepSorted) {
                   if (sortColumnsBy === sortModuleBy.importance){
@@ -321,8 +322,9 @@ export class PipelineMatrixBundle extends Component {
               }}
             />
           }
-          label="Keep sorted"
+          label="KEEP SORTED"
         />
+        </div>
       </div>
 
 

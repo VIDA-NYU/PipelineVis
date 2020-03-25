@@ -59,7 +59,6 @@
     "redux-thunk": "^2.3.0",
     "styled-button-component": "^4.0.0",
     "styled-components": "^5.0.1",
-    "styled-dropdown-component": "^4.0.0",
-    "typeface-roboto": "0.0.54"
+    "styled-dropdown-component": "^4.0.0"
   }
 }
