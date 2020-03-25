@@ -298,7 +298,7 @@ export class PipelineMatrixBundle extends Component {
             <Checkbox
               checked={keepSorted}
               onChange={() => {
-                if (!keepSorted) { 
+                if (!keepSorted) {
                   if (sortColumnsBy === sortModuleBy.importance){
                     const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.importance, this.state.importances, this.props.data.infos);
                     this.setState({moduleNames: newModuleNames});
