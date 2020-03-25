@@ -17,10 +17,6 @@ const mySymbols = [
   symbolStar
 ];
 
-function initialCaptalize(txt) {
-  return txt[0].toUpperCase();
-}
-
 export function computePipelineMatrixWidthHeight(pipelines, moduleNames, expandedPrimitiveData) {
   let svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
     constants.margin.left + constants.margin.right;
