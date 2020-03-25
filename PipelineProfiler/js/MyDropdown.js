@@ -39,19 +39,6 @@ export class MyDropdown extends Component {
         </MenuItem>)}
       </Menu>
     </div>
-    /*return <Dropdown>
-      <Button dropdownToggle onClick={() => this.setState({hidden: !hidden})}>
-        <Font>{buttonText}</Font>
-      </Button>
-      <DropdownMenu hidden={hidden} toggle={() => this.setState({hidden: !hidden})}>
-        {options.map((option,idx) => <DropdownItem key={idx} onClick={()=>{
-          this.setState({hidden: true});
-          option.action();
-        }}>
-          <Font>{option.name}</Font>
-        </DropdownItem>)}
-      </DropdownMenu>
-    </Dropdown>*/
   }
 }
 

@@ -18,6 +18,8 @@ import MergedGraph from "./MergedGraph";
 import Table from "./Table";
 import {MyDropdown} from "./MyDropdown";
 
+import {Checkbox, FormControlLabel} from "@material-ui/core";
+
 /*const newSchemeCategory10 = [
   "#7f7f7f",
   "#1f77b4",
@@ -81,6 +83,7 @@ export class PipelineMatrixBundle extends Component {
       expandedPrimitiveData: null,
       sortColumnsDropdownHidden: true,
       sortRowsDropdownHidden: true,
+      keepSorted: true
     }
   }
 
@@ -179,9 +182,8 @@ export class PipelineMatrixBundle extends Component {
   }
 
   render(){
-    /*<PrimitiveTable primitiveMetadata={this.state.primitiveMetadata}/>*/
     const {data} = this.props;
-    const {selectedPrimitive, hoveredPrimitive, tooltipPosition, drop} = this.state;
+    const {selectedPrimitive, hoveredPrimitive, tooltipPosition, drop, keepSorted, sortColumnsBy, sortRowsBy} = this.state;
     const {sortModuleBy, sortPipelineBy} = constants;
 
     let primitiveName = "";
@@ -290,6 +292,17 @@ export class PipelineMatrixBundle extends Component {
             }
           ]}
         />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={keepSorted}
+              onChange={() => {this.setState((prevState, props) => ({
+                keepSorted: !prevState.keepSorted
+              }))}}
+            />
+          }
+          label="Keep sorted"
+        />
       </div>
 
 
@@ -330,6 +343,26 @@ export class PipelineMatrixBundle extends Component {
         }
         metricRequestChange={metricRequest => {
           const importances = computePrimitiveImportances(this.props.data.infos, this.state.pipelines, metricRequest);
+
+          if (keepSorted) {
+            if (sortColumnsBy === sortModuleBy.importance){
+              const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.importance, importances, this.props.data.infos);
+              this.setState({moduleNames: newModuleNames});
+            }else if (sortColumnsBy === sortModuleBy.moduleType) {
+              const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.moduleType, importances, this.props.data.infos);
+              this.setState({moduleNames: newModuleNames});
+            }
+
+            if (sortRowsBy === sortPipelineBy.pipeline_score){
+              const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_score, metricRequest);
+              this.setState({pipelines: newPipelines});
+            } else if (sortRowsBy === sortPipelineBy.pipeline_source){
+              const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_source, metricRequest);
+              this.setState({pipelines: newPipelines});
+            }
+          }
+
+
           this.setState({metricRequest, importances});
         }}
         sortColumnBy={this.state.sortColumnsBy}
