@@ -244,13 +244,19 @@ export function computePrimitiveHyperparameterData(pipelines, pythonPath){
 }
 
 export function createHyperparamTableDataFromNode(node){
+  const skipHyperparams = {};
+  constants.skipHyperparameters.forEach(h => {
+    skipHyperparams[h] = true;
+  });
   const tableData = [];
   if ('hyperparams' in node) {
     for (const hyperparamName of Object.keys(node.hyperparams)) {
-      let row = {};
-      row['name'] = hyperparamName;
-      row['value'] = accessHyperparamValue(node.hyperparams[hyperparamName]);
-      tableData.push(row);
+      if (!(hyperparamName in skipHyperparams)){
+        let row = {};
+        row['name'] = hyperparamName;
+        row['value'] = accessHyperparamValue(node.hyperparams[hyperparamName]);
+        tableData.push(row);
+      }
     }
   }
   tableData.sort((a,b) => {
@@ -312,5 +318,6 @@ export const constants = {
     right: 10,
     top: 10,
     bottom: 10,
-  }
+  },
+  skipHyperparameters: ['use_inputs_columns', 'use_outputs_columns', 'exclude_inputs_columns', 'exclude_outputs_columns', 'return_result', 'return_semantic_type', 'use_semantic_types', 'add_index_columns', 'use_columns', 'exclude_columns', 'error_on_no_input', 'n_jobs', 'class_weight']
 };
