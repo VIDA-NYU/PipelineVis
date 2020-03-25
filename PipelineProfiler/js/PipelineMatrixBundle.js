@@ -292,13 +292,33 @@ export class PipelineMatrixBundle extends Component {
             }
           ]}
         />
+        <div style={{marginLeft: 10}}/>
         <FormControlLabel
           control={
             <Checkbox
               checked={keepSorted}
-              onChange={() => {this.setState((prevState, props) => ({
-                keepSorted: !prevState.keepSorted
-              }))}}
+              onChange={() => {
+                if (!keepSorted) { 
+                  if (sortColumnsBy === sortModuleBy.importance){
+                    const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.importance, this.state.importances, this.props.data.infos);
+                    this.setState({moduleNames: newModuleNames});
+                  }else if (sortColumnsBy === sortModuleBy.moduleType) {
+                    const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.moduleType, this.state.importances, this.props.data.infos);
+                    this.setState({moduleNames: newModuleNames});
+                  }
+
+                  if (sortRowsBy === sortPipelineBy.pipeline_score){
+                    const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_score, this.state.metricRequest);
+                    this.setState({pipelines: newPipelines});
+                  } else if (sortRowsBy === sortPipelineBy.pipeline_source){
+                    const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_source, this.state.metricRequest);
+                    this.setState({pipelines: newPipelines});
+                  }
+                }
+                this.setState((prevState, props) => ({
+                  keepSorted: !prevState.keepSorted
+                }));
+              }}
             />
           }
           label="Keep sorted"
