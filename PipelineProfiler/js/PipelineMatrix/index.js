@@ -50,7 +50,7 @@ export class PipelineMatrix extends Component {
       return true;
     } else {
       if (newprops.selectedPipelines !== this.props.selectedPipelines || newprops.metricRequest !== this.props.metricRequest ||
-      newprops.sortRowBy !== this.props.sortRowBy || newprops.sortColumn !== this.props.sortRowBy){
+      newprops.sortRowBy !== this.props.sortRowBy || newprops.sortColumnBy !== this.props.sortColumnBy){
         this.display(newprops);
       }
       return false;
