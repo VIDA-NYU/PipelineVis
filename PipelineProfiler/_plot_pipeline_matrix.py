@@ -4,6 +4,8 @@ import numpy as np
 import json
 import networkx as nx
 from ._graph_matching import pipeline_to_graph, merge_multiple_graphs
+from collections import defaultdict
+import copy
 
 def merge_graphs_comm_api(comm, open_msg): # this function is connected with the comm api on module load (__init__.py)
         # comm is the kernel Comm instance
@@ -72,6 +74,14 @@ def extract_scores(pipelines):
         scores.append(score)
     return np.array(scores)
 
+def rename_pipelines(pipelines):
+    sourceMap = defaultdict(lambda: 1)
+    for pipeline in pipelines:
+        source = pipeline['pipeline_source']['name']
+        pipeline['pipeline_source']['name'] = '{} #{}'.format(source, sourceMap[source])
+        sourceMap[source] += 1
+
+
 def transform_module_type(module_type):
     map = {
         'feature_extraction': 'Feature Extraction',
@@ -98,7 +108,6 @@ def transform_module_type(module_type):
         return ' '.join([n.capitalize() for n in module_type.split("_")])
 
 def extract_primitive_info(pipelines, enet_alpha, enet_l1):
-    pipelines = sorted(pipelines, key=lambda x: x['scores'][0]['normalized'], reverse=True)
     module_matrix, module_names = extract_module_matrix(pipelines)
     scores = extract_scores(pipelines)
     infos = {}
@@ -121,6 +130,9 @@ def extract_primitive_info(pipelines, enet_alpha, enet_l1):
     return infos, module_types
 
 def prepare_data_pipeline_matrix(pipelines, enet_alpha=0.001, enet_l1=0.1):
+    pipelines = copy.deepcopy(pipelines)
+    pipelines = sorted(pipelines, key=lambda x: x['scores'][0]['normalized'], reverse=True)
+    rename_pipelines(pipelines)
     info, module_types = extract_primitive_info(pipelines, enet_alpha=enet_alpha, enet_l1=enet_l1)
     data = {
         "infos": info,
