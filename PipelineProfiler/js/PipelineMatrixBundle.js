@@ -20,18 +20,8 @@ import {MyDropdown} from "./MyDropdown";
 
 import {Checkbox, FormControlLabel} from "@material-ui/core";
 
-/*const newSchemeCategory10 = [
-  "#7f7f7f",
-  "#1f77b4",
-  "#ff7f0e",
-  "#2ca02c",
-  "#d62728",
-  "#9467bd",
-  "#8c564b",
-  "#e377c2",
-  "#bcbd22",
-  "#17becf",
-];*/
+import { Button } from '@material-ui/core';
+
 
 const newSchemeCategory10 = schemeCategory10;
 
@@ -293,6 +283,32 @@ export class PipelineMatrixBundle extends Component {
               action: () => {
                 const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_source, this.state.metricRequest);
                 this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_source});
+              }
+            }
+          ]}
+        />
+
+        <MyDropdown
+          buttonText={"Edit"}
+          options={[
+            {
+              name: 'Remove selected',
+              action: () => {
+                const newPipelines = this.state.pipelines.filter(pipeline => {
+                  const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
+                  return typeof found === 'undefined';
+                });
+                this.setState({pipelines: newPipelines, selectedPipelines: []});
+              }
+            },
+            {
+              name: 'Remove unselected',
+              action: () => {
+                const newPipelines = this.state.pipelines.filter(pipeline => {
+                  const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
+                  return typeof found !== 'undefined';
+                });
+                this.setState({pipelines: newPipelines, selectedPipelines: []});
               }
             }
           ]}
