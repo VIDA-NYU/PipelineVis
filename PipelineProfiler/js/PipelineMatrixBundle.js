@@ -258,45 +258,6 @@ export class PipelineMatrixBundle extends Component {
 
     return <div ref={ref=>{this.ref = ref}}>
       <div style={{display: 'flex'}}>
-        <MyDropdown
-          buttonText={"Sort Primitives"}
-          options={[
-            {
-              name: 'By importance',
-              action: () => {
-                const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.importance, this.state.importances, this.props.data.infos);
-                this.setState({sortColumnsBy: sortModuleBy.importance, moduleNames: newModuleNames});
-              }
-            },
-            {
-              name: 'By type',
-              action: () => {
-                const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.moduleType, this.state.importances, this.props.data.infos);
-                this.setState({sortColumnsBy: sortModuleBy.moduleType, moduleNames: newModuleNames});
-              }
-            }
-          ]}
-        />
-        <div style={{marginLeft: 10}}/>
-        <MyDropdown
-          buttonText={"Sort Pipelines"}
-          options={[
-            {
-              name: 'By score',
-              action: () => {
-                const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_score, this.state.metricRequest);
-                this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_score});
-              }
-            },
-            {
-              name: 'By source',
-              action: () => {
-                const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_source, this.state.metricRequest);
-                this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_source});
-              }
-            }
-          ]}
-        />
 
         <MyDropdown
           buttonText={"Edit"}
@@ -347,6 +308,46 @@ export class PipelineMatrixBundle extends Component {
                 });
                 this.requestExportPipelines(newPipelines);
                 this.setState({exportedPipelineMessage: true});
+              }
+            }
+          ]}
+        />
+
+        <MyDropdown
+          buttonText={"Sort Primitives"}
+          options={[
+            {
+              name: 'By importance',
+              action: () => {
+                const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.importance, this.state.importances, this.props.data.infos);
+                this.setState({sortColumnsBy: sortModuleBy.importance, moduleNames: newModuleNames});
+              }
+            },
+            {
+              name: 'By type',
+              action: () => {
+                const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.moduleType, this.state.importances, this.props.data.infos);
+                this.setState({sortColumnsBy: sortModuleBy.moduleType, moduleNames: newModuleNames});
+              }
+            }
+          ]}
+        />
+        <div style={{marginLeft: 10}}/>
+        <MyDropdown
+          buttonText={"Sort Pipelines"}
+          options={[
+            {
+              name: 'By score',
+              action: () => {
+                const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_score, this.state.metricRequest);
+                this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_score});
+              }
+            },
+            {
+              name: 'By source',
+              action: () => {
+                const newPipelines = this.computeSortedPipelines(this.state.pipelines, sortPipelineBy.pipeline_source, this.state.metricRequest);
+                this.setState({pipelines: newPipelines, sortRowsBy: sortPipelineBy.pipeline_source});
               }
             }
           ]}
