@@ -5,6 +5,9 @@ import SolutionGraph from "./SolutionGraph";
 import {scaleOrdinal} from "d3-scale";
 import {select} from "d3-selection";
 import {schemeCategory10} from "d3-scale-chromatic";
+import {Snackbar} from "@material-ui/core";
+
+
 import {
   computePrimitiveImportances,
   constants,
@@ -18,10 +21,8 @@ import MergedGraph from "./MergedGraph";
 import Table from "./Table";
 import {MyDropdown} from "./MyDropdown";
 
-import {Checkbox, FormControlLabel} from "@material-ui/core";
-
-import { Button } from '@material-ui/core';
-
+import {Checkbox, FormControlLabel, IconButton} from "@material-ui/core";
+import CloseIcon from '@material-ui/icons/Close';
 
 const newSchemeCategory10 = schemeCategory10;
 
@@ -81,7 +82,8 @@ export class PipelineMatrixBundle extends Component {
       expandedPrimitiveData: null,
       sortColumnsDropdownHidden: true,
       sortRowsDropdownHidden: true,
-      keepSorted: true
+      keepSorted: true,
+      exportedPipelineMessage: false
     }
   }
 
@@ -333,6 +335,7 @@ export class PipelineMatrixBundle extends Component {
                   return typeof found !== 'undefined';
                 });
                 this.requestExportPipelines(newPipelines);
+                this.setState({exportedPipelineMessage: true});
               }
             },
             {
@@ -343,6 +346,7 @@ export class PipelineMatrixBundle extends Component {
                   return typeof found === 'undefined';
                 });
                 this.requestExportPipelines(newPipelines);
+                this.setState({exportedPipelineMessage: true});
               }
             }
           ]}
@@ -468,7 +472,13 @@ export class PipelineMatrixBundle extends Component {
       {primitiveHyperparamsView}
       <div style={{height: 100, width:"100%"}}/>
       </div>
-
+      <Snackbar open={this.state.exportedPipelineMessage} onClose={() => {this.setState({exportedPipelineMessage: false})}}
+                message={"Pipelines exported. Access with `PipelineProfiler.get_exported_pipelines()`"}
+                autoHideDuration={6000}
+                action={<IconButton size="small" aria-label="close" color="inherit" onClick={() => this.setState({exportedPipelineMessage: false})}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>}
+      />
     </div>
   }
 }
