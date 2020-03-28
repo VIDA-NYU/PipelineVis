@@ -32,60 +32,63 @@ class SolutionGraph extends PureComponent {
   }
 
   render() {
-    const { solution } = this.props;
-    if (!solution.description || !solution.description.pipeline) {
-      console.log("Invalid pipeline/solution data");
-      return <div />;
-    }
+    try {
+      const {solution} = this.props;
+      if (!solution.description || !solution.description.pipeline) {
+        console.log("Invalid pipeline/solution data");
+        return <div/>;
+      }
 
-    var g = new dagre.graphlib.Graph();
+      var g = new dagre.graphlib.Graph();
 
-    g.setGraph({ rankdir: 'LR', nodesep: 20, ranksep: 20 });
-    g.setDefaultEdgeLabel(function() {
-      return {};
-    });
-    const nodeDimentions = { width: 100, height: 55 };
-    solution.description.pipeline.inputs.forEach((input, idx) => {
-      g.setNode(`inputs.${idx}`, { label: 'Input', ...nodeDimentions });
-    });
-    solution.description.pipeline.outputs.forEach((output, idx) => {
-      g.setNode(`outputs.${idx}`, { label: 'Output', ...nodeDimentions });
-    });
-
-    solution.description.pipeline.steps.forEach((step, idx) => {
-      g.setNode(`steps.${idx}`, { label: getPrimitiveLabel(step.primitive.python_path), ...nodeDimentions });
-    });
-
-    solution.description.pipeline.steps.forEach((step, idx) => {
-      Object.keys(step.arguments).forEach(k => {
-        let source = step.arguments[k].data;
-        source = source.split('.').slice(0, 2).join('.');
-        g.setEdge(source, `steps.${idx}`, {});
+      g.setGraph({rankdir: 'LR', nodesep: 20, ranksep: 20});
+      g.setDefaultEdgeLabel(function () {
+        return {};
       });
-    });
+      const nodeDimentions = {width: 100, height: 55};
+      solution.description.pipeline.inputs.forEach((input, idx) => {
+        g.setNode(`inputs.${idx}`, {label: 'Input', ...nodeDimentions});
+      });
+      solution.description.pipeline.outputs.forEach((output, idx) => {
+        g.setNode(`outputs.${idx}`, {label: 'Output', ...nodeDimentions});
+      });
 
-    solution.description.pipeline.outputs.forEach((output, idx) => {
-      let source = output.data;
-      source = source.split('.').slice(0, 2).join('.');
-      g.setEdge(source, `outputs.${idx}`, {});
-    });
+      solution.description.pipeline.steps.forEach((step, idx) => {
+        g.setNode(`steps.${idx}`, {label: getPrimitiveLabel(step.primitive.python_path), ...nodeDimentions});
+      });
 
-    dagre.layout(g);
-    const margin = 30;
-    const width =
-      Math.max(...g.nodes().map(n => g.node(n).x + g.node(n).width)) + margin;
-    const height =
-      Math.max(...g.nodes().map(n => g.node(n).y + g.node(n).height)) + margin;
+      solution.description.pipeline.steps.forEach((step, idx) => {
+        Object.keys(step.arguments).forEach(k => {
+          let source = step.arguments[k].data;
+          source = source.split('.').slice(0, 2).join('.');
+          g.setEdge(source, `steps.${idx}`, {});
+        });
+      });
 
-    const onClick = (graph_idx) => {
-      let [nodeType, nodeIdx] = graph_idx.split(".");
-      nodeIdx = parseInt(nodeIdx);
-      const node = solution.description.pipeline[nodeType][nodeIdx];
-      this.props.onClick(node);
-    };
+      solution.description.pipeline.outputs.forEach((output, idx) => {
+        let source = output.data;
+        source = source.split('.').slice(0, 2).join('.');
+        g.setEdge(source, `outputs.${idx}`, {});
+      });
 
-    return (
-        <svg style={{width, height}} ref={ref => {this.setupDragZoom(ref, width, height)}}>
+      dagre.layout(g);
+      const margin = 30;
+      const width =
+        Math.max(...g.nodes().map(n => g.node(n).x + g.node(n).width)) + margin;
+      const height =
+        Math.max(...g.nodes().map(n => g.node(n).y + g.node(n).height)) + margin;
+
+      const onClick = (graph_idx) => {
+        let [nodeType, nodeIdx] = graph_idx.split(".");
+        nodeIdx = parseInt(nodeIdx);
+        const node = solution.description.pipeline[nodeType][nodeIdx];
+        this.props.onClick(node);
+      };
+
+      return (
+        <svg style={{width, height}} ref={ref => {
+          this.setupDragZoom(ref, width, height)
+        }}>
           <defs>
             <marker id="triangle" viewBox="0 0 10 10"
                     refX="8" refY="5"
@@ -100,7 +103,7 @@ class SolutionGraph extends PureComponent {
               <g
                 key={n}
                 transform={`translate(${g.node(n).x -
-                  g.node(n).width / 2},${g.node(n).y - g.node(n).height / 2})`}
+                g.node(n).width / 2},${g.node(n).y - g.node(n).height / 2})`}
               >
                 <foreignObject
                   width={g.node(n).width}
@@ -145,7 +148,10 @@ class SolutionGraph extends PureComponent {
             })}
           </g>
         </svg>
-    );
+      );
+    } catch (error) {
+      return <div>Error displaying pipeline.</div>
+    }
   }
 }
 

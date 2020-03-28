@@ -87,6 +87,11 @@ export class PipelineMatrixBundle extends Component {
     }
   }
 
+  componentDidCatch(error, info) {
+    console.log(error);
+    this.setState({selectedPipelines: []})
+  }
+
   computeSortedPipelines(pipelines, sortPipelinesBy, metricRequest){
     const selectedScores = extractMetric(pipelines, metricRequest);
     const selectedScoresDigests = selectedScores.map((score, idx) => ({score, pipeline_digest: pipelines[idx].pipeline_digest}));
