@@ -42,19 +42,27 @@ export class PipelineMatrixBundle extends Component {
     moduleNames = this.computeSortedModuleNames(moduleNames, sortColumnsBy, importances, this.props.data.infos);
 
     this.requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
+    this.requestExportPipelines = () => {console.error(new Error("Cannot find Jupyter namespace from javascript"))};
     if (window.Jupyter !== undefined) {
-      const comm = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {'foo': 6});
+      const commMerge = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {'foo': 6});
 
       this.requestMergeGraph = (pipelines) => {
-        comm.send({pipelines});
+        commMerge.send({pipelines});
         this.setState({mergedGraph: null});
       };
 
       // Register a handler
-      comm.on_msg(msg => {
+      commMerge.on_msg(msg => {
         const mergedGraph = msg.content.data.merged;
         this.setState({mergedGraph});
       });
+
+
+      const commExport = Jupyter.notebook.kernel.comm_manager.new_comm('export_pipelines_comm_api', {'foo': 6});
+
+      this.requestExportPipelines = (pipelines) => {
+        commExport.send({pipelines});
+      }
     }
 
     this.state = {
@@ -324,10 +332,7 @@ export class PipelineMatrixBundle extends Component {
                   const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
                   return typeof found !== 'undefined';
                 });
-                if (window.IPython){
-                  const pipelinesDigests = newPipelines.map(p=>p.pipeline_digest);
-                  window.IPython.notebook.kernel.execute(`exportedPipelines = ${JSON.stringify(pipelinesDigests)}`);
-                }
+                this.requestExportPipelines(newPipelines);
               }
             },
             {
@@ -337,10 +342,7 @@ export class PipelineMatrixBundle extends Component {
                   const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
                   return typeof found === 'undefined';
                 });
-                if (window.IPython){
-                  const pipelinesDigests = newPipelines.map(p=>p.pipeline_digest);
-                  window.IPython.notebook.kernel.execute(`exportedPipelines = ${JSON.stringify(pipelinesDigests)}`);
-                }
+                this.requestExportPipelines(newPipelines);
               }
             }
           ]}

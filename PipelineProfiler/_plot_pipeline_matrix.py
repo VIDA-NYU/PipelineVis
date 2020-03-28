@@ -7,6 +7,8 @@ from ._graph_matching import pipeline_to_graph, merge_multiple_graphs
 from collections import defaultdict
 import copy
 
+exportedPipelines = []
+
 def merge_graphs_comm_api(comm, open_msg): # this function is connected with the comm api on module load (__init__.py)
         # comm is the kernel Comm instance
         # open_msg is the comm_open message
@@ -147,3 +149,22 @@ def plot_pipeline_matrix(data_dict):
     id = id_generator()
     html_all = make_html(data_dict, id)
     display(HTML(html_all))
+
+
+def export_pipelines_comm_api(comm, open_msg): # this function is connected with the comm api on module load (__init__.py)
+    # comm is the kernel Comm instance
+    # open_msg is the comm_open message
+
+    # Register handler for later messages
+    @comm.on_msg
+    def _recv(msg):
+        global exportedPipelines
+        exportedPipelines = msg['content']['data']['pipelines']
+
+def get_exported_pipelines():
+    global exportedPipelines
+    return exportedPipelines
+
+# Setting up connections to jupyter
+get_ipython().kernel.comm_manager.register_target('merge_graphs_comm_api', merge_graphs_comm_api)
+get_ipython().kernel.comm_manager.register_target('export_pipelines_comm_api', export_pipelines_comm_api)
