@@ -313,6 +313,26 @@ export class PipelineMatrixBundle extends Component {
             }
           ]}
         />
+
+        <MyDropdown
+          buttonText={"Export"}
+          options={[
+            {
+              name: 'Export selected',
+              action: () => {
+                const newPipelines = this.state.pipelines.filter(pipeline => {
+                  const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
+                  return typeof found !== 'undefined';
+                });
+                if (window.IPython){
+                  const pipelinesDigests = newPipelines.map(p=>p.pipeline_digest);
+                  window.IPython.notebook.kernel.execute(`exportedPipelines = ${JSON.stringify(pipelinesDigests)}`);
+                }
+              }
+            }
+          ]}
+        />
+
         <div style={{marginLeft: 10, marginTop: -4}}>
         <FormControlLabel
           control={
