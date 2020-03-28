@@ -329,6 +329,19 @@ export class PipelineMatrixBundle extends Component {
                   window.IPython.notebook.kernel.execute(`exportedPipelines = ${JSON.stringify(pipelinesDigests)}`);
                 }
               }
+            },
+            {
+              name: 'Export all',
+              action: () => {
+                const newPipelines = this.state.pipelines.filter(pipeline => {
+                  const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
+                  return typeof found === 'undefined';
+                });
+                if (window.IPython){
+                  const pipelinesDigests = newPipelines.map(p=>p.pipeline_digest);
+                  window.IPython.notebook.kernel.execute(`exportedPipelines = ${JSON.stringify(pipelinesDigests)}`);
+                }
+              }
             }
           ]}
         />
