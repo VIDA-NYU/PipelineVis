@@ -144,9 +144,10 @@ def prepare_data_pipeline_matrix(pipelines, enet_alpha=0.001, enet_l1=0.1):
     return data
 
 
-def plot_pipeline_matrix(data_dict):
+def plot_pipeline_matrix(pipelines):
     from IPython.core.display import display, HTML
     id = id_generator()
+    data_dict = prepare_data_pipeline_matrix(pipelines)
     html_all = make_html(data_dict, id)
     display(HTML(html_all))
 
