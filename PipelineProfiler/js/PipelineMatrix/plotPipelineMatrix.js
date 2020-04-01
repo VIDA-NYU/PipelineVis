@@ -73,7 +73,8 @@ export function plotPipelineMatrix(ref,
                                    onSelectExpandedPrimitive,
                                    expandedPrimitiveData,
                                    expandedPrimitiveName,
-                                   metricRequest) {
+                                   metricRequest,
+                                   highlightPowersetColumns) {
 
   const {infos, module_types: moduleTypes} = data;
   const {moduleTypeOrder, moduleTypeOrderMap} = constants;
@@ -697,6 +698,19 @@ export function plotPipelineMatrix(ref,
     )
     .attr("x", x => left + colScale(x))
     .attr("fill", () => expandedPrimitiveData ? "#33333333" : "#00000000");
+
+  svg.selectAll(".HighlightedPowersetPrimitives")
+    .data(highlightPowersetColumns)
+    .join(
+      enter => enter
+        .append("rect")
+        .attr("class", "HighlightedPowersetPrimitives")
+        .attr("width", colScale.bandwidth())
+        .attr("y", top - constants.moduleImportanceHeight)
+        .attr("height", bottom - top + constants.moduleImportanceHeight)
+    )
+    .attr("x", x => left + colScale(x))
+    .attr("fill", () => "#33333333");
 
   selectedGroup.selectAll("rect")
     .data(x => x, x => x)

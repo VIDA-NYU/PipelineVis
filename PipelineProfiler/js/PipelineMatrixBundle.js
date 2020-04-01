@@ -211,7 +211,17 @@ export class PipelineMatrixBundle extends Component {
 
   render(){
     const {data} = this.props;
-    const {selectedPrimitive, hoveredPrimitive, tooltipPosition, drop, keepSorted, sortColumnsBy, sortRowsBy, powersetAnalysis} = this.state;
+    const {
+      selectedPrimitive,
+      hoveredPrimitive,
+      tooltipPosition,
+      drop,
+      keepSorted,
+      sortColumnsBy,
+      sortRowsBy,
+      powersetAnalysis,
+      highlightPowersetColumns
+    } = this.state;
     const {sortModuleBy, sortPipelineBy} = constants;
 
     let primitiveName = "";
@@ -486,8 +496,6 @@ export class PipelineMatrixBundle extends Component {
               this.setState({pipelines: newPipelines});
             }
           }
-
-
           this.setState({metricRequest, importances});
         }}
         sortColumnBy={this.state.sortColumnsBy}
@@ -508,6 +516,7 @@ export class PipelineMatrixBundle extends Component {
             this.setState({hoveredPrimitive: null});
           }
         }}
+        highlightPowersetColumns={highlightPowersetColumns}
       />
       {tooltip}
       <div onMouseMove={()=>{this.cleanMouseOver()}}>

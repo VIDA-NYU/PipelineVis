@@ -23,7 +23,8 @@ export class PipelineMatrix extends Component {
       importances,
       selectedPipelines,
       metricRequest,
-      selectedPipelinesColorScale
+      selectedPipelinesColorScale,
+      highlightPowersetColumns
     } = props;
 
     plotPipelineMatrix(
@@ -39,7 +40,8 @@ export class PipelineMatrix extends Component {
       onSelectExpandedPrimitive,
       expandedPrimitiveData,
       expandedPrimitiveName,
-      metricRequest
+      metricRequest,
+      highlightPowersetColumns
     );
   }
 
@@ -50,7 +52,8 @@ export class PipelineMatrix extends Component {
       return true;
     } else {
       if (newprops.selectedPipelines !== this.props.selectedPipelines || newprops.metricRequest !== this.props.metricRequest ||
-      newprops.sortRowBy !== this.props.sortRowBy || newprops.sortColumnBy !== this.props.sortColumnBy){
+      newprops.sortRowBy !== this.props.sortRowBy || newprops.sortColumnBy !== this.props.sortColumnBy ||
+        newprops.highlightPowersetColumns !== this.props.highlightPowersetColumns){
         this.display(newprops);
       }
       return false;
@@ -119,4 +122,5 @@ PipelineMatrix.propTypes = {
   metricOptions: PropTypes.array.isRequired,
   sortRowBy: PropTypes.string,
   moduleNames: PropTypes.array.isRequired,
+  highlightPowersetColumns: PropTypes.array
 };
