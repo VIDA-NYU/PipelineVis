@@ -4,6 +4,7 @@ import numpy as np
 import json
 import networkx as nx
 from ._graph_matching import pipeline_to_graph, merge_multiple_graphs
+from ._powerset_analysis import compute_group_importance
 from collections import defaultdict
 import copy
 
@@ -166,6 +167,19 @@ def get_exported_pipelines():
     global exportedPipelines
     return exportedPipelines
 
+def powerset_analysis_comm_api(comm, open_msg): # this function is connected with the comm api on module load (__init__.py)
+    # comm is the kernel Comm instance
+    # open_msg is the comm_open message
+
+    # Register handler for later messages
+    @comm.on_msg
+    def _recv(msg):
+        pipelines = msg['content']['data']['pipelines']
+        scores = msg['content']['data']['scores']
+        analysis = compute_group_importance(pipelines, scores, 2)
+        comm.send({"analysis": analysis})
+
 # Setting up connections to jupyter
 get_ipython().kernel.comm_manager.register_target('merge_graphs_comm_api', merge_graphs_comm_api)
 get_ipython().kernel.comm_manager.register_target('export_pipelines_comm_api', export_pipelines_comm_api)
+get_ipython().kernel.comm_manager.register_target('powerset_analysis_comm_api', powerset_analysis_comm_api)

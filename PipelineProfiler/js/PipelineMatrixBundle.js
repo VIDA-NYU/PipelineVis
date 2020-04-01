@@ -7,14 +7,14 @@ import {select} from "d3-selection";
 import {schemeCategory10} from "d3-scale-chromatic";
 import {Snackbar} from "@material-ui/core";
 
-
 import {
   computePrimitiveImportances,
   constants,
   extractMetric,
   extractMetricNames,
   createHyperparamTableDataFromNode,
-  computePrimitiveHyperparameterData
+  computePrimitiveHyperparameterData,
+  getPrimitiveLabel,
 } from "./helpers";
 
 import MergedGraph from "./MergedGraph";
@@ -39,12 +39,17 @@ export class PipelineMatrixBundle extends Component {
     const sortColumnsBy = constants.sortModuleBy.importance,
       sortRowsBy = constants.sortPipelineBy.pipeline_score;
 
+    const scores = extractMetric(pipelines, metricRequest);
+
     pipelines = this.computeSortedPipelines(pipelines, sortRowsBy, metricRequest);
     moduleNames = this.computeSortedModuleNames(moduleNames, sortColumnsBy, importances, this.props.data.infos);
 
     this.requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
     this.requestExportPipelines = () => {console.error(new Error("Cannot find Jupyter namespace from javascript"))};
+    this.requestPowersetAnalysis = () => {console.error(new Error("Cannot find Jupyter namespace from javascript"))};
     if (window.Jupyter !== undefined) {
+      // "Merge pipelines" connection to jupyter
+
       const commMerge = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {'foo': 6});
 
       this.requestMergeGraph = (pipelines) => {
@@ -55,15 +60,29 @@ export class PipelineMatrixBundle extends Component {
       // Register a handler
       commMerge.on_msg(msg => {
         const mergedGraph = msg.content.data.merged;
-        this.setState({mergedGraph});
+        this.setState({ mergedGraph });
       });
 
+      // "Export pipelines" connection to jupyter
 
       const commExport = Jupyter.notebook.kernel.comm_manager.new_comm('export_pipelines_comm_api', {'foo': 6});
 
       this.requestExportPipelines = (pipelines) => {
-        commExport.send({pipelines});
-      }
+        commExport.send({ pipelines });
+      };
+
+
+      // "Powerset analysis" connection to jupyter
+
+      const commPowerset = Jupyter.notebook.kernel.comm_manager.new_comm('powerset_analysis_comm_api', {'foo': 6});
+      this.requestPowersetAnalysis = (pipelines, scores) => {
+        commPowerset.send({ pipelines, scores })
+      };
+
+      commPowerset.on_msg(msg => {
+        const powersetAnalysis = msg.content.data.analysis;
+        this.setState({ powersetAnalysis })
+      })
     }
 
     this.state = {
@@ -76,6 +95,7 @@ export class PipelineMatrixBundle extends Component {
       metricOptions,
       importances,
       moduleNames,
+      powersetAnalysis: null,
       mergedGraph: null,
       hoveredPrimitive: null,
       expandedPrimitive: null,
@@ -83,8 +103,11 @@ export class PipelineMatrixBundle extends Component {
       sortColumnsDropdownHidden: true,
       sortRowsDropdownHidden: true,
       keepSorted: true,
-      exportedPipelineMessage: false
-    }
+      exportedPipelineMessage: false,
+      highlightPowersetColumns: []
+    };
+
+    this.requestPowersetAnalysis(pipelines, scores);
   }
 
   componentDidCatch(error, info) {
@@ -188,7 +211,7 @@ export class PipelineMatrixBundle extends Component {
 
   render(){
     const {data} = this.props;
-    const {selectedPrimitive, hoveredPrimitive, tooltipPosition, drop, keepSorted, sortColumnsBy, sortRowsBy} = this.state;
+    const {selectedPrimitive, hoveredPrimitive, tooltipPosition, drop, keepSorted, sortColumnsBy, sortRowsBy, powersetAnalysis} = this.state;
     const {sortModuleBy, sortPipelineBy} = constants;
 
     let primitiveName = "";
@@ -254,6 +277,25 @@ export class PipelineMatrixBundle extends Component {
     let tooltip = null;
     if (hoveredPrimitive) {
       tooltip = this.createHyperparamInfo(hoveredPrimitive);
+    }
+
+    let powersetTable = null;
+    if (powersetAnalysis) {
+      const powersetColumns = [
+        {
+          Header: 'Columns',
+          accessor: (d) => d.group.map(getPrimitiveLabel).join(', ')
+        },
+        {
+          Header: 'Importance',
+          accessor: (d) => d.importance
+        }
+      ];
+      powersetTable = <Table
+        columns={powersetColumns}
+        data={powersetAnalysis}
+        onClick={(d) => {this.setState({highlightPowersetColumns: d.group})}}
+      />
     }
 
     return <div ref={ref=>{this.ref = ref}}>
@@ -473,6 +515,7 @@ export class PipelineMatrixBundle extends Component {
       {primitiveHyperparamsView}
       <div style={{height: 100, width:"100%"}}/>
       </div>
+      {powersetTable}
       <Snackbar open={this.state.exportedPipelineMessage} onClose={() => {this.setState({exportedPipelineMessage: false})}}
                 message={"Pipelines exported. Access with `PipelineProfiler.get_exported_pipelines()`"}
                 autoHideDuration={6000}
