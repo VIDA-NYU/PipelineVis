@@ -45,7 +45,18 @@ class CombinatorialImportanceMatrix extends PureComponent{
           <div>Importance</div>
           <div><_HorizontalAxis width={width}/></div>
         </div>,
-        accessor: (d) => <div style={{marginLeft: margin, width: width - 2*margin, display: 'flex', marginRight: 0, marginTop:0, marginBottom: 0, padding: 0}}>
+        accessor: (d) => <div
+          style={{
+            marginLeft: margin,
+            width: width - 2*margin,
+            display: 'flex',
+            marginRight: 0,
+            marginTop:0,
+            marginBottom: 0,
+            padding: 0
+          }}
+          title={d.importance}
+        >
           <div style={{width: width/2}}>
             {d.importance < 0 ?
               <div style={{display: 'flex'}}>
