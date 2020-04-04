@@ -5,7 +5,8 @@ import SolutionGraph from "./SolutionGraph";
 import {scaleOrdinal} from "d3-scale";
 import {select} from "d3-selection";
 import {schemeCategory10} from "d3-scale-chromatic";
-import {Snackbar} from "@material-ui/core";
+import {Snackbar, Button, Checkbox, FormControlLabel, IconButton} from "@material-ui/core";
+import CombinatorialImportanceMatrix from "./CombinatorialImportanceMatrix";
 
 import {
   computePrimitiveImportances,
@@ -21,7 +22,6 @@ import MergedGraph from "./MergedGraph";
 import Table from "./Table";
 import {MyDropdown} from "./MyDropdown";
 
-import {Checkbox, FormControlLabel, IconButton} from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 
 const newSchemeCategory10 = schemeCategory10;
@@ -38,8 +38,6 @@ export class PipelineMatrixBundle extends Component {
     const importances = computePrimitiveImportances(props.data.infos, props.data.pipelines, metricRequest);
     const sortColumnsBy = constants.sortModuleBy.importance,
       sortRowsBy = constants.sortPipelineBy.pipeline_score;
-
-    const scores = extractMetric(pipelines, metricRequest);
 
     pipelines = this.computeSortedPipelines(pipelines, sortRowsBy, metricRequest);
     moduleNames = this.computeSortedModuleNames(moduleNames, sortColumnsBy, importances, this.props.data.infos);
@@ -107,7 +105,6 @@ export class PipelineMatrixBundle extends Component {
       highlightPowersetColumns: []
     };
 
-    this.requestPowersetAnalysis(pipelines, scores);
   }
 
   componentDidCatch(error, info) {
@@ -291,19 +288,8 @@ export class PipelineMatrixBundle extends Component {
 
     let powersetTable = null;
     if (powersetAnalysis) {
-      const powersetColumns = [
-        {
-          Header: 'Columns',
-          accessor: (d) => d.group.map(getPrimitiveLabel).join(', ')
-        },
-        {
-          Header: 'Importance',
-          accessor: (d) => d.importance
-        }
-      ];
-      powersetTable = <Table
-        columns={powersetColumns}
-        data={powersetAnalysis}
+      powersetTable = <CombinatorialImportanceMatrix
+        powersetAnalysis={powersetAnalysis}
         onClick={(d) => {this.setState({highlightPowersetColumns: d.group})}}
       />
     }
@@ -405,6 +391,26 @@ export class PipelineMatrixBundle extends Component {
           ]}
         />
 
+        <div style={{marginLeft: 10}}/>
+        <MyDropdown
+          buttonText={"Combinatorial Analysis"}
+          options={[
+            {
+              name: 'Run',
+              action: () => {
+                const scores = extractMetric(this.state.pipelines, this.state.metricRequest);
+                this.requestPowersetAnalysis(this.state.pipelines, scores);
+              }
+            },
+            {
+              name: 'Clear',
+              action: () => {
+                this.setState({ powersetAnalysis: null, highlightPowersetColumns: [] })
+              }
+            }
+          ]}
+        />
+
         <div style={{marginLeft: 10, marginTop: -4}}>
         <FormControlLabel
           control={
@@ -440,6 +446,7 @@ export class PipelineMatrixBundle extends Component {
         </div>
       </div>
 
+      {powersetTable}
 
       <PipelineMatrix
         data={data}
@@ -524,7 +531,6 @@ export class PipelineMatrixBundle extends Component {
       {primitiveHyperparamsView}
       <div style={{height: 100, width:"100%"}}/>
       </div>
-      {powersetTable}
       <Snackbar open={this.state.exportedPipelineMessage} onClose={() => {this.setState({exportedPipelineMessage: false})}}
                 message={"Pipelines exported. Access with `PipelineProfiler.get_exported_pipelines()`"}
                 autoHideDuration={6000}

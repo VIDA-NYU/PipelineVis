@@ -12,8 +12,8 @@ class Table extends PureComponent {
     return <table>
         <tbody>
         <tr>
-          {columns.map(column => {
-            return <th key={column.Header}>{column.Header}</th>
+          {columns.map((column, idx) => {
+            return <th key={idx}>{column.Header}</th>
           })}
         </tr>
         {data.map((row, idx) => (
@@ -33,7 +33,7 @@ class Table extends PureComponent {
 Table.propTypes = {
   data: PropTypes.array.isRequired,
   columns: PropTypes.arrayOf(PropTypes.shape({
-    Header: PropTypes.string,
+    Header: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     accessor: PropTypes.func.isRequired,
   })).isRequired,
   onClick: PropTypes.func,
