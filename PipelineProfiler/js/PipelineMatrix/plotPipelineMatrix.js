@@ -243,18 +243,22 @@ export function plotPipelineMatrix(ref,
     .selectAll("rect")
     .data(x => x, x => x) // loading data with identity function
     .join(
-      enter => enter
-        .append("rect")
-        .attr("x", x => colScale(x) + 2)
-        .attr("y", x => importances[x] > 0 ?
-          halfImportanceHeight - importanceScale(importances[x])
-          : halfImportanceHeight
-        )
-        .attr("width", colScale.bandwidth() - 4)
-        .attr("height", x => importances[x] > 0 ?
-          importanceScale(importances[x])
-          : importanceScale(-importances[x])
-        ),
+      enter => {
+        const rect = enter
+          .append("rect")
+          .attr("x", x => colScale(x) + 2)
+          .attr("y", x => importances[x] > 0 ?
+            halfImportanceHeight - importanceScale(importances[x])
+            : halfImportanceHeight
+          )
+          .attr("width", colScale.bandwidth() - 4)
+          .attr("height", x => importances[x] > 0 ?
+            importanceScale(importances[x])
+            : importanceScale(-importances[x])
+          );
+        rect.append("title");
+        return rect;
+      },
       update => update
         .call(update => {
             return update.transition(t)
@@ -271,6 +275,9 @@ export function plotPipelineMatrix(ref,
           }
         )
     );
+
+  moduleImportanceBars.selectAll("title")
+    .text(x => importances[x]);
 
   let moduleImportanceAxis = svg.selectAll(".axisImportance")
     .data([1], x => x)
@@ -415,11 +422,15 @@ export function plotPipelineMatrix(ref,
     .selectAll("rect")
     .data(x => x, x => x.pipeline_digest)
     .join(
-      enter => enter
-        .append("rect")
-        .attr("transform", x => `translate(0, ${rowScale(x.pipeline_digest) + 3})`)
-        .attr("width", (x) => scoreScale(x.score))
-        .attr("height", rowScale.bandwidth() - 4),
+      enter => {
+        const rect = enter
+          .append("rect")
+          .attr("transform", x => `translate(0, ${rowScale(x.pipeline_digest) + 3})`)
+          .attr("width", (x) => scoreScale(x.score))
+          .attr("height", rowScale.bandwidth() - 4)
+        rect.append("title");
+        return rect;
+      },
       update => update
         .call(update => update.transition(t)
           .attr("transform", x => `translate(0, ${rowScale(x.pipeline_digest) + 3})`)
@@ -427,6 +438,9 @@ export function plotPipelineMatrix(ref,
           .attr("height", rowScale.bandwidth() - 4)
         )
     );
+
+  pipelineScoreBars.selectAll("title")
+    .text(x => x.score);
 
   pipelineScoreBars
     .selectAll("text")
