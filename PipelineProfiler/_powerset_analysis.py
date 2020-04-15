@@ -28,7 +28,7 @@ def extract_scores(pipelines):
     return scores
 
 
-def compute_group_importance(pipelines, scores, up_to_k=3):
+def compute_group_importance(pipelines, scores, up_to_k=5):
     primitive_matrix, primitives = extract_primitive_matrix(pipelines)
     column_idx_map = {p: idx for idx, p  in enumerate(primitives)}
     importances = {}
