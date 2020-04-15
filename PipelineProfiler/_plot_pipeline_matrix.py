@@ -81,7 +81,7 @@ def rename_pipelines(pipelines):
     sourceMap = defaultdict(lambda: 1)
     for pipeline in pipelines:
         source = pipeline['pipeline_source']['name']
-        pipeline['pipeline_source']['name'] = '{} #{:02}'.format(source, sourceMap[source])
+        pipeline['pipeline_source']['name'] = '{} #{}'.format(source, sourceMap[source])
         sourceMap[source] += 1
 
 
