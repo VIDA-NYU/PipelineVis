@@ -138,13 +138,7 @@ export class PipelineMatrixBundle extends Component {
         } else if (bsource > asource){
           return -1;
         } else{
-          if (asplit.length > 0 && bsplit.length > 0){
-            const anum = +asplit[1];
-            const bnum = +bsplit[1];
-            return anum - bnum;
-          } else{
-            return 0;
-          }
+          return 0
         }
       });
     }
