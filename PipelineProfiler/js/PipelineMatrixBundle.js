@@ -565,6 +565,11 @@ export class PipelineMatrixBundle extends Component {
           }
         }}
         highlightPowersetColumns={highlightPowersetColumns}
+        onReversePipelinesClick={() => {
+          let newPipelines = [...this.state.pipelines];
+          newPipelines.reverse();
+          this.setState({pipelines: newPipelines});
+        }}
       />
       {tooltip}
       <div onMouseMove={()=>{this.cleanMouseOver()}}>

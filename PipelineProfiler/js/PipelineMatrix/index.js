@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import {plotPipelineMatrix, computePipelineMatrixWidthHeight} from "./plotPipelineMatrix";
 import "./pipelineMatrix.css";
 import {constants} from "../helpers";
-
+import ImportExportIcon from '@material-ui/icons/ImportExport';
+import IconButton from '@material-ui/core/IconButton';
 export class PipelineMatrix extends Component {
-
   constructor(props) {
     super(props);
+    this.state = {
+    };
   }
 
   display(props){
@@ -41,13 +43,13 @@ export class PipelineMatrix extends Component {
       expandedPrimitiveData,
       expandedPrimitiveName,
       metricRequest,
-      highlightPowersetColumns
+      highlightPowersetColumns,
     );
   }
 
   shouldComponentUpdate(newprops, newstate){
     if (newprops.moduleNames.length !== this.props.moduleNames.length ||
-      this.props.pipelines.length !== newprops.pipelines.length ||
+      this.props.pipelines !== newprops.pipelines ||
       this.props.expandedPrimitiveData !== newprops.expandedPrimitiveData) {
       return true;
     } else {
@@ -94,6 +96,20 @@ export class PipelineMatrix extends Component {
             })
           }
         </select>
+        <div
+          style={{
+            position: 'absolute',
+            left: constants.margin.left + constants.pipelineNameWidth + constants.cellWidth * moduleNames.length + paddingHyperparamColsWidth + constants.pipelineScoreWidth,
+            top: constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight - 25,
+            width: 25,
+            height: 25,
+          }}
+          onClick={() => {
+            this.props.onReversePipelinesClick();
+          }}
+        >
+          <ImportExportIcon fontSize={"large"} style={{ color: "#6d6d6d" }}/>
+        </div>
       </div>;
   }
 }
@@ -122,5 +138,6 @@ PipelineMatrix.propTypes = {
   metricOptions: PropTypes.array.isRequired,
   sortRowBy: PropTypes.string,
   moduleNames: PropTypes.array.isRequired,
-  highlightPowersetColumns: PropTypes.array
+  highlightPowersetColumns: PropTypes.array,
+  onReversePipelinesClick: PropTypes.func
 };
