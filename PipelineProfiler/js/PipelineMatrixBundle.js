@@ -440,12 +440,13 @@ export class PipelineMatrixBundle extends Component {
               action: () => {
                 const scores = extractMetric(this.state.pipelines, this.state.metricRequest);
                 this.requestPowersetAnalysis(this.state.pipelines, scores);
+                this.setState({expandedPrimitive: null, expandedPrimitiveData: null});
               }
             },
             {
               name: 'Clear',
               action: () => {
-                this.setState({ powersetAnalysis: null, highlightPowersetColumns: [] })
+                this.setState({ powersetAnalysis: null, highlightPowersetColumns: [], expandedPrimitive: null, expandedPrimitiveData: null })
               }
             }
           ]}
