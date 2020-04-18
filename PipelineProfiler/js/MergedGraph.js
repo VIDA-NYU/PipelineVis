@@ -115,17 +115,17 @@ class MergedGraph extends PureComponent {
                 g.node(n).width / 2},${g.node(n).y - g.node(n).height / 2})`}
               >
                 <foreignObject
-                  width={g.node(n).width}
-                  height={g.node(n).height}
+                  width={g.node(n).width + "px"}
+                  height={g.node(n).height + "px"}
                   requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"
                 >
-                  <div>
                     {
                       g.node(n).data.map((node, idx) => {
+                        // Adding colorbars that identify source.
                         const sourceBarWidth = nodeDimentions.width/node.origins.length;
                         let sourceBars = null;
                         if (node.origins.length < selectedPipelinesColorScale.domain().length){
-                          sourceBars = <div style={{display: 'flex', width:nodeDimentions.width, height: 5}}>
+                          sourceBars = <div style={{display: 'flex', width:nodeDimentions.width + "px", height: 5 + "px"}}>
                             {
                               node.origins.map(origin => {
                                 return <div key={origin}
@@ -140,17 +140,18 @@ class MergedGraph extends PureComponent {
                           </div>;
                         }
 
-                        return <div key={idx}>
+                        return <div key={idx} style={{width: nodeDimentions.width, height: nodeDimentions.height}}>
                             {sourceBars}
                           <div
                             style={{
-                              position: 'relative',
+                              boxSizing: 'border-box',
                               textAlign: 'center',
                               fontSize: '10px',
                               display: 'flex',
                               justifyContent: 'center',
                               alignItems: 'center',
                               height: (nodeDimentions.height - 5) + "px",
+                              width: nodeDimentions.width + "px",
                               border: 'solid 1px black',
                               borderColor: '#c6c6c6',
                               padding: '5px',
@@ -161,7 +162,6 @@ class MergedGraph extends PureComponent {
                         </div>
                       })
                     }
-                  </div>
                 </foreignObject>
               </g>
             })}
