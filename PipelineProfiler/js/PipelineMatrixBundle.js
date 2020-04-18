@@ -309,6 +309,29 @@ export class PipelineMatrixBundle extends Component {
       />
     }
 
+    const updateMetric = (pipelines) => {
+      const importances = computePrimitiveImportances(this.props.data.infos, pipelines, this.state.metricRequest);
+
+      if (keepSorted) {
+        if (sortColumnsBy === sortModuleBy.importance){
+          const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.importance, importances, this.props.data.infos);
+          this.setState({moduleNames: newModuleNames});
+        }else if (sortColumnsBy === sortModuleBy.moduleType) {
+          const newModuleNames = this.computeSortedModuleNames(this.state.moduleNames, sortModuleBy.moduleType, importances, this.props.data.infos);
+          this.setState({moduleNames: newModuleNames});
+        }
+
+        if (sortRowsBy === sortPipelineBy.pipeline_score){
+          const newPipelines = this.computeSortedPipelines(pipelines, sortPipelineBy.pipeline_score, this.state.metricRequest);
+          this.setState({pipelines: newPipelines});
+        } else if (sortRowsBy === sortPipelineBy.pipeline_source){
+          const newPipelines = this.computeSortedPipelines(pipelines, sortPipelineBy.pipeline_source, this.state.metricRequest);
+          this.setState({pipelines: newPipelines});
+        }
+      }
+      this.setState({importances});
+    };
+
     return <div ref={ref=>{this.ref = ref}}>
       <div style={{display: 'flex'}}>
 
@@ -322,6 +345,7 @@ export class PipelineMatrixBundle extends Component {
                   const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
                   return typeof found === 'undefined';
                 });
+                updateMetric(newPipelines);
                 this.setState({pipelines: newPipelines, selectedPipelines: []});
               }
             },
@@ -332,6 +356,7 @@ export class PipelineMatrixBundle extends Component {
                   const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
                   return typeof found !== 'undefined';
                 });
+                updateMetric(newPipelines);
                 this.setState({pipelines: newPipelines, selectedPipelines: []});
               }
             }
