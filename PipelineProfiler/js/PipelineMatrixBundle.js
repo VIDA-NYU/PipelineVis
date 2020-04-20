@@ -359,7 +359,6 @@ export class PipelineMatrixBundle extends Component {
 
                 const usedPrimitives = getUsedPrimitives(newPipelines);
                 let newModuleNames = this.state.moduleNames.filter(name => name in usedPrimitives);
-
                 const importances = updateMetric(newPipelines);
                 newModuleNames = this.computeSortedModuleNames(newModuleNames, this.state.sortColumnsBy, importances, this.props.data.infos);
                 this.setState({pipelines: newPipelines, selectedPipelines: [], moduleNames: newModuleNames});
@@ -374,7 +373,6 @@ export class PipelineMatrixBundle extends Component {
                 });
                 const usedPrimitives = getUsedPrimitives(newPipelines);
                 let newModuleNames = this.state.moduleNames.filter(name => name in usedPrimitives);
-
                 const importances = updateMetric(newPipelines);
                 newModuleNames = this.computeSortedModuleNames(newModuleNames, this.state.sortColumnsBy, importances, this.props.data.infos);
                 this.setState({pipelines: newPipelines, selectedPipelines: [], moduleNames: newModuleNames});
