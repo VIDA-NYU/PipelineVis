@@ -90,6 +90,11 @@ export function plotPipelineMatrix(ref,
     .style("width", svgWidth + "px")
     .style("height", svgHeight + "px");
 
+  const plottedPipelineNameLength = svg.selectAll(".legendPipelineSourceGroup").selectAll("text").size();
+  if (plottedPipelineNameLength !== pipelines.length){
+    svg.selectAll("*").remove();
+  }
+
   const colScale = scaleBand()
     .domain(moduleNames)
     .range([0, moduleNames.length * constants.cellWidth])
@@ -180,11 +185,12 @@ export function plotPipelineMatrix(ref,
       enter => enter
         .append("line")
         .attr("class", "row")
-        .attr("x1", 0)
-        .attr("y1", (x) => rowScale(x.pipeline_digest) + bandOver2)
-        .attr("x2", constants.cellWidth * moduleNames.length)
-        .attr("y2", (x) => rowScale(x.pipeline_digest) + bandOver2)
-    );
+
+    )
+    .attr("x1", 0)
+    .attr("y1", (x) => rowScale(x.pipeline_digest) + bandOver2)
+    .attr("x2", constants.cellWidth * moduleNames.length)
+    .attr("y2", (x) => rowScale(x.pipeline_digest) + bandOver2);
 
   guideLinesGroup
     .selectAll(".col")
@@ -289,11 +295,11 @@ export function plotPipelineMatrix(ref,
       ${constants.margin.top + constants.moduleNameHeight})`)
     );
 
-  let axisObject = axisLeft()
+  let importanceAxisObject = axisLeft()
     .ticks(5)
     .scale(importanceScaleVisible);
 
-  moduleImportanceAxis.call(axisObject);
+  moduleImportanceAxis.call(importanceAxisObject);
 
   const zeroLineHeight = constants.margin.top + constants.moduleNameHeight + halfImportanceHeight;
 
@@ -303,13 +309,13 @@ export function plotPipelineMatrix(ref,
       enter => enter
         .append("line")
         .attr("class", "zeroLine")
-        .attr("x1", constants.margin.left + constants.pipelineNameWidth)
-        .attr("x2", constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth)
-        .attr("y1", zeroLineHeight)
-        .attr("y2", zeroLineHeight)
         .style("stroke", "#bababa")
         .style("stroke-width", 1)
-    );
+    )
+    .attr("x1", constants.margin.left + constants.pipelineNameWidth)
+    .attr("x2", constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth)
+    .attr("y1", zeroLineHeight)
+    .attr("y2", zeroLineHeight);
 
   const moduleNameGroups = svg.selectAll(".moduleNameGroup")
     .data(moduleNames, x => x)
@@ -460,12 +466,12 @@ export function plotPipelineMatrix(ref,
     );
 
   const legendPipelineSourceGroup = svg
-    .selectAll("#legendPipelineSourceGroup")
+    .selectAll(".legendPipelineSourceGroup")
     .data([pipelines])
     .join(
       enter => enter
         .append("g")
-        .attr("id", "legendPipelineSourceGroup")
+        .attr("class", "legendPipelineSourceGroup")
         .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth}, ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight + bandOver2})`)
     );
 

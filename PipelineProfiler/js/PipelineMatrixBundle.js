@@ -309,6 +309,16 @@ export class PipelineMatrixBundle extends Component {
       />
     }
 
+    const getUsedPrimitives = (pipelines) => {
+      const primitives = {};
+      pipelines.forEach(pipeline => {
+        pipeline['steps'].forEach(step => {
+          primitives[step['primitive']['python_path']] = true;
+        });
+      });
+      return primitives;
+    };
+
     const updateMetric = (pipelines) => {
       const importances = computePrimitiveImportances(this.props.data.infos, pipelines, this.state.metricRequest);
 
@@ -330,6 +340,7 @@ export class PipelineMatrixBundle extends Component {
         }
       }
       this.setState({importances});
+      return importances;
     };
 
     return <div ref={ref=>{this.ref = ref}}>
@@ -345,8 +356,13 @@ export class PipelineMatrixBundle extends Component {
                   const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
                   return typeof found === 'undefined';
                 });
-                updateMetric(newPipelines);
-                this.setState({pipelines: newPipelines, selectedPipelines: []});
+
+                const usedPrimitives = getUsedPrimitives(newPipelines);
+                let newModuleNames = this.state.moduleNames.filter(name => name in usedPrimitives);
+
+                const importances = updateMetric(newPipelines);
+                newModuleNames = this.computeSortedModuleNames(newModuleNames, this.state.sortColumnsBy, importances, this.props.data.infos);
+                this.setState({pipelines: newPipelines, selectedPipelines: [], moduleNames: newModuleNames});
               }
             },
             {
@@ -356,8 +372,12 @@ export class PipelineMatrixBundle extends Component {
                   const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
                   return typeof found !== 'undefined';
                 });
-                updateMetric(newPipelines);
-                this.setState({pipelines: newPipelines, selectedPipelines: []});
+                const usedPrimitives = getUsedPrimitives(newPipelines);
+                let newModuleNames = this.state.moduleNames.filter(name => name in usedPrimitives);
+
+                const importances = updateMetric(newPipelines);
+                newModuleNames = this.computeSortedModuleNames(newModuleNames, this.state.sortColumnsBy, importances, this.props.data.infos);
+                this.setState({pipelines: newPipelines, selectedPipelines: [], moduleNames: newModuleNames});
               }
             }
           ]}
