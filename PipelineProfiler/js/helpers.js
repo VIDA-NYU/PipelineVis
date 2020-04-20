@@ -212,6 +212,11 @@ export function computePrimitiveHyperparameterData(pipelines, pythonPath){
   let unique_checker = {};
   let allHyperparamsHeader = {};
 
+  const skipHyperparams = {};
+  constants.skipHyperparameters.forEach(h => {
+    skipHyperparams[h] = true;
+  });
+
   pipelines.forEach(pipeline => {
     pipeline.steps.forEach(step => {
       const python_path = step.primitive.python_path;
@@ -219,19 +224,21 @@ export function computePrimitiveHyperparameterData(pipelines, pythonPath){
       if (python_path === pythonPath){
         if ('hyperparams' in step){
           Object.keys(step.hyperparams).forEach(hyperparamKey => {
-            const value  = accessHyperparamValue(step.hyperparams[hyperparamKey]);
-            const unique_key = pipeline_digest + hyperparamKey + value;
-            const header_key = createHyperparamTxtDesc(hyperparamKey, value);
-            allHyperparamsHeader[header_key] = true;
-            if (!(unique_key in unique_checker)){
-              stepSamples.push({
-                pipeline_digest: pipeline_digest,
-                hyperparam: hyperparamKey,
-                value,
-                unique_key,
-                header_key,
-              });
-              unique_checker[unique_key] = true;
+            if (!(hyperparamKey in skipHyperparams)) {
+              const value = accessHyperparamValue(step.hyperparams[hyperparamKey]);
+              const unique_key = pipeline_digest + hyperparamKey + value;
+              const header_key = createHyperparamTxtDesc(hyperparamKey, value);
+              allHyperparamsHeader[header_key] = true;
+              if (!(unique_key in unique_checker)) {
+                stepSamples.push({
+                  pipeline_digest: pipeline_digest,
+                  hyperparam: hyperparamKey,
+                  value,
+                  unique_key,
+                  header_key,
+                });
+                unique_checker[unique_key] = true;
+              }
             }
           });
         }
