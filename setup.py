@@ -6,4 +6,10 @@ setup(
     version="0.1",
     packages=find_packages(exclude=['js', 'node_modules']),
     include_package_data=True,
+    install_requires=[
+        "numpy",
+        "scipy",
+        "scikit-learn",
+        "networkx",
+    ]
 )

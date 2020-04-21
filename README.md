@@ -7,7 +7,7 @@ D3M Pipeline Profiler tool.
 ## Install
 Run:
 ~~~~
-python setup.py install
+pip install .
 ~~~~
 
 ## Data preprocessing
