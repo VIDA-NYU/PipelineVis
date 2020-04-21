@@ -180,6 +180,9 @@ def powerset_analysis_comm_api(comm, open_msg): # this function is connected wit
         comm.send({"analysis": analysis})
 
 # Setting up connections to jupyter
-get_ipython().kernel.comm_manager.register_target('merge_graphs_comm_api', merge_graphs_comm_api)
-get_ipython().kernel.comm_manager.register_target('export_pipelines_comm_api', export_pipelines_comm_api)
-get_ipython().kernel.comm_manager.register_target('powerset_analysis_comm_api', powerset_analysis_comm_api)
+try:
+    get_ipython().kernel.comm_manager.register_target('merge_graphs_comm_api', merge_graphs_comm_api)
+    get_ipython().kernel.comm_manager.register_target('export_pipelines_comm_api', export_pipelines_comm_api)
+    get_ipython().kernel.comm_manager.register_target('powerset_analysis_comm_api', powerset_analysis_comm_api)
+except Exception as e:
+    pass
