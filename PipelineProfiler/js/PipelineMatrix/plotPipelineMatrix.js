@@ -232,9 +232,15 @@ export function plotPipelineMatrix(ref,
         ));
 
 
+  let importanceModuleNamesImportanceBars = [];
+
+  if (importanceScale.domain()[0] !== importanceScale.domain()[1]){
+    importanceModuleNamesImportanceBars = moduleNames;
+  }
+
   const moduleImportanceBars = svg
     .selectAll("#module_importance_bars")
-    .data([moduleNames])
+    .data([importanceModuleNamesImportanceBars])
     .join(
       enter => enter
         .append("g")
