@@ -5,9 +5,25 @@
 D3M Pipeline Profiler tool.
 
 ## Install
-Run:
+
+### Option 1: Build and install via pip:
 ~~~~
+cd PipelineProfiler
+npm install
+npm run build
+cd ..
 pip install .
+~~~~
+
+### Option 2: Run the docker image:
+~~~~
+docker build -t pipelineprofiler
+docker run -p 9999:8888 pipelineprofiler
+~~~~
+
+Then copy the access token and log in to jupyter in the browser url:
+~~~~
+localhost:9999
 ~~~~
 
 ## Data preprocessing

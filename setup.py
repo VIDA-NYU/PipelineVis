@@ -11,5 +11,6 @@ setup(
         "scipy",
         "scikit-learn",
         "networkx",
+        "notebook"
     ]
 )
