@@ -347,7 +347,7 @@ export class PipelineMatrixBundle extends Component {
       <div style={{display: 'flex'}}>
 
         <MyDropdown
-          buttonText={"Edit"}
+          buttonText={"Subset"}
           options={[
             {
               name: 'Remove selected',
