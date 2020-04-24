@@ -104,7 +104,7 @@ function JSONStringReplacer(key, value) {
 }
 
 
-export function extractMetric (pipelines, scoreRequest) { // scoreRequest: {type: constants.scoreRequest, name: str}
+export function extractMetric (pipelines, scoreRequest, scoreType= constants.scoreType.VALUE) { // scoreRequest: {type: constants.scoreRequest, name: str}
   if (scoreRequest['type'] === constants.scoreRequest.TIME){
     return pipelines.map(p => (new Date(p['end']) - new Date(p['start'])) / 1000);
   } else if (scoreRequest['type'] === constants.scoreRequest.D3MSCORE) {
@@ -117,7 +117,7 @@ export function extractMetric (pipelines, scoreRequest) { // scoreRequest: {type
     if (idxScore === -1) {
       return null;
     }
-    return pipelines.map(p => p['scores'][idxScore]['value']);
+    return pipelines.map(p => p['scores'][idxScore][scoreType]);
   }
 }
 
@@ -300,6 +300,10 @@ moduleTypeOrder.forEach((x, idx) => {
 export const constants = {
   moduleTypeOrder,
   moduleTypeOrderMap,
+  scoreType: {
+    VALUE: 'value',
+    NORMALIZED: 'normalized'
+  },
   scoreRequest: {
     TIME: 'TIME',
     D3MSCORE: 'D3MSCORE'

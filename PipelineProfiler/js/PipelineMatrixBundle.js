@@ -113,7 +113,7 @@ export class PipelineMatrixBundle extends Component {
   }
 
   computeSortedPipelines(pipelines, sortPipelinesBy, metricRequest){
-    const selectedScores = extractMetric(pipelines, metricRequest);
+    const selectedScores = extractMetric(pipelines, metricRequest, constants.scoreType.NORMALIZED);
     const selectedScoresDigests = selectedScores.map((score, idx) => ({score, pipeline_digest: pipelines[idx].pipeline_digest}));
     const selectedScoresDigestsMap = {};
     selectedScoresDigests.forEach(x => {
