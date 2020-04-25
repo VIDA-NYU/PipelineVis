@@ -38,7 +38,20 @@ class CombinatorialImportanceMatrix extends PureComponent{
     const powersetColumns = [
       {
         Header: 'Columns',
-        accessor: (d) => d.group.map(getPrimitiveLabel).join(', ')
+        accessor: (d) => <div style={{display: "flex"}}>
+          {d.group.map(getPrimitiveLabel).map(x=>
+            <div
+              style={{
+              padding: 5,
+              borderRadius: 5,
+              marginLeft: 10,
+              backgroundColor: "#8f8f8f",
+              color: "#FFFFFF"
+            }}
+             key={x}
+            >{x}</div>
+          )}
+        </div>
       },
       {
         Header: <div>
