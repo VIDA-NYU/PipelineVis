@@ -283,6 +283,7 @@ export class PipelineMatrixBundle extends Component {
             onClick={node => {
               this.setState({selectedPrimitive: node})
             }}
+            key={this.state.selectedPipelines[0].pipeline_digest}
           />
         </>;
       } else { //(this.state.selectedPipelines.length > 1)
@@ -290,6 +291,7 @@ export class PipelineMatrixBundle extends Component {
           pipelineGraph = <MergedGraph
             merged={this.state.mergedGraph}
             selectedPipelinesColorScale={this.state.selectedPipelinesColorScale}
+            key={this.state.selectedPipelines.map(x = x.pipeline_digest).join('')}
           />;
         }
       }
