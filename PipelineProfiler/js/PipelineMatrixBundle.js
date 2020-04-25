@@ -125,21 +125,21 @@ export class PipelineMatrixBundle extends Component {
       newPipelines.sort((a, b) => selectedScoresDigestsMap[b.pipeline_digest] - selectedScoresDigestsMap[a.pipeline_digest]);
     } else if (sortPipelinesBy === constants.sortPipelineBy.pipeline_source){
       newPipelines.sort((a, b) => selectedScoresDigestsMap[b.pipeline_digest] - selectedScoresDigestsMap[a.pipeline_digest]);
+      let curIdx = 0;
+      let pipelineSourceOrder = {};
+      newPipelines.forEach(pipeline => {
+        const sourcename = pipeline.pipeline_source.name.split("#")[0];
+        if (!(sourcename in pipelineSourceOrder)){
+          pipelineSourceOrder[sourcename] = curIdx;
+          curIdx += 1;
+        }
+      });
       newPipelines.sort((a, b) => {
         const aname = a.pipeline_source.name;
         const bname = b.pipeline_source.name;
-        const asplit = aname.split("#");
-        const bsplit = bname.split("#");
-        const asource = asplit[0];
-        const bsource = bsplit[0];
-
-        if (asource > bsource){
-          return 1;
-        } else if (bsource > asource){
-          return -1;
-        } else{
-          return 0
-        }
+        const asource = aname.split("#")[0];
+        const bsource = bname.split("#")[0];
+        return pipelineSourceOrder[asource] - pipelineSourceOrder[bsource]
       });
     }
     return newPipelines;
