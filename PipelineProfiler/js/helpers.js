@@ -165,7 +165,7 @@ export function getPrimitiveLabel(python_path) {
 
 export function computePrimitiveImportances(infos, pipelines, scoreRequest) {
   const primitiveNames = Object.keys(infos);
-  const scores = extractMetric(pipelines, scoreRequest);
+  const scores = extractMetric(pipelines, scoreRequest, constants.scoreType.NORMALIZED);
 
   const hashTable = computePipelinePrimitiveHashTable(pipelines);
   const primitiveImportances = {};
