@@ -291,7 +291,7 @@ export class PipelineMatrixBundle extends Component {
           pipelineGraph = <MergedGraph
             merged={this.state.mergedGraph}
             selectedPipelinesColorScale={this.state.selectedPipelinesColorScale}
-            key={this.state.selectedPipelines.map(x = x.pipeline_digest).join('')}
+            key={this.state.selectedPipelines.map(x => x.pipeline_digest).join('')}
           />;
         }
       }
