@@ -100,7 +100,7 @@ export class PipelineMatrixBundle extends Component {
       expandedPrimitiveData: null,
       sortColumnsDropdownHidden: true,
       sortRowsDropdownHidden: true,
-      keepSorted: true,
+      keepSorted: false,
       exportedPipelineMessage: false,
       highlightPowersetColumns: []
     };
