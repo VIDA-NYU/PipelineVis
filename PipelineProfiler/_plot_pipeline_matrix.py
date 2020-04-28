@@ -90,7 +90,7 @@ def transform_module_type(module_type):
         'feature_extraction': 'Feature Extraction',
         'learner': 'Classification',
         'normalization': 'Preprocessing',
-        'feature_construction': 'Feature Extraction',
+        'feature_construction': 'Feature Selection',
         'classification': 'Classification',
         'data_transformation': 'Preprocessing',
         'schema_discovery': 'Preprocessing',
