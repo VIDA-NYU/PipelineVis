@@ -287,6 +287,7 @@ class ModuleTypeOrder {
   constructor() {
     this.moduleTypeOrder = [
       "Preprocessing",
+      "Feature Selection",
       "NLP",
       "Feature Extraction",
       "Operator",
