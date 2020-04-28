@@ -199,7 +199,7 @@ function accessHyperparamValue(hyperparam) {
       break;
     }
   }
-  return JSON.stringify(data).replace(/"/g, '')
+  return JSON.stringify(data, JSONStringReplacer).replace(/"/g, '')
     .replace(/https:\/\/metadata.datadrivendiscovery.org\/types\//g, "");;
 }
 

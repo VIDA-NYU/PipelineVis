@@ -386,7 +386,7 @@ export function plotPipelineMatrix(ref,
     .attr("x", -5)
     .attr("y", -15)
     .text("Primitive Type")
-    .style("fill", "#9a9a9a")
+    .style("fill", "#656565")
     .style("font-weight", "bold");
 
   const lengendRowGroup = legendModuleType
@@ -413,7 +413,7 @@ export function plotPipelineMatrix(ref,
     .attr("x", 14)
     .attr("y", 10)
     .text(x => x)
-    .style("fill", "#9a9a9a");
+    .style("fill", "#656565");
 
 
   const pipelineScoreBars = svg
