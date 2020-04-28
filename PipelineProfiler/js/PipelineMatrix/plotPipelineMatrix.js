@@ -1,5 +1,5 @@
 import "d3-selection";
-import {select, event, mouse} from "d3-selection";
+import {select, selectAll, event, mouse} from "d3-selection";
 import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
 import {extent} from "d3-array";
 import {constants, extractMetric, getPrimitiveLabel} from "../helpers";
@@ -77,7 +77,7 @@ export function plotPipelineMatrix(ref,
                                    highlightPowersetColumns) {
 
   const {infos, module_types: moduleTypes} = data;
-  const {moduleTypeOrder, moduleTypeOrderMap} = constants;
+  const {moduleTypeOrder} = constants;
   const selectedScores = extractMetric(pipelines, metricRequest);
   const selectedScoresDigests = selectedScores.map((score, idx) => ({
     score,
@@ -158,7 +158,7 @@ export function plotPipelineMatrix(ref,
   });
 
   const usedModuleTypes = Object.keys(_usedModuleTypesObj);
-  usedModuleTypes.sort((a,b) => moduleTypeOrderMap[a] - moduleTypeOrderMap[b]);
+  usedModuleTypes.sort((a,b) => moduleTypeOrder.get_order(a) -  moduleTypeOrder.get_order(b));
 
   const shapeScale = scaleOrdinal()
     .range(mySymbols.map(s => symbol()
@@ -369,6 +369,8 @@ export function plotPipelineMatrix(ref,
 
   const paddingHyperparamColsWidth = expandedPrimitiveData ? expandedPrimitiveData.orderedHeader.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam : 0;
 
+  selectAll(".legend_module_type").selectAll("*").remove();
+
   const legendModuleType = svg
     .selectAll(".legend_module_type")
     .data([usedModuleTypes])
@@ -379,8 +381,6 @@ export function plotPipelineMatrix(ref,
     )
     .attr("transform", `translate(${constants.margin.left + constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + paddingHyperparamColsWidth + 70},
         ${constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight - 50 - usedModuleTypes.length * 15})`);
-
-  legendModuleType.selectAll("*").remove();
 
   legendModuleType.append("text")
     .attr("x", -5)
@@ -439,7 +439,7 @@ export function plotPipelineMatrix(ref,
           .append("rect")
           .attr("transform", x => `translate(0, ${rowScale(x.pipeline_digest) + 3})`)
           .attr("width", (x) => scoreScale(x.score))
-          .attr("height", rowScale.bandwidth() - 4)
+          .attr("height", rowScale.bandwidth() - 4);
         rect.append("title");
         return rect;
       },

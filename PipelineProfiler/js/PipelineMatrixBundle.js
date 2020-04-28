@@ -150,18 +150,9 @@ export class PipelineMatrixBundle extends Component {
     if (sortModulesBy === constants.sortModuleBy.importance) {
       newModuleNames.sort((a, b) => importances[b] - importances[a]);
     } else if (sortModulesBy === constants.sortModuleBy.moduleType) {
-      const {moduleTypeOrder, moduleTypeOrderMap} = constants;
-      const maxNumber = moduleTypeOrder.length;
-      let newIdx = maxNumber;
-      newModuleNames.forEach(name => {
-        if (!(infos[name]['module_type'] in moduleTypeOrderMap)){
-          moduleTypeOrderMap[infos[name]['module_type']] = newIdx;
-          newIdx++;
-        }
-      });
-
+      const {moduleTypeOrder} = constants;
       newModuleNames.sort((a, b) => importances[b] - importances[a]);
-      newModuleNames.sort((a, b) => moduleTypeOrderMap[infos[a]['module_type']] - moduleTypeOrderMap[infos[b]['module_type']]);
+      newModuleNames.sort((a, b) => moduleTypeOrder.get_order(infos[a]['module_type']) - moduleTypeOrder.get_order(infos[b]['module_type']));
     }
     return newModuleNames;
   }

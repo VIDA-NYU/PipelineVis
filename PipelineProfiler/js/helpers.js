@@ -281,25 +281,44 @@ export function createHyperparamTableDataFromNode(node){
   return tableData;
 }
 
-const moduleTypeOrder = [
-  "Preprocessing",
-  "NLP",
-  "Feature Extraction",
-  "Operator",
-  "Regression",
-  "Classification",
-  "Time Series",
-];
 
-const moduleTypeOrderMap = {};
 
-moduleTypeOrder.forEach((x, idx) => {
-  moduleTypeOrderMap[x] = idx;
-});
+class ModuleTypeOrder {
+  constructor() {
+    this.moduleTypeOrder = [
+      "Preprocessing",
+      "NLP",
+      "Feature Extraction",
+      "Operator",
+      "Regression",
+      "Classification",
+      "TS Classification",
+      "Collaborative Filtering",
+      "Time Series",
+    ];
+
+    this.moduleTypeOrderMap = {};
+
+    this.moduleTypeOrder.forEach((x, idx) => {
+      this.moduleTypeOrderMap[x] = idx;
+    });
+
+    this.n = this.moduleTypeOrder.length;
+  }
+
+  get_order(moduleType){
+    if (moduleType in this.moduleTypeOrderMap){
+      return this.moduleTypeOrderMap[moduleType];
+    } else{
+      this.moduleTypeOrderMap[moduleType] = this.n;
+      this.n += 1;
+      return this.moduleTypeOrderMap[moduleType];
+    }
+  }
+}
 
 export const constants = {
-  moduleTypeOrder,
-  moduleTypeOrderMap,
+  moduleTypeOrder: new ModuleTypeOrder(),
   scoreType: {
     VALUE: 'value',
     NORMALIZED: 'normalized'
