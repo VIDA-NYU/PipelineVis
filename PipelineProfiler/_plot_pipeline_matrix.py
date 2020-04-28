@@ -98,11 +98,11 @@ def transform_module_type(module_type):
         'data_cleaning': 'Preprocessing',
         'regression': 'Regression',
         'operator': 'Operator',
-        'feature_selection': 'Feature Extraction',
+        'feature_selection': 'Feature Selection',
         'semisupervised_classification': 'Classification',
         'natural_language_processing': 'NLP',
         'time_series_forecasting': 'Forecasting',
-        'time_series_classification': 'Classification',
+        'time_series_classification': 'TS Classification',
         'time_series_segmentation': 'Feature Extraction'
     }
     if module_type in map:
