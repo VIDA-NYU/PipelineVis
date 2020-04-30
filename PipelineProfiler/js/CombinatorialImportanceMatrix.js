@@ -55,7 +55,7 @@ class CombinatorialImportanceMatrix extends PureComponent{
       },
       {
         Header: <div>
-          <div>Importance</div>
+          <div>Contribution</div>
           <div><_HorizontalAxis width={width}/></div>
         </div>,
         accessor: (d) => <div
