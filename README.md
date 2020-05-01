@@ -28,9 +28,9 @@ localhost:9999
 
 ## Data preprocessing
 
-You need to merge two files in order to explore the pipelines: pipelines.json and pipeline_runs.json, from the metalearning database.
+PipelineProfiler reads data from the D3M Metalearning database. You can download this data from: https://metalearning.datadrivendiscovery.org/dumps/2020/03/04/metalearningdb_dump_20200304.tar.gz
 
-Then run:
+You need to merge two files in order to explore the pipelines: pipelines.json and pipeline_runs.json.  To do so, run
 ~~~~
 python -m PipelineProfiler.pipeline_merge [-n NUMBER_PIPELINES] pipeline_runs_file pipelines_file output_file
 ~~~~
