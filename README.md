@@ -8,7 +8,12 @@ AutoML Pipeline exploration tool compatible with Jupyter Notebooks.
 
 ## Demo
 
-To use PipelineProfiler, first install the Python library (use instructions below). Then, run "Demo.ipynb".
+To use PipelineProfiler, first install the Python library (use instructions below). Then, run in Jupyter Notebook:
+~~~~
+import PipelineProfiler
+data = PipelineProfiler.get_heartstatlog_data()
+PipelineProfiler.plot_pipeline_matrix(data)
+~~~~
 
 ## Install
 
