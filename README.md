@@ -8,8 +8,7 @@ AutoML Pipeline exploration tool compatible with Jupyter Notebooks.
 
 ## Demo
 
-A system demo is available 
-
+To use PipelineProfiler, first install the Python library (use instructions below). Then, run "Demo.ipynb".
 
 ## Install
 
