@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="pipelineprofiler-jorgehpo",
+    name="pipelineprofiler",
     version="0.1.0",
     author="Jorge Piazentin Ono, Sonia Castelo, Roque Lopez, Enrico Bertini, Juliana Freire, Claudio Silva",
     author_email="jorgehpo@nyu.edu",

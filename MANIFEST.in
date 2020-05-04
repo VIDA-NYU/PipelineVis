@@ -1,1 +1,2 @@
 include PipelineProfiler/build/pipelineVis.js
+include PipelineProfiler/data/teaser_data_heartstatlog.json
