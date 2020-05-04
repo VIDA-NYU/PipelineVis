@@ -6,6 +6,11 @@ AutoML Pipeline exploration tool compatible with Jupyter Notebooks.
 
 **Paper**: [https://arxiv.org/abs/2005.00160](https://arxiv.org/abs/2005.00160)
 
+## Demo
+
+A system demo is available 
+
+
 ## Install
 
 ### Option 1: Build and install via pip:

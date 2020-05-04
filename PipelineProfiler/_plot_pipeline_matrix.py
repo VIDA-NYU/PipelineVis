@@ -176,7 +176,7 @@ def powerset_analysis_comm_api(comm, open_msg): # this function is connected wit
     def _recv(msg):
         pipelines = msg['content']['data']['pipelines']
         scores = msg['content']['data']['scores']
-        analysis = compute_group_importance(pipelines, scores, 2)
+        analysis = compute_group_importance(pipelines, scores, 3)
         comm.send({"analysis": analysis})
 
 # Setting up connections to jupyter
