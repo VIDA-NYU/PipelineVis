@@ -12,18 +12,14 @@ To use PipelineProfiler, first install the Python library (use instructions belo
 
 ## Install
 
-### Option 1: Build and install via pip:
+### Option 1: install via pip:
 ~~~~
-cd PipelineProfiler
-npm install
-npm run build
-cd ..
-pip install .
+pip install pipelineprofiler
 ~~~~
 
 ### Option 2: Run the docker image:
 ~~~~
-docker build -t pipelineprofiler
+docker build -t pipelineprofiler .
 docker run -p 9999:8888 pipelineprofiler
 ~~~~
 
