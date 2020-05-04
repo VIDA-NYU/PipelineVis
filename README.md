@@ -1,8 +1,10 @@
 # PipelineProfiler
 
+AutoML Pipeline exploration tool compatible with Jupyter Notebooks.
+
 ![System screen](https://github.com/VIDA-NYU/PipelineVis/blob/master/imgs/system.png)
 
-D3M Pipeline Profiler tool.
+**Paper**: [https://arxiv.org/abs/2005.00160](https://arxiv.org/abs/2005.00160)
 
 ## Install
 
