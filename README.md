@@ -2,6 +2,8 @@
 
 AutoML Pipeline exploration tool compatible with Jupyter Notebooks.
 
+[![arxiv badge](https://img.shields.io/badge/arXiv-2005.00160-red)](https://arxiv.org/abs/2005.00160)
+
 ![System screen](https://github.com/VIDA-NYU/PipelineVis/blob/master/imgs/system.png)
 
 **Paper**: [https://arxiv.org/abs/2005.00160](https://arxiv.org/abs/2005.00160)
