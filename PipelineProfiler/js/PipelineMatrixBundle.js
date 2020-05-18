@@ -180,7 +180,7 @@ export class PipelineMatrixBundle extends Component {
       accessor: x => x.name
     }, {
       Header: 'Value',
-      accessor: x => JSON.stringify(x.value)
+      accessor: x => x.value
     }];
     const tooltipStyle = {
       padding: 15,

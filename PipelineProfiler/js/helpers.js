@@ -106,7 +106,11 @@ function JSONStringReplacer(key, value) {
 
 export function extractMetric (pipelines, scoreRequest, scoreType= constants.scoreType.VALUE) { // scoreRequest: {type: constants.scoreRequest, name: str}
   if (scoreRequest['type'] === constants.scoreRequest.TIME){
-    return pipelines.map(p => (new Date(p['end']) - new Date(p['start'])) / 1000);
+    if ('start' in pipelines[0] && 'end' in pipelines[0]){
+      return pipelines.map(p => (new Date(p['end']) - new Date(p['start'])) / 1000);
+    } else if ('time' in pipelines[0]){
+      return pipelines.map(p => +p['time']);
+    }
   } else if (scoreRequest['type'] === constants.scoreRequest.D3MSCORE) {
     let idxScore = -1;
     pipelines[0]['scores'].forEach((score, idx) => {
@@ -346,7 +350,7 @@ export const constants = {
   moduleTypeHeight: 20,
   margin: {
     left: 10,
-    right: 10,
+    right: 30,
     top: 10,
     bottom: 10,
   },
