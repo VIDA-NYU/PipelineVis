@@ -8,11 +8,22 @@ class DefaultOrder:
             self.order_map[elem] = len(self.order_map)
         return self.order_map[elem]
 
+def find_metric_name(automl):
+    try:
+        statistics = automl.sprint_statistics()
+        lines = statistics.split("\n")
+        my_line = list(filter(lambda x: x.upper().find("METRIC") > -1, l))[0]
+        metric = my_line.split(":")[1].strip().upper()
+        return metric
+    except Exception as e:
+        return "METRIC"
+
 def import_autosklearn(automl, source='auto-sklearn'):
     cv_results = automl.cv_results_
     node_order = DefaultOrder(['data_preprocessing', 'feature_preprocessor','classifier', 'regressor'])
     n_models = len(cv_results['mean_test_score'])
     pipelines = [];
+    metric_name = find_metric_name(automl)
     for i in range(n_models):
         # Computing auxiliary pipeline structure
         struct = {}
@@ -36,7 +47,7 @@ def import_autosklearn(automl, source='auto-sklearn'):
             'inputs': [{'name': 'input dataset'}],
             'steps': [],
             'scores': [{
-                'metric': {'metric': 'METRIC', 'params': {'pos_label': '1'}},
+                'metric': {'metric': metric_name, 'params': {'pos_label': '1'}},
                 'normalized': cv_results['mean_test_score'][i],
                 'value': cv_results['mean_test_score'][i],
             }],
