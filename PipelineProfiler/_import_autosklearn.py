@@ -12,7 +12,7 @@ def find_metric_name(automl):
     try:
         statistics = automl.sprint_statistics()
         lines = statistics.split("\n")
-        my_line = list(filter(lambda x: x.upper().find("METRIC") > -1, l))[0]
+        my_line = list(filter(lambda x: x.upper().find("METRIC") > -1, lines))[0]
         metric = my_line.split(":")[1].strip().upper()
         return metric
     except Exception as e:
