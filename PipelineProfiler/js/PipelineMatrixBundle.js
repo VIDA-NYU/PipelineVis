@@ -266,7 +266,6 @@ export class PipelineMatrixBundle extends Component {
     if (this.state.selectedPipelines && this.state.selectedPipelines.length > 0 ){
       if (this.state.selectedPipelines.length === 1) {
         pipelineGraph = <>
-          <p><strong>Pipeline Digest: </strong> {this.state.selectedPipelines[0].pipeline_digest}</p>
           <SolutionGraph
             solution={ {description: {
                 pipeline: this.state.selectedPipelines[0]
