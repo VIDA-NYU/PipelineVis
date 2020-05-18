@@ -7,6 +7,7 @@ import {select} from "d3-selection";
 import {schemeCategory10} from "d3-scale-chromatic";
 import {Snackbar, Button, Checkbox, FormControlLabel, IconButton} from "@material-ui/core";
 import CombinatorialImportanceMatrix from "./CombinatorialImportanceMatrix";
+import CommAPI from "./CommAPI";
 
 import {
   computePrimitiveImportances,
@@ -42,46 +43,17 @@ export class PipelineMatrixBundle extends Component {
     pipelines = this.computeSortedPipelines(pipelines, sortRowsBy, metricRequest);
     moduleNames = this.computeSortedModuleNames(moduleNames, sortColumnsBy, importances, this.props.data.infos);
 
-    this.requestMergeGraph = () => {console.error(new Error("Cannot find Jupyter namespace from javascript."))};
-    this.requestExportPipelines = () => {console.error(new Error("Cannot find Jupyter namespace from javascript"))};
-    this.requestPowersetAnalysis = () => {console.error(new Error("Cannot find Jupyter namespace from javascript"))};
-    if (window.Jupyter !== undefined) {
-      // "Merge pipelines" connection to jupyter
+    this.commMergeGraph = new CommAPI('merge_graphs_comm_api', (msg) => {
+      const mergedGraph = msg.merged;
+      this.setState({ mergedGraph });
+    });
 
-      const commMerge = Jupyter.notebook.kernel.comm_manager.new_comm('merge_graphs_comm_api', {'foo': 6});
+    this.commExportPipelines = new CommAPI('export_pipelines_comm_api', (msg) => {});
 
-      this.requestMergeGraph = (pipelines) => {
-        commMerge.send({pipelines});
-        this.setState({mergedGraph: null});
-      };
-
-      // Register a handler
-      commMerge.on_msg(msg => {
-        const mergedGraph = msg.content.data.merged;
-        this.setState({ mergedGraph });
-      });
-
-      // "Export pipelines" connection to jupyter
-
-      const commExport = Jupyter.notebook.kernel.comm_manager.new_comm('export_pipelines_comm_api', {'foo': 6});
-
-      this.requestExportPipelines = (pipelines) => {
-        commExport.send({ pipelines });
-      };
-
-
-      // "Powerset analysis" connection to jupyter
-
-      const commPowerset = Jupyter.notebook.kernel.comm_manager.new_comm('powerset_analysis_comm_api', {'foo': 6});
-      this.requestPowersetAnalysis = (pipelines, scores) => {
-        commPowerset.send({ pipelines, scores })
-      };
-
-      commPowerset.on_msg(msg => {
-        const powersetAnalysis = msg.content.data.analysis;
-        this.setState({ powersetAnalysis })
-      })
-    }
+    this.commPowersetAnalysis = new CommAPI('powerset_analysis_comm_api', (msg) => {
+      const powersetAnalysis = msg.analysis;
+      this.setState({ powersetAnalysis })
+    });
 
     this.state = {
       pipelines,
@@ -383,7 +355,7 @@ export class PipelineMatrixBundle extends Component {
                   const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
                   return typeof found !== 'undefined';
                 });
-                this.requestExportPipelines(newPipelines);
+                this.commExportPipelines.call({pipelines: newPipelines});
                 this.setState({exportedPipelineMessage: true});
               }
             },
@@ -394,7 +366,7 @@ export class PipelineMatrixBundle extends Component {
                   const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
                   return typeof found === 'undefined';
                 });
-                this.requestExportPipelines(newPipelines);
+                this.commExportPipelines.call({pipelines: newPipelines});
                 this.setState({exportedPipelineMessage: true});
               }
             }
@@ -449,7 +421,7 @@ export class PipelineMatrixBundle extends Component {
               name: 'Run',
               action: () => {
                 const scores = extractMetric(this.state.pipelines, this.state.metricRequest);
-                this.requestPowersetAnalysis(this.state.pipelines, scores);
+                this.commPowersetAnalysis.call({pipelines: this.state.pipelines, scores});
                 this.setState({expandedPrimitive: null, expandedPrimitiveData: null});
               }
             },
@@ -528,7 +500,8 @@ export class PipelineMatrixBundle extends Component {
               if (newSelectedPipelines.length === this.state.selectedPipelines.length) {
                 newSelectedPipelines.push(selectedPipeline);
               }
-              this.requestMergeGraph(newSelectedPipelines);
+              this.commMergeGraph.call({pipelines: newSelectedPipelines});
+              this.setState({mergedGraph: null})
             }
             newSelectedPipelines.forEach(pipeline => {selectedPipelinesColorScale(pipeline.pipeline_digest)});
             this.setState({selectedPipelines: newSelectedPipelines, selectedPrimitive: null, selectedPipelinesColorScale})
