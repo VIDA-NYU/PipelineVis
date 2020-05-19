@@ -1,16 +1,22 @@
 # PipelineProfiler
 
-AutoML Pipeline exploration tool compatible with Jupyter Notebooks.
+AutoML Pipeline exploration tool compatible with Jupyter Notebooks. Supports auto-sklearn and D3M pipeline format.
 
 [![arxiv badge](https://img.shields.io/badge/arXiv-2005.00160-red)](https://arxiv.org/abs/2005.00160)
 
 ![System screen](https://github.com/VIDA-NYU/PipelineVis/blob/master/imgs/system.png)
 
+(Shift click to select multiple pipelines)
+
 **Paper**: [https://arxiv.org/abs/2005.00160](https://arxiv.org/abs/2005.00160)
 
 ## Demo
 
-To use PipelineProfiler, first install the Python library (use instructions below). Then, run in Jupyter Notebook:
+Live demo (Google Colab):
+- [Heart Stat Log data](https://colab.research.google.com/drive/1k_h4HWUKsd83PmYMEBJ87UP2SSJQYw9A?usp=sharing)
+- [auto-sklearn classification](https://colab.research.google.com/drive/1_2FRIkHNFGOiIJt-n_3zuh8vpSMLhwzx?usp=sharing)
+
+In Jupyter Notebook:
 ~~~~
 import PipelineProfiler
 data = PipelineProfiler.get_heartstatlog_data()
