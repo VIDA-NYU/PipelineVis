@@ -16,14 +16,12 @@ import {
   extractMetricNames,
   createHyperparamTableDataFromNode,
   computePrimitiveHyperparameterData,
-  getPrimitiveLabel,
 } from "./helpers";
 
+import CloseIcon from '@material-ui/icons/Close';
 import MergedGraph from "./MergedGraph";
 import Table from "./Table";
 import {MyDropdown} from "./MyDropdown";
-
-import CloseIcon from '@material-ui/icons/Close';
 
 const newSchemeCategory10 = schemeCategory10;
 
@@ -44,16 +42,14 @@ export class PipelineMatrixBundle extends Component {
     moduleNames = this.computeSortedModuleNames(moduleNames, sortColumnsBy, importances, this.props.data.infos);
 
     this.commMergeGraph = new CommAPI('merge_graphs_comm_api', (msg) => {
-      const mergedGraph = msg.merged;
-      this.setState({ mergedGraph });
-    });
+      this.setState({ mergedGraph: msg.merged });
+    }, ['pipelines']);
 
-    this.commExportPipelines = new CommAPI('export_pipelines_comm_api', (msg) => {});
+    this.commExportPipelines = new CommAPI('export_pipelines_comm_api', (msg) => {}, ['pipelines']);
 
     this.commPowersetAnalysis = new CommAPI('powerset_analysis_comm_api', (msg) => {
-      const powersetAnalysis = msg.analysis;
-      this.setState({ powersetAnalysis })
-    });
+      this.setState({ powersetAnalysis: msg.analysis })
+    }, ['pipelines', 'scores']);
 
     this.state = {
       pipelines,
