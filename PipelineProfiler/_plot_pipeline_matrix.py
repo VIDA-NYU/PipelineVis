@@ -15,7 +15,7 @@ def comm_powerset_analysis(msg):
     pipelines = msg['pipelines']
     scores = msg['scores']
     analysis = compute_group_importance(pipelines, scores, 2)
-    return ({"analysis": analysis});
+    return {"analysis": analysis}
 setup_comm_api('powerset_analysis_comm_api', comm_powerset_analysis)
 
 def comm_merge_graphs(msg):
@@ -23,12 +23,13 @@ def comm_merge_graphs(msg):
     graphs = [pipeline_to_graph(pipeline, pipeline['pipeline_digest']) for pipeline in pipelines]
     merged = merge_multiple_graphs(graphs)
     data_dict = nx.readwrite.json_graph.node_link_data(merged)
-    return ({"merged": data_dict})
+    return {"merged": data_dict}
 setup_comm_api('merge_graphs_comm_api', comm_merge_graphs)
 
 def comm_export_pipelines(msg):
     global exportedPipelines
     exportedPipelines = msg['pipelines']
+    return {}
 setup_comm_api('export_pipelines_comm_api', comm_export_pipelines)
 
 def get_exported_pipelines():

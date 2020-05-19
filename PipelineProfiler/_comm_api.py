@@ -18,9 +18,14 @@ def setup_comm_jupyter(api_call_id, callback):
 def setup_comm_api(api_call_id, callback):
     # Function that abstracts notebook connection to javascript
     try:
+        jupyter_setup = True
         setup_comm_jupyter(api_call_id, callback)
     except Exception:
-        try:
-            setup_comm_colab(api_call_id, callback)
-        except Exception:
-            print("Error: Cannot find Jupyter/Colab namespace for Python")
+        jupyter_setup = False
+    try:
+        colab_setup = True
+        setup_comm_colab(api_call_id, callback)
+    except Exception:
+        colab_setup = False
+    if not jupyter_setup and not colab_setup:
+        print("Error: Cannot find Jupyter/Colab namespace for Python")
