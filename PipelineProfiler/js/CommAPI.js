@@ -4,8 +4,7 @@ const COMM_TYPES = {
 };
 
 export default class CommAPI{
-  constructor(api_call_id, callback, paramList) {
-    this.paramList = paramList;
+  constructor(api_call_id, callback) {
     this.callback = callback;
     this.mode = null;
     if (window.Jupyter !== undefined) {
@@ -18,10 +17,10 @@ export default class CommAPI{
       });
     } else if (window.google !== undefined) {
       this.mode = COMM_TYPES.COLAB;
-      this.comm = async function(orderedParams){
+      this.comm = async function(msg){
         const result = await google.colab.kernel.invokeFunction(
           api_call_id,
-          orderedParams, // The arguments.
+          [msg], // The argument
           {}); // kwargs
         callback(result.data['application/json']);
       };
@@ -35,8 +34,7 @@ export default class CommAPI{
       if (this.mode === COMM_TYPES.JUPYTER){
         this.comm.send(msg);
       } else if (this.mode === COMM_TYPES.COLAB){
-        const orderedParams = this.paramList.map(param => msg[param]);
-        this.comm(orderedParams);
+        this.comm(msg);
       }
     }
   }

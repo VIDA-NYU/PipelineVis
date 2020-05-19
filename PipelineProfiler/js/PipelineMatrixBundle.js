@@ -43,13 +43,13 @@ export class PipelineMatrixBundle extends Component {
 
     this.commMergeGraph = new CommAPI('merge_graphs_comm_api', (msg) => {
       this.setState({ mergedGraph: msg.merged });
-    }, ['pipelines']);
+    });
 
-    this.commExportPipelines = new CommAPI('export_pipelines_comm_api', (msg) => {}, ['pipelines']);
+    this.commExportPipelines = new CommAPI('export_pipelines_comm_api', (msg) => {});
 
     this.commPowersetAnalysis = new CommAPI('powerset_analysis_comm_api', (msg) => {
       this.setState({ powersetAnalysis: msg.analysis })
-    }, ['pipelines', 'scores']);
+    });
 
     this.state = {
       pipelines,
