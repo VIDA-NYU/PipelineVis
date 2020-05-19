@@ -5,6 +5,7 @@ import SolutionGraph from "./SolutionGraph"
 import {PipelineMatrix} from "./PipelineMatrix";
 import {PipelineMatrixBundle} from "./PipelineMatrixBundle";
 import MergedGraph from "./MergedGraph";
+import "regenerator-runtime/runtime";
 
 export function renderMergedPipeline(divName, data){
 	ReactDOM.render(
