@@ -814,7 +814,7 @@ export function plotPipelineMatrix(ref,
         const colIdx = Math.floor((mGlobal[0] - left) / constants.cellHeight);
         const moduleName = moduleNames[colIdx];
 
-        onHover(pipelines[pipelineRowIndex], moduleName, [getEvent().pageX, getEvent().pageY]);
+        onHover(pipelines[pipelineRowIndex], moduleName, [getEvent().clientX, getEvent().clientY]);
 
         svg
           .select("#highlight_row")
