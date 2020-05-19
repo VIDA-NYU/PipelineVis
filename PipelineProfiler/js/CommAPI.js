@@ -13,6 +13,7 @@ export default class CommAPI{
       this.comm = window.Jupyter.notebook.kernel.comm_manager.new_comm(api_call_id, {});
       this.comm.on_msg(msg => {
         const data = msg.content.data;
+        console.log(data);
         callback(data);
       });
     } else if (window.google !== undefined) {

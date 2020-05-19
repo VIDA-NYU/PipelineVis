@@ -5,23 +5,35 @@ import json
 import networkx as nx
 from ._graph_matching import pipeline_to_graph, merge_multiple_graphs
 from ._powerset_analysis import compute_group_importance
+from ._comm_api import setup_comm_api
 from collections import defaultdict
 import copy
 
 exportedPipelines = []
 
-def merge_graphs_comm_api(comm, open_msg): # this function is connected with the comm api on module load (__init__.py)
-        # comm is the kernel Comm instance
-        # open_msg is the comm_open message
+def comm_powerset_analysis(msg):
+    pipelines = msg['pipelines']
+    scores = msg['scores']
+    analysis = compute_group_importance(pipelines, scores, 2)
+    return ({"analysis": analysis});
+setup_comm_api('powerset_analysis_comm_api', comm_powerset_analysis)
 
-        # Register handler for later messages
-        @comm.on_msg
-        def _recv(msg):
-            pipelines = msg['content']['data']['pipelines']
-            graphs = [pipeline_to_graph(pipeline, pipeline['pipeline_digest']) for pipeline in pipelines]
-            merged = merge_multiple_graphs(graphs)
-            data_dict = nx.readwrite.json_graph.node_link_data(merged)
-            comm.send({"merged": data_dict})
+def comm_merge_graphs(msg):
+    pipelines = msg['pipelines']
+    graphs = [pipeline_to_graph(pipeline, pipeline['pipeline_digest']) for pipeline in pipelines]
+    merged = merge_multiple_graphs(graphs)
+    data_dict = nx.readwrite.json_graph.node_link_data(merged)
+    return ({"merged": data_dict})
+setup_comm_api('merge_graphs_comm_api', comm_merge_graphs)
+
+def comm_export_pipelines(msg):
+    global exportedPipelines
+    exportedPipelines = msg['pipelines']
+setup_comm_api('export_pipelines_comm_api', comm_export_pipelines)
+
+def get_exported_pipelines():
+    global exportedPipelines
+    return exportedPipelines
 
 
 def id_generator(size=15):
@@ -151,38 +163,3 @@ def plot_pipeline_matrix(pipelines):
     data_dict = prepare_data_pipeline_matrix(pipelines)
     html_all = make_html(data_dict, id)
     display(HTML(html_all))
-
-
-def export_pipelines_comm_api(comm, open_msg): # this function is connected with the comm api on module load (__init__.py)
-    # comm is the kernel Comm instance
-    # open_msg is the comm_open message
-
-    # Register handler for later messages
-    @comm.on_msg
-    def _recv(msg):
-        global exportedPipelines
-        exportedPipelines = msg['content']['data']['pipelines']
-
-def get_exported_pipelines():
-    global exportedPipelines
-    return exportedPipelines
-
-def powerset_analysis_comm_api(comm, open_msg): # this function is connected with the comm api on module load (__init__.py)
-    # comm is the kernel Comm instance
-    # open_msg is the comm_open message
-
-    # Register handler for later messages
-    @comm.on_msg
-    def _recv(msg):
-        pipelines = msg['content']['data']['pipelines']
-        scores = msg['content']['data']['scores']
-        analysis = compute_group_importance(pipelines, scores, 3)
-        comm.send({"analysis": analysis})
-
-# Setting up connections to jupyter
-try:
-    get_ipython().kernel.comm_manager.register_target('merge_graphs_comm_api', merge_graphs_comm_api)
-    get_ipython().kernel.comm_manager.register_target('export_pipelines_comm_api', export_pipelines_comm_api)
-    get_ipython().kernel.comm_manager.register_target('powerset_analysis_comm_api', powerset_analysis_comm_api)
-except Exception as e:
-    pass
