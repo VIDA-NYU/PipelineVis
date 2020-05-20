@@ -1,3 +1,5 @@
+import numpy as np
+
 class DefaultOrder:
     def __init__(self, order):
         self.order_map = {}
@@ -18,8 +20,22 @@ def find_metric_name(automl):
     except Exception as e:
         return "METRIC"
 
+def find_ensemble_weights(all_params, models_with_weights):
+    weights = np.zeros(len(all_params))
+    try:
+      for idx, param in enumerate(all_params):
+          for weight, pipeline in models_with_weights:
+              weighted_param = pipeline.config.get_dictionary()
+              if param == weighted_param:
+                  weights[idx] = weight
+                  break
+    except Exception:
+        pass
+    return weights
+
 def import_autosklearn(automl, source='auto-sklearn'):
     cv_results = automl.cv_results_
+    weights = find_ensemble_weights(automl.cv_results_['params'], automl.get_models_with_weights())
     node_order = DefaultOrder(['data_preprocessing', 'feature_preprocessor','classifier', 'regressor'])
     n_models = len(cv_results['mean_test_score'])
     pipelines = [];
@@ -50,6 +66,11 @@ def import_autosklearn(automl, source='auto-sklearn'):
                 'metric': {'metric': metric_name, 'params': {'pos_label': '1'}},
                 'normalized': cv_results['mean_test_score'][i],
                 'value': cv_results['mean_test_score'][i],
+            },
+            {
+                'metric': {'metric': 'ENSEMBLE WEIGHT', 'params': {'pos_label': '2'}},
+                'normalized': weights[i],
+                'value': weights[i]
             }],
             'pipeline_source': {'name': source},
             'pipeline_digest': '{}'.format(i),
