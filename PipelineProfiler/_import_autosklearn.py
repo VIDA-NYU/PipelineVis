@@ -36,7 +36,7 @@ def find_ensemble_weights(all_params, models_with_weights):
 def import_autosklearn(automl, source='auto-sklearn'):
     cv_results = automl.cv_results_
     weights = find_ensemble_weights(automl.cv_results_['params'], automl.get_models_with_weights())
-    node_order = DefaultOrder(['data_preprocessing', 'feature_preprocessor','classifier', 'regressor'])
+    node_order = DefaultOrder(['balancing', 'data_preprocessing', 'feature_preprocessor','classifier', 'regressor'])
     n_models = len(cv_results['mean_test_score'])
     pipelines = [];
     metric_name = find_metric_name(automl)
@@ -45,7 +45,11 @@ def import_autosklearn(automl, source='auto-sklearn'):
         struct = {}
         for key in cv_results['params'][i]:
             split = key.split(":")
-            if split[1] == '__choice__' or split[1] == 'strategy':
+            if split[0] == 'balancing' and split[1] == 'strategy':
+                if cv_results['params'][i][key] != 'none':
+                    struct['balancing'] = {'class_balancing': {'strategy': cv_results['params'][i][key]}}
+                continue
+            if split[1] == '__choice__':
                 continue
             module_type = split[0]
             if module_type not in struct:
