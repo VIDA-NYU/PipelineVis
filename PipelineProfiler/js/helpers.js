@@ -103,18 +103,14 @@ function JSONStringReplacer(key, value) {
   return value;
 }
 
-
 export function extractMetric (pipelines, scoreRequest, scoreType= constants.scoreType.VALUE) { // scoreRequest: {type: constants.scoreRequest, name: str}
-  let idxScore = -1;
-  pipelines[0]['scores'].forEach((score, idx) => {
-    if (score['metric']['metric'] === scoreRequest.name) {
-      idxScore = idx;
+  return pipelines.map(p => {
+    if (scoreRequest.name in p['score_map']) {
+      return p['score_map'][scoreRequest.name][scoreType]
+    } else {
+      return 0;
     }
   });
-  if (idxScore === -1) {
-    return null;
-  }
-  return pipelines.map(p => p['scores'][idxScore][scoreType]);
 }
 
 function computePrimitiveImportanceBiserialCorrelation(pipelinePrimitiveLookup, scores, primitive) {
@@ -172,7 +168,12 @@ export function computePrimitiveImportances(infos, pipelines, scoreRequest) {
 }
 
 export function extractMetricNames(pipelines) {
-  return pipelines[0]['scores'].map(score => score['metric']['metric']);
+  const metricNames = new Set();
+  pipelines.forEach(pipeline => {
+    let names = Object.keys(pipeline['score_map']);
+    names.forEach(name => {metricNames.add(name)});
+  });
+  return [...metricNames];
 }
 
 /*

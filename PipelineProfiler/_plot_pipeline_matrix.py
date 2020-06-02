@@ -157,9 +157,16 @@ def extract_d3m_time_metric(pipelines):
                 'value': diff_sec,
             })
 
+def compute_metric_map(pipelines):
+    for pipeline in pipelines:
+        pipeline['score_map'] = {}
+        for score in pipeline['scores']:
+            pipeline['score_map'][score['metric']['metric']] = score            
+
 def prepare_data_pipeline_matrix(pipelines, enet_alpha=0.001, enet_l1=0.1):
     pipelines = copy.deepcopy(pipelines)
     extract_d3m_time_metric(pipelines)
+    compute_metric_map(pipelines)
     pipelines = sorted(pipelines, key=lambda x: x['scores'][0]['normalized'], reverse=True)
     rename_pipelines(pipelines)
     info, module_types = extract_primitive_info(pipelines, enet_alpha=enet_alpha, enet_l1=enet_l1)
