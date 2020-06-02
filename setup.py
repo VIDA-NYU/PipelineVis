@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="pipelineprofiler",
-    version="0.1.11",
+    version="0.1.12",
     author="Jorge Piazentin Ono, Sonia Castelo, Roque Lopez, Enrico Bertini, Juliana Freire, Claudio Silva",
     author_email="jorgehpo@nyu.edu",
     description="Pipeline Profiler tool. Enables the exploration of D3M pipelines in Jupyter Notebooks",
@@ -21,6 +21,7 @@ setup(
     ],
     python_requires='>=3.6',
     install_requires=[
+        "python-dateutil",
         "numpy",
         "scipy",
         "scikit-learn",

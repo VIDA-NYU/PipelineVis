@@ -1,6 +1,7 @@
 import pkg_resources
 import string
 import numpy as np
+from dateutil.parser import parse
 import json
 import networkx as nx
 from ._graph_matching import pipeline_to_graph, merge_multiple_graphs
@@ -145,8 +146,20 @@ def extract_primitive_info(pipelines, enet_alpha, enet_l1):
             }
     return infos, module_types
 
+def extract_d3m_time_metric(pipelines):
+    for pipeline in pipelines:
+        if 'end' in pipeline and 'start' in pipeline: # using D3M prediction time format
+            diff = parse(pipeline['end']) - parse(pipeline['start'])
+            diff_sec = diff.total_seconds()
+            pipeline['scores'].append({
+                'metric': {'metric': 'PRED TIME (s)'},
+                'normalized': diff_sec,
+                'value': diff_sec,
+            })
+
 def prepare_data_pipeline_matrix(pipelines, enet_alpha=0.001, enet_l1=0.1):
     pipelines = copy.deepcopy(pipelines)
+    extract_d3m_time_metric(pipelines)
     pipelines = sorted(pipelines, key=lambda x: x['scores'][0]['normalized'], reverse=True)
     rename_pipelines(pipelines)
     info, module_types = extract_primitive_info(pipelines, enet_alpha=enet_alpha, enet_l1=enet_l1)

@@ -75,10 +75,13 @@ def import_autosklearn(automl, source='auto-sklearn'):
                 'metric': {'metric': 'ENSEMBLE WEIGHT', 'params': {'pos_label': '2'}},
                 'normalized': weights[i],
                 'value': weights[i]
+            },{
+                'metric': {'metric': 'MEAN FIT TIME', 'params': {'pos_label': '3'}},
+                'normalized': cv_results['mean_fit_time'][i],
+                'value': cv_results['mean_fit_time'][i],
             }],
             'pipeline_source': {'name': source},
             'pipeline_digest': '{}'.format(i),
-            'time': cv_results['mean_fit_time'][i],
         }
         prev_list = ['inputs.0']
         cur_step_idx = 0

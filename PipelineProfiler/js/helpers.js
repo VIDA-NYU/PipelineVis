@@ -105,24 +105,16 @@ function JSONStringReplacer(key, value) {
 
 
 export function extractMetric (pipelines, scoreRequest, scoreType= constants.scoreType.VALUE) { // scoreRequest: {type: constants.scoreRequest, name: str}
-  if (scoreRequest['type'] === constants.scoreRequest.TIME){
-    if ('start' in pipelines[0] && 'end' in pipelines[0]){
-      return pipelines.map(p => (new Date(p['end']) - new Date(p['start'])) / 1000);
-    } else if ('time' in pipelines[0]){
-      return pipelines.map(p => +p['time']);
+  let idxScore = -1;
+  pipelines[0]['scores'].forEach((score, idx) => {
+    if (score['metric']['metric'] === scoreRequest.name) {
+      idxScore = idx;
     }
-  } else if (scoreRequest['type'] === constants.scoreRequest.D3MSCORE) {
-    let idxScore = -1;
-    pipelines[0]['scores'].forEach((score, idx) => {
-      if (score['metric']['metric'] === scoreRequest.name) {
-        idxScore = idx;
-      }
-    });
-    if (idxScore === -1) {
-      return null;
-    }
-    return pipelines.map(p => p['scores'][idxScore][scoreType]);
+  });
+  if (idxScore === -1) {
+    return null;
   }
+  return pipelines.map(p => p['scores'][idxScore][scoreType]);
 }
 
 function computePrimitiveImportanceBiserialCorrelation(pipelinePrimitiveLookup, scores, primitive) {

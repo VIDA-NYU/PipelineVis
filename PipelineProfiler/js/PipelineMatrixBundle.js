@@ -32,7 +32,6 @@ export class PipelineMatrixBundle extends Component {
     let moduleNames = Object.keys(props.data.infos);
     const metricNames = extractMetricNames(props.data.pipelines);
     let metricOptions = metricNames.map(name => ({type: constants.scoreRequest.D3MSCORE, name}));
-    metricOptions.push({type: constants.scoreRequest.TIME, name: 'TIME (s)'});
     const metricRequest = metricOptions[0];
     const importances = computePrimitiveImportances(props.data.infos, props.data.pipelines, metricRequest);
     const sortColumnsBy = constants.sortModuleBy.importance,
@@ -68,7 +67,7 @@ export class PipelineMatrixBundle extends Component {
       expandedPrimitiveData: null,
       sortColumnsDropdownHidden: true,
       sortRowsDropdownHidden: true,
-      keepSorted: false,
+      keepSorted: true,
       exportedPipelineMessage: false,
       highlightPowersetColumns: []
     };
