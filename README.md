@@ -12,6 +12,8 @@ AutoML Pipeline exploration tool compatible with Jupyter Notebooks. Supports aut
 
 **Video**: [https://youtu.be/2WSYoaxLLJ8](https://youtu.be/2WSYoaxLLJ8)
 
+**Blog**: [Medium post](https://towardsdatascience.com/exploring-auto-sklearn-models-with-pipelineprofiler-5b2c54136044)
+
 ## Demo
 
 Live demo (Google Colab):
