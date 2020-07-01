@@ -790,7 +790,7 @@ export function plotPipelineMatrix(ref,
             .style("fill", highlightColor);
 
           svg
-            .select("#legendPipelineSourceGroup")
+            .select(".legendPipelineSourceGroup")
             .selectAll("text")
             .style("fill", d => d.pipeline_digest === pipelineIdx ? hoveredColor : unhoveredColor);
 
@@ -832,7 +832,7 @@ export function plotPipelineMatrix(ref,
           .style("fill", d => d === moduleName ? hoveredColor : unhoveredColor);
 
         svg
-          .select("#legendPipelineSourceGroup")
+          .select(".legendPipelineSourceGroup")
           .selectAll("text")
           .style("fill", d => {
             return d.pipeline_digest === pipelineIdx ? hoveredColor : unhoveredColor
@@ -861,7 +861,7 @@ export function plotPipelineMatrix(ref,
         .style("fill", unhoveredColor);
 
       svg
-        .select("#legendPipelineSourceGroup")
+        .select(".legendPipelineSourceGroup")
         .selectAll("text")
         .style("fill", unhoveredColor);
 
