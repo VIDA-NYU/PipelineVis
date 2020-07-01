@@ -302,6 +302,18 @@ export class PipelineMatrixBundle extends Component {
       return importances;
     };
 
+    const updatePipelineStateInfo = (newPipelines) => {
+      const usedPrimitives = getUsedPrimitives(newPipelines);
+      let newModuleNames = this.state.moduleNames.filter(name => name in usedPrimitives);
+      const importances = updateMetric(newPipelines);
+      newModuleNames = this.computeSortedModuleNames(newModuleNames, this.state.sortColumnsBy, importances, this.props.data.infos);
+      if (this.state.expandedPrimitive){
+        const expandedPrimitiveData = computePrimitiveHyperparameterData(newPipelines, this.state.expandedPrimitive);
+        this.setState({expandedPrimitiveData});
+      }
+      this.setState({pipelines: newPipelines, selectedPipelines: [], moduleNames: newModuleNames});
+    };
+
     return <div ref={ref=>{this.ref = ref}}>
       <div style={{display: 'flex'}}>
 
@@ -315,12 +327,7 @@ export class PipelineMatrixBundle extends Component {
                   const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
                   return typeof found === 'undefined';
                 });
-
-                const usedPrimitives = getUsedPrimitives(newPipelines);
-                let newModuleNames = this.state.moduleNames.filter(name => name in usedPrimitives);
-                const importances = updateMetric(newPipelines);
-                newModuleNames = this.computeSortedModuleNames(newModuleNames, this.state.sortColumnsBy, importances, this.props.data.infos);
-                this.setState({pipelines: newPipelines, selectedPipelines: [], moduleNames: newModuleNames});
+                updatePipelineStateInfo(newPipelines);
               }
             },
             {
@@ -330,11 +337,7 @@ export class PipelineMatrixBundle extends Component {
                   const found = this.state.selectedPipelines.find(selected => selected.pipeline_digest === pipeline.pipeline_digest);
                   return typeof found !== 'undefined';
                 });
-                const usedPrimitives = getUsedPrimitives(newPipelines);
-                let newModuleNames = this.state.moduleNames.filter(name => name in usedPrimitives);
-                const importances = updateMetric(newPipelines);
-                newModuleNames = this.computeSortedModuleNames(newModuleNames, this.state.sortColumnsBy, importances, this.props.data.infos);
-                this.setState({pipelines: newPipelines, selectedPipelines: [], moduleNames: newModuleNames});
+                updatePipelineStateInfo(newPipelines);
               }
             }
           ]}
