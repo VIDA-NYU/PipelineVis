@@ -462,12 +462,12 @@ export function plotPipelineMatrix(ref,
         .append("text")
         .attr("transform", x => `translate(${constants.pipelineScoreWidth}, ${rowScale(x.pipeline_digest) + rowScale.bandwidth() - 2})`)
         .attr("text-anchor", "end")
-        .text(x => x.score.toFixed(2)),
+        .text(x => x.score.toFixed(3)),
       update => update
         .call(update => update.transition(t)
           .attr("transform", x => `translate(${constants.pipelineScoreWidth}, ${rowScale(x.pipeline_digest) + rowScale.bandwidth() - 2})`)
           .attr("text-anchor", "end")
-          .text(x => x.score.toFixed(2))
+          .text(x => x.score.toFixed(3))
         )
     );
 
