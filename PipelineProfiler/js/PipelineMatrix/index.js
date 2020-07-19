@@ -26,7 +26,8 @@ export class PipelineMatrix extends Component {
       selectedPipelines,
       metricRequest,
       selectedPipelinesColorScale,
-      highlightPowersetColumns
+      highlightPowersetColumns,
+      sortColumnBy
     } = props;
 
     plotPipelineMatrix(
@@ -44,6 +45,7 @@ export class PipelineMatrix extends Component {
       expandedPrimitiveName,
       metricRequest,
       highlightPowersetColumns,
+      sortColumnBy
     );
   }
 

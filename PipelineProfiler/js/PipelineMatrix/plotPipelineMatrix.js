@@ -61,6 +61,43 @@ function computeBracketsHyperparams(orderedHeader) {
 const hoveredColor = "#720400";
 const unhoveredColor = "#797979";
 
+function plotModuleSeparatorLines(svg, pipelines, moduleNames, infos, colScale, sortColumnBy){
+  const separators = [];
+  if (sortColumnBy === constants.sortModuleBy.moduleType){
+    let prevModuleType = infos[moduleNames[0]].module_type;
+    for (const moduleName of moduleNames){
+      const moduleType = infos[moduleName].module_type;
+      if (moduleType !== prevModuleType){
+        separators.push(colScale(moduleName));
+        prevModuleType = moduleType;
+      }
+    }
+  }
+
+  const separatorLines = svg.selectAll(".separatorLines")
+    .data([separators])
+    .join(
+      enter => enter
+        .append("g")
+        .attr("class", "separatorLines"),
+      update => update
+  );
+
+  separatorLines.selectAll("line")
+    .data(x => x)
+    .join(
+      enter => enter
+        .append("line")
+        .attr("x1",x=>x + constants.margin.left + constants.pipelineNameWidth)
+        .attr("x2",x=>x + constants.margin.left + constants.pipelineNameWidth)
+        .attr("y1",constants.margin.top + constants.moduleNameHeight - constants.cellHeight)
+        .attr("y2",constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight + constants.cellHeight * pipelines.length)
+        .style("stroke", hoveredColor)
+        .style("stroke-dasharray", 4),
+      update => update
+    )
+}
+
 export function plotPipelineMatrix(ref,
                                    data,
                                    pipelines,
@@ -74,7 +111,8 @@ export function plotPipelineMatrix(ref,
                                    expandedPrimitiveData,
                                    expandedPrimitiveName,
                                    metricRequest,
-                                   highlightPowersetColumns) {
+                                   highlightPowersetColumns,
+                                   sortColumnBy) {
 
   const {infos, module_types: moduleTypes} = data;
   const {moduleTypeOrder} = constants;
@@ -654,6 +692,8 @@ export function plotPipelineMatrix(ref,
       .attr("d", bracketGenerator)
       .attr("class", "bracket");
   }
+
+  plotModuleSeparatorLines(svg, pipelines, moduleNames, infos, colScale, sortColumnBy);
 
 
   /*
