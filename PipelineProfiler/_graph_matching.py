@@ -3,6 +3,18 @@ import numpy as np
 from scipy.optimize import linear_sum_assignment
 from ._similarity_flooding import similarity_flooding
 
+#####
+# Merges graphs
+#
+# Usage:
+#
+# from PipelineProfiler._graph_matching import pipeline_to_graph, merge_multiple_graphs
+# from PipelineProfiler._plot_pipeline_node_link import plot_merged_pipeline
+# pipelines = [pipeline_to_graph(x) for x in pipelines_problem["66_chlorineConcentration_problem"]]
+# merged = merge_multiple_graphs(pipelines[:3])
+# plot_merged_pipeline(merged)
+
+
 def graph_data_accessor(node, graph_name):
     if 'hyperparams' in node:
         hyperparams = node['hyperparams']
@@ -16,6 +28,8 @@ def graph_data_accessor(node, graph_name):
     }
 
 def pipeline_to_graph(pipeline, name=''):
+    if name == '':
+        name = pipeline['pipeline_digest']
     G = nx.DiGraph(name=name)
     # Adding input node
     G.add_node('inputs.0', data=[{'python_path': 'Input', 'node_name': 'Input', 'hyperparams': {}, 'graph_name': name}])
