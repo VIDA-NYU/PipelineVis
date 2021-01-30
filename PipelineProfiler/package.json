@@ -52,7 +52,7 @@
     "dagre": "^0.8.4",
     "install": "^0.12.2",
     "lodash": "^4.17.19",
-    "npm": "^6.14.5",
+    "npm": "^6.14.6",
     "react-feather": "^1.1.6",
     "react-move": "^5.2.0",
     "react-redux": "^6.0.0",
