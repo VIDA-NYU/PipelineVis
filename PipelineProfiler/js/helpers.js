@@ -98,7 +98,7 @@ function computePipelinePrimitiveHashTable(pipelines) {
 
 function JSONStringReplacer(key, value) {
   if (typeof value === 'number' && !Number.isInteger(value)) {
-    return value.toFixed(2);
+    return value.toFixed(5);
   }
   return value;
 }

@@ -39,6 +39,7 @@ def merge_pipeline_files(pipelines_file, pipeline_runs_file, n=-1, verbose=False
                     'pipeline_id': pipeline['id'],
                     'pipeline_digest': pipeline['digest'],
                     'pipeline_source': pipeline['source'],
+                    'created': pipeline['created'],
                     'inputs': pipeline['inputs'],
                     'outputs': pipeline['outputs'],
                     'problem': run['problem'],
