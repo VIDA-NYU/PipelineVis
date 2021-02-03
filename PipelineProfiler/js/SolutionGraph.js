@@ -60,8 +60,13 @@ class SolutionGraph extends PureComponent {
       solution.description.pipeline.steps.forEach((step, idx) => {
         Object.keys(step.arguments).forEach(k => {
           let source = step.arguments[k].data;
-          source = source.split('.').slice(0, 2).join('.');
-          g.setEdge(source, `steps.${idx}`, {});
+          if (typeof source == "string") {
+            source = [source];
+          }
+          source.forEach(s => {
+            s = s.split('.').slice(0, 2).join('.');
+            g.setEdge(s, `steps.${idx}`, {});
+          })
         });
       });
 
