@@ -21,11 +21,11 @@ Live demo (Google Colab):
 - [auto-sklearn classification](https://colab.research.google.com/drive/1_2FRIkHNFGOiIJt-n_3zuh8vpSMLhwzx?usp=sharing)
 
 In Jupyter Notebook:
-~~~~
+```Python
 import PipelineProfiler
 data = PipelineProfiler.get_heartstatlog_data()
 PipelineProfiler.plot_pipeline_matrix(data)
-~~~~
+```
 
 ## Install
 
@@ -56,29 +56,29 @@ python -m PipelineProfiler.pipeline_merge [-n NUMBER_PIPELINES] pipeline_runs_fi
 
 ## Pipeline exploration
 
-~~~~
+```Python
 import PipelineProfiler
 import json
-~~~~
+```
 
 In a jupyter notebook, load the output_file 
 
-~~~~
+```Python
 with open("output_file.json", "r") as f:
     pipelines = json.load(f)
-~~~~
+```
 
 and then plot it using:
 
-~~~~
+```Python
 PipelineProfiler.plot_pipeline_matrix(pipelines[:10])
-~~~~
+```
 
 ## Data postprocessing
 
 You might want to group pipelines by problem type, and select the top k pipelines from each team. To do so, use the code:
 
-~~~~
+```Python
 def get_top_k_pipelines_team(pipelines, k):
     team_pipelines = defaultdict(list)
     for pipeline in pipelines:
@@ -103,4 +103,4 @@ for pipeline in pipelines:
     pipelines_problem[problem_id].append(pipeline)
 for problem in pipelines_problem.keys():
     pipelines_problem[problem] = sort_pipeline_scores(get_top_k_pipelines_team(pipelines_problem[problem], k=100))
-~~~~
+```
