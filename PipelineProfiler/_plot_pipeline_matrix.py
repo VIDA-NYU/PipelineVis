@@ -124,7 +124,7 @@ def transform_module_type(module_type):
     else:
         return ' '.join([n.capitalize() for n in module_type.split("_")])
 
-def extract_primitive_info(pipelines, enet_alpha, enet_l1):
+def extract_primitive_info(pipelines, manual_primitive_types=None):
     module_matrix, module_names = extract_module_matrix(pipelines)
     scores = extract_scores(pipelines)
     infos = {}
@@ -136,7 +136,10 @@ def extract_primitive_info(pipelines, enet_alpha, enet_l1):
                 continue
             split = python_path.split(".")
             module_desc = step['primitive']['name']
-            module_type = transform_module_type(split[2])
+            if manual_primitive_types is not None and python_path in manual_primitive_types:
+                module_type = manual_primitive_types[python_path]
+            else:
+                module_type = transform_module_type(split[2])
             module_types.add(module_type)
             module_name = split[3]
             infos[python_path] = {
@@ -163,13 +166,14 @@ def compute_metric_map(pipelines):
         for score in pipeline['scores']:
             pipeline['score_map'][score['metric']['metric']] = score            
 
-def prepare_data_pipeline_matrix(pipelines, enet_alpha=0.001, enet_l1=0.1):
+def prepare_data_pipeline_matrix(pipelines, manual_primitive_types=None):
     pipelines = copy.deepcopy(pipelines)
     extract_d3m_time_metric(pipelines)
     compute_metric_map(pipelines)
     pipelines = sorted(pipelines, key=lambda x: x['scores'][0]['normalized'], reverse=True)
     rename_pipelines(pipelines)
-    info, module_types = extract_primitive_info(pipelines, enet_alpha=enet_alpha, enet_l1=enet_l1)
+    info, module_types = extract_primitive_info(pipelines, manual_primitive_types=manual_primitive_types)
+
     data = {
         "infos": info,
         "pipelines": pipelines,
@@ -183,9 +187,9 @@ def get_pipeline_profiler_html(pipelines):
     html_all = make_html(data_dict, id)
     return html_all
     
-def plot_pipeline_matrix(pipelines):
+def plot_pipeline_matrix(pipelines, manual_primitive_types=None):
     from IPython.core.display import display, HTML
     id = id_generator()
-    data_dict = prepare_data_pipeline_matrix(pipelines)
+    data_dict = prepare_data_pipeline_matrix(pipelines, manual_primitive_types)
     html_all = make_html(data_dict, id)
     display(HTML(html_all))
