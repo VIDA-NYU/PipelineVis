@@ -4,7 +4,7 @@ AutoML Pipeline exploration tool compatible with Jupyter Notebooks. Supports aut
 
 [![arxiv badge](https://img.shields.io/badge/arXiv-2005.00160-red)](https://arxiv.org/abs/2005.00160)
 
-![System screen](https://github.com/VIDA-NYU/PipelineVis/blob/master/imgs/system.png)
+![System screen](https://github.com/VIDA-NYU/PipelineVis/raw/master/imgs/system.png)
 
 (Shift click to select multiple pipelines)
 
