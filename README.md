@@ -1,6 +1,6 @@
 # PipelineProfiler
 
-AutoML Pipeline exploration tool compatible with Jupyter Notebooks. Supports auto-sklearn and D3M pipeline format.
+AutoML Pipeline exploration tool compatible with Jupyter Notebooks. Supports Auto-Sklearn, Alpha-AutoML and D3M pipeline format.
 
 [![arxiv badge](https://img.shields.io/badge/arXiv-2005.00160-red)](https://arxiv.org/abs/2005.00160)
 
@@ -26,6 +26,8 @@ import PipelineProfiler
 data = PipelineProfiler.get_heartstatlog_data()
 PipelineProfiler.plot_pipeline_matrix(data)
 ```
+
+You can also find multiple examples of PipelineProfiler in the [Alpha-AutoML repository](https://github.com/VIDA-NYU/alpha-automl/tree/devel/examples), an extensible AutoML system for multiple ML tasks.
 
 ## Install
 
